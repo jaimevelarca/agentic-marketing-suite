@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Corrida {{ s.id }}{% endblock %}
+{% block content %}
+<h1>Corrida {{ s.id }}</h1>
+<p class="nota">Cliente: <b>{{ s.client_id }}</b> ·
+  Estado: {% if s.paused %}<span class="chip pausa">{{ s.status }}</span>
+  {% else %}<span class="chip ok">{{ s.status }}</span>{% endif %}</p>
+
+{% if s.pending %}
+<h2>En espera de tu revisión</h2>
+<table>
+<thead><tr><th>Bloque</th><th></th></tr></thead>
+<tbody>
+{% for b in s.pending %}
+<tr><td>{{ b }}</td>
+    <td><a class="btn btn-sec" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">Revisar</a></td></tr>
+{% endfor %}
+</tbody>
+</table>
+<form method="post" action="{% url 'reanudar' s.id %}" style="margin-top:1rem">{% csrf_token %}
+  <button class="btn btn-sec" type="submit">Reanudar corrida</button>
+  <span class="nota">Reanuda después de aprobar; si la compuerta sigue sin aprobarse, la corrida vuelve a pausarse.</span>
+</form>
+{% endif %}
+
+<h2>Bloques aprobados ({{ s.blocks|length }})</h2>
+<p>{% for b in s.blocks %}<a class="chip" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">{{ b }}</a> {% endfor %}</p>
+
+<h2>Bitácora de agentes</h2>
+<table>
+<thead><tr><th>Agente</th><th>Capa</th><th>Compuerta</th><th>Resultado</th></tr></thead>
+<tbody>
+{% for t in s.transcript %}
+<tr><td>{{ t.agent }} — {{ t.name }}</td><td>{{ t.layer }}</td>
+    <td>{{ t.gate_status|default:t.gate }}</td>
+    <td>{% if t.valid %}<span class="chip ok">válido</span>{% else %}
+        <span class="chip pausa">inválido: {{ t.error }}</span>{% endif %}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

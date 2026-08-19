@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Nueva corrida{% endblock %}
+{% block content %}
+<h1>Nueva corrida</h1>
+<form method="post">{% csrf_token %}
+  <label for="id_client">Identificador del cliente</label>
+  <input type="text" name="client_id" id="id_client" value="{{ client_id }}"
+         placeholder="p. ej. acme-co (si se omite, se toma del JSON)">
+  <label for="id_inputs">Datos de incorporación (JSON)</label>
+  <textarea name="inputs_json" id="id_inputs">{{ inputs_json }}</textarea>
+  <p><label style="display:inline;font-weight:400">
+    <input type="checkbox" name="auto_approve" value="1">
+    Aprobación automática (solo pruebas — omite las compuertas humanas)</label></p>
+  <p><button class="btn btn-sec" type="submit">Iniciar corrida</button></p>
+</form>
+{% endblock %}

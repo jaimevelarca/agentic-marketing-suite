@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Tablero{% endblock %}
+{% block content %}
+<h1>Tablero</h1>
+<p class="nota">{{ sessions|length }} corrida{{ sessions|length|pluralize }} ·
+  {{ pendientes }} bloque{{ pendientes|pluralize }} en espera de revisión.</p>
+<table>
+<thead><tr><th>Corrida</th><th>Cliente</th><th>Estado</th><th>Bloques</th><th>Agentes válidos</th></tr></thead>
+<tbody>
+{% for s in sessions %}
+<tr>
+  <td><a href="{% url 'sesion' s.id %}">{{ s.id }}</a></td>
+  <td>{{ s.client_id }}</td>
+  <td>{% if s.pending %}<span class="chip pausa">en pausa · {{ s.pending|join:", " }}</span>
+      {% else %}<span class="chip ok">sin pendientes</span>{% endif %}</td>
+  <td>{{ s.blocks }}</td>
+  <td>{{ s.agents_valid }}/19</td>
+</tr>
+{% empty %}
+<tr><td colspan="5">Aún no hay corridas. <a href="{% url 'nueva' %}">Inicia la primera</a>.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

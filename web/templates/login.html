@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Acceso{% endblock %}
+{% block content %}
+<h1>Acceso</h1>
+<form method="post" style="max-width:22rem">{% csrf_token %}
+  <label for="id_username">Usuario</label>
+  <input type="text" name="username" id="id_username" autofocus>
+  <label for="id_password">Contraseña</label>
+  <input type="password" name="password" id="id_password"
+         style="width:100%;padding:.5em;border:1px solid var(--line);border-radius:6px;font:inherit">
+  {% if form.errors %}<p class="nota" style="color:var(--bad)">Usuario o contraseña incorrectos.</p>{% endif %}
+  <p><button class="btn btn-sec" type="submit">Entrar</button></p>
+</form>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ b.block }} · {{ b.client_id }}{% endblock %}
+{% block content %}
+<h1>{{ b.block }}</h1>
+<p class="nota">Cliente: <b>{{ b.client_id }}</b> · Estado de compuerta:
+  <span class="chip {% if b.gate_status == 'approved' or b.gate_status == 'auto_approved' %}ok{% else %}pausa{% endif %}">{{ b.gate_status }}</span></p>
+
+<form method="post" action="{% url 'decidir' b.client_id b.block %}">{% csrf_token %}
+  <input type="hidden" name="volver" value="{{ volver }}">
+  <label for="id_nota">Nota (opcional)</label>
+  <input type="text" name="nota" id="id_nota" placeholder="Motivo u observaciones de la decisión">
+  <p style="display:flex;gap:.6rem;margin-top:.8rem">
+    <button class="btn btn-aprobar" name="decision" value="approved" type="submit">Aprobar</button>
+    <button class="btn btn-devolver" name="decision" value="returned" type="submit">Devolver</button>
+    <button class="btn btn-bloquear" name="decision" value="blocked" type="submit">Bloquear</button>
+    {% if volver %}<a class="btn" style="background:#EDF2F0;color:var(--ink2)" href="{% url 'sesion' volver %}">Regresar a la corrida</a>{% endif %}
+  </p>
+</form>
+
+<h2>Contenido del bloque</h2>
+<pre>{{ b.payload_json }}</pre>
+{% endblock %}
