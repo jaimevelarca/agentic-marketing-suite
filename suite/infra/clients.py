@@ -290,6 +290,16 @@ def read_memory_block(client_id: str, block: str) -> dict | None:
     return (snap.to_dict() or {}).get("payload")
 
 
+def read_gate_status(client_id: str, block: str) -> str | None:
+    """Current gate status of a block (None if the block doesn't exist yet)."""
+    if settings.backend == "memory":
+        return MEMORY_STORE["memory_blocks"].get(client_id, {}).get(block, {}).get("gate_status")
+    snap = _block_ref(firestore_client(), client_id, block).get()
+    if not snap.exists:
+        return None
+    return (snap.to_dict() or {}).get("gate_status")
+
+
 def set_gate_status(client_id: str, block: str, status: str, actor: str = "system",
                     note: str | None = None) -> None:
     """Human/system gate decision on a block: update gate_status + audit trail.

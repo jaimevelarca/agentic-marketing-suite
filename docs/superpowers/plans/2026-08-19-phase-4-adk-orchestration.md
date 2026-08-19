@@ -1,9 +1,6 @@
-# Phase 4 — ADK 2.x Orchestration Implementation Plan (DRAFT — verified API notes)
+# Phase 4 — ADK 2.x Orchestration Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
->
-> **Status: draft.** API surface verified against google-adk 2.7.1 on 2026-08-19;
-> finalize task steps when the phase starts.
 
 **Goal:** The 19-agent DAG runs as an ADK 2.x graph `Workflow` on Cloud Run, pausing at human gates and resuming on Firestore gate approval — the legacy Cloud Workflows YAML retired.
 
@@ -23,9 +20,41 @@
 - HITL verified end-to-end: gate function returns `RequestInput(prompt=..., keys=[...])` → run pauses (downstream never executes). Collect ids via `get_request_input_interrupt_ids(event)`; resume with `runner.run(..., new_message=types.Content(role="user", parts=[create_request_input_response(interrupt_id, {key: value})]))` → workflow continues.
 - Resume subtlety: with default `rerun_on_resume=False` the gate function is NOT re-executed on resume — the workflow proceeds past it. So don't rely on the gate node to write the decision into state on resume; the decision's source of truth is the Firestore gate doc (`clients.set_gate_status`), which the resume driver reads.
 
-**Sketch (finalize into tasks at phase start):**
-1. `suite/orchestration/adk_workflow.py`: build `Workflow` from `PIPELINE` (FunctionNode per step, edges from `reads`/layer order, gate nodes after human-gated steps).
-2. Firestore-backed session service (or DatabaseSessionService on the Phase 5 Cloud SQL).
-3. Runner entrypoint for Cloud Run Job; resume path triggered by gate-doc change (Eventarc on Firestore write, or poll-on-start).
-4. Offline tests: workflow topology mirrors `PIPELINE` exactly (node count, edge set, gate placement); gate pause/resume with fake session service.
-5. Retire `deploy/workflows/suite-pipeline.yaml` + `deploy/cloudbuild.yaml` rewrite (image → Artifact Registry from Phase 1).
+## Tasks
+
+### Task 1: `suite/orchestration/adk_workflow.py` (test-first)
+`build_workflow(auto_approve: bool) -> Workflow`: one `FunctionNode` per `PIPELINE`
+step (name `agent_<id>` with dots→underscores), sequential edges in PIPELINE order
+(same semantics as `run_pipeline` today). Each agent fn(ctx): payload = client_id +
+inputs + upstream blocks from `ctx.state["blocks"]`; call the step's `run`; store
+result block(s) into state; record `gate_status`. After each human-gated step
+(gate in `GATED`), a gate node `gate_<id>`: if auto_approve → pass; else read the
+Firestore gate doc via `clients.read_gate_status` — approved/auto_approved → pass;
+else return `RequestInput(prompt=..., keys=["decision"])` (pause).
+Tests (offline): topology (19 agent nodes + gate nodes after exactly the GATED
+steps, edge chain in order); full fixture run via Runner+InMemorySessionService
+(auto_approve) → 20 blocks in final state; gated run pauses at first gate,
+resume after set_gate_status("approved") completes downstream.
+- [ ] tests → fail → implement → 221+N green → commit
+
+### Task 2: `read_gate_status` in clients.py (tiny, test-first)
+`read_gate_status(client_id, block) -> str | None` for both backends.
+- [ ] test + implement + commit (folded into Task 1's commit if convenient)
+
+### Task 3: `suite/infra/adk_sessions.py` — FirestoreSessionService
+Implements the 4 abstract methods + `append_event` persistence over
+`adk_sessions/{app}:{user}:{session}` root docs + `events` subcollection
+(events too large for one doc). Offline tests with FakeFirestore.
+- [ ] tests → implement → commit
+
+### Task 4: `suite/orchestration/adk_entrypoint.py` + live dev proof (exit criterion)
+CLI: `start` (create session, run until pause/complete) and `resume` (rebuild
+resume Content from pending interrupt ids + gate docs, continue). Live proof
+against dev Firestore: fixture LLM + gcp backend, no auto-approve → pauses at
+gate 1.1; `clients.set_gate_status(...approved)`; `resume` → run completes.
+- [ ] live proof → record in plan → ROADMAP ✅ → commit + push
+
+### Task 5: retire legacy choreography
+Delete `deploy/workflows/suite-pipeline.yaml`; note in deploy/README that
+orchestration is the ADK workflow (containerization lands in Phase 6).
+- [ ] commit
