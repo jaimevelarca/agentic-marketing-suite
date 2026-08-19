@@ -196,8 +196,11 @@ def upsert_client_profile(client_id: str, profile: dict, gate_status: str) -> No
     _block_ref(fs, client_id, "client_profile").set(
         {"payload": profile, "gate_status": gate_status, "updated_at": _now_field()}, merge=True)
     root = {"client_id": client_id, "updated_at": _now_field()}
-    if isinstance(profile, dict) and profile.get("name"):
-        root["name"] = profile["name"]
+    name = profile.get("name") if isinstance(profile, dict) else None
+    if isinstance(name, dict):  # DEL-17 profiles carry {"trade": ..., "legal": ...}
+        name = name.get("trade") or name.get("legal")
+    if name:
+        root["name"] = name
     fs.collection("clients").document(client_id).set(root, merge=True)
     _append_audit(fs, client_id, "client_profile",
                   {"action": "write", "gate_status": gate_status, "agent_write": True})

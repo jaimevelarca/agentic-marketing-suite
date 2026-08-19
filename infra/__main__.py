@@ -94,7 +94,8 @@ topics = {
         name=name,
         opts=pulumi.ResourceOptions(depends_on=[apis["pubsub.googleapis.com"]]),
     )
-    for name in ("client-interview-questions", "layer-handoff")
+    # review-queue-events is published by agent 6.1 (performance_analytics.py)
+    for name in ("client-interview-questions", "layer-handoff", "review-queue-events")
 }
 
 # --- Budget alert (MXN 2,000/mo ≈ USD 100 on this project) ------------------

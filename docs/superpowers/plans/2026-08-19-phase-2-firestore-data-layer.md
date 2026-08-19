@@ -31,11 +31,11 @@
   - `read_memory_block(client_id, block)` → payload dict or None.
   - `set_gate_status(client_id, block, status, actor="system", note=None)` → update block doc's `gate_status` + audit entry `{action: "gate", status, actor, note}`; raises `ValueError` on unknown status. Memory backend mirrors all of the above (audit under `MEMORY_STORE["audit"]`).
 
-- [ ] Step 1: Write failing tests with a `FakeFirestore` (records `document(path).set/update` calls) monkeypatched over `clients.firestore_client`.
-- [ ] Step 2: Run → fail (no `set_gate_status`, SQL path raises).
-- [ ] Step 3: Implement; delete `_pg_pool`/SQL code.
-- [ ] Step 4: Full suite green (207 + new).
-- [ ] Step 5: Commit.
+- [x] Step 1: Write failing tests with a `FakeFirestore` (records `document(path).set/update` calls) monkeypatched over `clients.firestore_client`.
+- [x] Step 2: Run → fail (no `set_gate_status`, SQL path raises).
+- [x] Step 3: Implement; delete `_pg_pool`/SQL code.
+- [x] Step 4: Full suite green (207 + new).
+- [x] Step 5: Commit.
 
 ### Task 2: Purge Cloud SQL from config, deps, scripts, migrations
 
@@ -43,12 +43,12 @@
 - Modify: `suite/infra/config.py` (drop `sql_*`, `db_*`, `sql_instance_connection_name`), `pyproject.toml` (drop psycopg, psycopg-pool), `suite/scripts/run_live.sh` (drop proxy/PGPASSWORD block)
 - Delete: `suite/migrations/`
 
-- [ ] Step 1: Grep proves no remaining consumer of the removed names.
-- [ ] Step 2: `uv sync` re-lock; full suite green.
-- [ ] Step 3: Commit.
+- [x] Step 1: Grep proves no remaining consumer of the removed names.
+- [x] Step 2: `uv sync` re-lock; full suite green.
+- [x] Step 3: Commit.
 
 ### Task 3: Live smoke run against real Firestore (exit criterion)
 
-- [ ] Step 1: `PYTHONPATH=suite SUITE_LLM_PROVIDER=fixture SUITE_BACKEND=gcp GCP_PROJECT_ID=agentic-marketing-suite python -m orchestration.demo` (fixture LLM, real Firestore; ADC).
-- [ ] Step 2: Verify with a read-back script: 20 blocks under `clients/acme_smb_001/blocks`, review-queue docs present, audit entries present.
-- [ ] Step 3: Record result in ROADMAP (Phase 2 ✅) + commit + push.
+- [x] Step 1: `PYTHONPATH=suite SUITE_LLM_PROVIDER=fixture SUITE_BACKEND=gcp GCP_PROJECT_ID=agentic-marketing-suite python -m orchestration.demo` (fixture LLM, real Firestore; ADC).
+- [x] Step 2: Verify with a read-back script: 20 blocks under `clients/acme_smb_001/blocks`, review-queue docs present, audit entries present.
+- [x] Step 3: Record result in ROADMAP (Phase 2 ✅) + commit + push.

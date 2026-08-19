@@ -42,7 +42,7 @@ IAM, Pub/Sub topics, budget alerts, Cloud Build/GitHub Actions trigger wiring.
 **Exit:** entire project state reproducible from `infra/`; nothing created by hand
 except the state bucket and the project itself (import both).
 
-### Phase 2 — Firestore data layer
+### Phase 2 — Firestore data layer ✅ 2026-08-19 (smoke run: 20 blocks + audit in (default) db)
 Replace the `gcp` backend in `suite/infra/clients.py`: memory blocks, client
 profiles, review queue, run ledger as Firestore collections
 (`clients/{id}`, `runs/{id}`, `runs/{id}/blocks/{block}`, `review_queue/{id}`).
