@@ -52,7 +52,10 @@ def _make_agent_fn(step: AgentStep):
     def agent_fn(ctx):
         inputs = ctx.state.get("inputs") or {}
         blocks = dict(ctx.state.get("blocks") or {})
-        payload: dict = {"client_id": ctx.state["client_id"], **inputs}
+        # The run's client_id is authoritative — spread inputs FIRST so an
+        # onboarding JSON carrying its own client_id can't hijack the identity
+        # (agents would write one client while gates read another).
+        payload: dict = {**inputs, "client_id": ctx.state["client_id"]}
         for blk in step.reads:
             if blk in blocks:
                 payload[blk] = blocks[blk]

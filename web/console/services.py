@@ -37,6 +37,18 @@ def list_sessions() -> list[dict]:
     return out
 
 
+def _last_interrupt_ids(session) -> list[str]:
+    """Una sesión está en pausa si y solo si su ÚLTIMO evento trae una
+    interrupción sin responder (al reanudar, la respuesta y los eventos de los
+    nodos siguientes quedan después). Esto evita dobles reanudaciones cuando el
+    estado (`pending_blocks`) aún no se actualiza por un hilo en curso."""
+    from google.adk.workflow.utils._workflow_hitl_utils import (
+        get_request_input_interrupt_ids)
+    if not session.events:
+        return []
+    return get_request_input_interrupt_ids(session.events[-1])
+
+
 def get_session(session_id: str) -> dict | None:
     s = asyncio.run(_service().get_session(
         app_name=APP_NAME, user_id=USER_ID, session_id=session_id))
@@ -44,6 +56,8 @@ def get_session(session_id: str) -> dict | None:
         return None
     state = s.state
     pending = sorted((state.get("pending_blocks") or {}).keys())
+    paused = bool(_last_interrupt_ids(s))
+    done = len([t for t in (state.get("transcript") or []) if t]) >= 19 and not paused
     return {
         "id": s.id,
         "client_id": state.get("client_id"),
@@ -51,9 +65,9 @@ def get_session(session_id: str) -> dict | None:
         "blocks": sorted((state.get("blocks") or {}).keys()),
         "pending": pending,
         "transcript": state.get("transcript") or [],
-        "status": "en pausa (compuerta humana)" if pending else (
-            "terminada" if len(state.get("transcript") or []) >= 19 else "en curso"),
-        "paused": bool(pending),
+        "status": ("en pausa (compuerta humana)" if paused
+                   else ("terminada" if done else "en curso")),
+        "paused": paused,
     }
 
 
@@ -98,7 +112,7 @@ def resume_run(session_id: str) -> bool:
     from google.adk.runners import Runner
     from google.genai import types
     from google.adk.workflow.utils._workflow_hitl_utils import (
-        create_request_input_response, get_request_input_interrupt_ids)
+        create_request_input_response)
     from orchestration.adk_workflow import build_workflow
 
     service = _service()
@@ -106,11 +120,7 @@ def resume_run(session_id: str) -> bool:
         app_name=APP_NAME, user_id=USER_ID, session_id=session_id))
     if session is None:
         return False
-    ids: list[str] = []
-    for event in reversed(list(session.events)):
-        ids = get_request_input_interrupt_ids(event)
-        if ids:
-            break
+    ids = _last_interrupt_ids(session)  # solo si la pausa sigue vigente
     if not ids:
         return False
     message = types.Content(role="user", parts=[

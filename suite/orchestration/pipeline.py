@@ -121,7 +121,9 @@ def run_pipeline(
     transcript: list[dict] = []
 
     for step in PIPELINE:
-        payload: dict = {"client_id": client_id, **inputs}
+        # client_id is authoritative — inputs spread first so an onboarding
+        # JSON with its own client_id cannot hijack the run identity.
+        payload: dict = {**inputs, "client_id": client_id}
         for blk in step.reads:
             if blk in memory:
                 payload[blk] = memory[blk]

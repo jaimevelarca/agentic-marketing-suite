@@ -35,14 +35,16 @@ def _runner_and_service():
 
 
 def _pending_interrupt_ids(events) -> list[str]:
-    """Ids of the most recent pause (our workflow pauses one gate at a time)."""
+    """Ids of a still-pending pause. A session is paused iff its LAST event
+    carries an unanswered interrupt (on resume, the response and subsequent
+    node events land after it) — checking only the last event prevents
+    double-resumes against a run that is already in flight."""
     from google.adk.workflow.utils._workflow_hitl_utils import (
         get_request_input_interrupt_ids)
-    for event in reversed(list(events)):
-        ids = get_request_input_interrupt_ids(event)
-        if ids:
-            return ids
-    return []
+    events = list(events)
+    if not events:
+        return []
+    return get_request_input_interrupt_ids(events[-1])
 
 
 def _drive(runner, session_id: str, message=None) -> list[str]:

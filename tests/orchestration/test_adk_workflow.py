@@ -114,3 +114,17 @@ def test_gated_run_pauses_then_resumes_on_approval():
     assert len(state["blocks"]) == 20
     assert state.get("pending_blocks") == {}
     assert len([t for t in state["transcript"] if t["valid"]]) == 19
+
+
+def test_state_client_id_beats_inputs_client_id():
+    """Inputs JSON carrying its own client_id must NOT hijack the run identity:
+    blocks are written under the run's client_id (live bug: agents wrote under
+    'acme' from acme.json while gates read 'acme-co')."""
+    ss = InMemorySessionService()
+    runner = Runner(node=adk_workflow.build_workflow(), app_name="suite", session_service=ss)
+    inputs = dict(ACME, client_id="intruso")
+    _, ids, state = _run(runner, ss, state={
+        "client_id": "cliente-real", "inputs": inputs, "auto_approve": True})
+    assert ids == []
+    assert "cliente-real" in clients.MEMORY_STORE["memory_blocks"]
+    assert "intruso" not in clients.MEMORY_STORE["memory_blocks"]
