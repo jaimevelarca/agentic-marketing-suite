@@ -1,6 +1,7 @@
-"""Client factories + routing helpers for Vertex (Anthropic), Cloud SQL,
-Firestore, and Pub/Sub — plus an offline ('memory'/'fixture') mode so the whole
-Suite runs end-to-end with no GCP project and no Anthropic EULA.
+"""Client factories + routing helpers for the LLM providers, Firestore, and
+Pub/Sub — plus an offline ('memory'/'fixture') mode so the whole Suite runs
+end-to-end with no GCP project and no API key. Firestore is the only
+persistence backend (roadmap Phase 2 removed Cloud SQL).
 
 Two independent runtime switches (see infra.config.Settings):
   - settings.llm_provider: "vertex" (prod) | "fixture" (canned per-agent text)
@@ -26,13 +27,14 @@ _ROOT = Path(__file__).resolve().parents[2]
 # When settings.backend == "memory", memory-block writes, review-queue docs, and
 # Pub/Sub publishes land here instead of GCP. The orchestrator reads this for
 # the offline demo; tests reset it between runs.
-MEMORY_STORE: dict = {"memory_blocks": {}, "review_queue": [], "published": []}
+MEMORY_STORE: dict = {"memory_blocks": {}, "review_queue": [], "published": [], "audit": []}
 
 
 def reset_memory_store() -> None:
     MEMORY_STORE["memory_blocks"] = {}
     MEMORY_STORE["review_queue"] = []
     MEMORY_STORE["published"] = []
+    MEMORY_STORE["audit"] = []
 
 
 # --- LLM (provider-pluggable) ------------------------------------------------
@@ -137,42 +139,68 @@ def publish(topic: str, payload: dict) -> str:
     return future.result(timeout=30)
 
 
-# --- Cloud SQL ---------------------------------------------------------------
-@lru_cache
-def _pg_pool():
-    """psycopg connection pool against the Cloud SQL Postgres, reached via the
-    local cloud-sql-proxy (host 127.0.0.1). Created lazily."""
-    import psycopg_pool
-    conninfo = (
-        f"host={settings.db_host} port={settings.db_port} "
-        f"dbname={settings.db_name} user={settings.db_user}"
-    )
-    return psycopg_pool.ConnectionPool(conninfo, min_size=1, max_size=4, open=True)
+# --- Firestore persistence (memory blocks + gate state) ----------------------
+# Layout: clients/{client_id}                     root doc (metadata)
+#         clients/{client_id}/blocks/{block}      payload + gate_status + updated_at
+#         clients/{client_id}/blocks/{block}/audit/{auto}   append-only history
+GATE_STATUSES = {"pending", "pending_review", "approved", "auto_approved", "returned", "blocked"}
+
+
+def _now_field():
+    from google.cloud import firestore
+    return firestore.SERVER_TIMESTAMP
+
+
+def _block_ref(fs, client_id: str, block: str):
+    return fs.collection("clients").document(client_id).collection("blocks").document(block)
+
+
+def _append_audit(fs, client_id: str, block: str, entry: dict) -> None:
+    entry = dict(entry)
+    entry["at"] = _now_field()
+    _block_ref(fs, client_id, block).collection("audit").add(entry)
+
+
+def write_memory_block(client_id: str, block: str, obj: dict, gate_status: str) -> None:
+    """Persist any agent's validated structured output to its memory block.
+    The 'client_profile' block additionally refreshes the client root doc."""
+    if settings.backend == "memory":
+        MEMORY_STORE["memory_blocks"].setdefault(client_id, {})[block] = {
+            "payload": obj, "gate_status": gate_status,
+        }
+        MEMORY_STORE.setdefault("audit", []).append(
+            {"client_id": client_id, "block": block, "action": "write", "gate_status": gate_status})
+        return
+    if block == "client_profile":
+        upsert_client_profile(client_id, obj, gate_status)
+        return
+    fs = firestore_client()
+    _block_ref(fs, client_id, block).set(
+        {"payload": obj, "gate_status": gate_status, "updated_at": _now_field()}, merge=True)
+    _append_audit(fs, client_id, block, {"action": "write", "gate_status": gate_status,
+                                         "agent_write": True})
 
 
 def upsert_client_profile(client_id: str, profile: dict, gate_status: str) -> None:
-    """UPSERT a client_profile row (client_id is PRIMARY KEY)."""
-    with _pg_pool().connection() as conn:
-        conn.execute(
-            "INSERT INTO client_profiles (client_id, profile, gate_status, created_at) "
-            "VALUES (%s, %s, %s, NOW()) "
-            "ON CONFLICT (client_id) DO UPDATE SET "
-            "profile = EXCLUDED.profile, gate_status = EXCLUDED.gate_status, updated_at = NOW()",
-            (client_id, json.dumps(profile), gate_status),
-        )
-
-
-def _upsert_memory_block(client_id: str, block: str, obj: dict, gate_status: str) -> None:
-    """UPSERT one structured memory block into the generic memory_blocks table
-    (002_memory_blocks.sql). PK = (client_id, block)."""
-    with _pg_pool().connection() as conn:
-        conn.execute(
-            "INSERT INTO memory_blocks (client_id, block, payload, gate_status, created_at) "
-            "VALUES (%s, %s, %s, %s, NOW()) "
-            "ON CONFLICT (client_id, block) DO UPDATE SET "
-            "payload = EXCLUDED.payload, gate_status = EXCLUDED.gate_status, updated_at = NOW()",
-            (client_id, block, json.dumps(obj), gate_status),
-        )
+    """client_profile block write + refresh of the client root doc (metadata
+    other surfaces list clients by)."""
+    if settings.backend == "memory":
+        MEMORY_STORE["memory_blocks"].setdefault(client_id, {})["client_profile"] = {
+            "payload": profile, "gate_status": gate_status,
+        }
+        MEMORY_STORE.setdefault("audit", []).append(
+            {"client_id": client_id, "block": "client_profile", "action": "write",
+             "gate_status": gate_status})
+        return
+    fs = firestore_client()
+    _block_ref(fs, client_id, "client_profile").set(
+        {"payload": profile, "gate_status": gate_status, "updated_at": _now_field()}, merge=True)
+    root = {"client_id": client_id, "updated_at": _now_field()}
+    if isinstance(profile, dict) and profile.get("name"):
+        root["name"] = profile["name"]
+    fs.collection("clients").document(client_id).set(root, merge=True)
+    _append_audit(fs, client_id, "client_profile",
+                  {"action": "write", "gate_status": gate_status, "agent_write": True})
 
 
 def read_memory_block(client_id: str, block: str) -> dict | None:
@@ -180,34 +208,30 @@ def read_memory_block(client_id: str, block: str) -> dict | None:
     upstream block when running as its own Cloud Run Job). Returns None if absent."""
     if settings.backend == "memory":
         return MEMORY_STORE["memory_blocks"].get(client_id, {}).get(block, {}).get("payload")
-    if block == "client_profile":
-        with _pg_pool().connection() as conn:
-            row = conn.execute(
-                "SELECT profile FROM client_profiles WHERE client_id = %s", (client_id,)
-            ).fetchone()
-            return row[0] if row else None
-    with _pg_pool().connection() as conn:
-        row = conn.execute(
-            "SELECT payload FROM memory_blocks WHERE client_id = %s AND block = %s",
-            (client_id, block),
-        ).fetchone()
-        return row[0] if row else None
+    snap = _block_ref(firestore_client(), client_id, block).get()
+    if not snap.exists:
+        return None
+    return (snap.to_dict() or {}).get("payload")
 
 
-def write_memory_block(client_id: str, block: str, obj: dict, gate_status: str) -> None:
-    """Persist any agent's validated structured output to its memory block.
-    Routes by backend ('memory' vs 'gcp') and keeps the dedicated client_profiles
-    table for the 'client_profile' block while everything else goes to the
-    generic memory_blocks table."""
+def set_gate_status(client_id: str, block: str, status: str, actor: str = "system",
+                    note: str | None = None) -> None:
+    """Human/system gate decision on a block: update gate_status + audit trail.
+    This is the write path the review UI (roadmap Phase 5) calls; the paused
+    orchestrator watches the same doc to resume."""
+    if status not in GATE_STATUSES:
+        raise ValueError(f"unknown gate status {status!r} (allowed: {sorted(GATE_STATUSES)})")
     if settings.backend == "memory":
-        MEMORY_STORE["memory_blocks"].setdefault(client_id, {})[block] = {
-            "payload": obj, "gate_status": gate_status,
-        }
+        MEMORY_STORE["memory_blocks"].setdefault(client_id, {}).setdefault(
+            block, {"payload": None})["gate_status"] = status
+        MEMORY_STORE.setdefault("audit", []).append(
+            {"client_id": client_id, "block": block, "action": "gate", "status": status,
+             "actor": actor, "note": note})
         return
-    if block == "client_profile":
-        upsert_client_profile(client_id, obj, gate_status)
-    else:
-        _upsert_memory_block(client_id, block, obj, gate_status)
+    fs = firestore_client()
+    _block_ref(fs, client_id, block).update({"gate_status": status, "updated_at": _now_field()})
+    _append_audit(fs, client_id, block,
+                  {"action": "gate", "status": status, "actor": actor, "note": note})
 
 
 # --- JSON Schemas (auto-discovered) ------------------------------------------
