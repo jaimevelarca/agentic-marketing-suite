@@ -11,7 +11,7 @@ como archivo de referencia en `~/dev/qhhe/ai-marketing-suite`).
   2026-08-19). **Review del baseline:** `docs/REVIEW-2026-08-19.md`.
 - **Planes por fase:** `docs/superpowers/plans/` (uno por fase al arrancarla).
 - Al cerrar sesión que cambie el estado del proyecto: actualizar ROADMAP (marcar
-  fase/exit) y dejar nota de sesión.
+  fase/exit) y dejar nota de sesión en `docs/session_logs/AAAA-MM-DD_<tema>.md`.
 
 ## GCP / identidad
 - Project **`agentic-marketing-suite`** (folder QHHE `274831265727`, billing
