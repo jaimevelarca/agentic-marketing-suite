@@ -1,16 +1,14 @@
 [project]
-name = "ai-mkt-suite"
-version = "0.1.0"
-description = "Digital Marketing AI Suite — Acme Co."
-requires-python = ">=3.11"
+name = "agentic-marketing-suite"
+version = "0.2.0"
+description = "Agentic Marketing Suite — QHHE's 6-layer / 19-agent marketing engine"
+requires-python = ">=3.12"
 readme = "README.md"
 
 dependencies = [
     "anthropic[vertex]>=0.96",
-    "google-cloud-aiplatform>=1.70",
     "google-cloud-firestore>=2.27",
     "google-cloud-pubsub>=2.23",
-    "google-cloud-secret-manager>=2.20",
     # DB access: code uses psycopg v3 + pool over cloud-sql-proxy (127.0.0.1).
     "psycopg[binary]>=3.2",
     "psycopg-pool>=3.2",
@@ -21,13 +19,12 @@ dependencies = [
     # not `google-cloud-sql-connector` — which broke `pip install .` in the deploy image.)
     "pydantic>=2.8",
     "jsonschema>=4.23",
-    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]
 adk = ["google-adk>=0.1"]
 mcp = ["mcp>=1.2"]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.6"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
 
 [build-system]
 requires = ["hatchling"]
@@ -38,4 +35,4 @@ packages = ["suite"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"

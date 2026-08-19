@@ -28,6 +28,9 @@ from typing import Any
 from infra.config import settings
 from infra import clients
 from infra import skeleton
+from infra.log import get_logger
+
+log = get_logger("agent")
 
 _JSON_BLOCK = re.compile(r"```json\n([\s\S]+?)\n```")
 
@@ -177,6 +180,7 @@ class BaseAgent:
             try:
                 raw = self.call(user_turn)
             except Exception as e:  # network/model error — surface, don't crash a batch
+                log.exception("agent %s: model call failed (client=%s)", self.agent_id, client_id)
                 return AgentResult(self.agent_id, client_id, {}, None, False, f"model call failed: {e}")
             outputs = self.split_outputs(raw)
             obj = self.extract_json(outputs.get("output_1", ""))
@@ -188,6 +192,9 @@ class BaseAgent:
             if valid:
                 break
 
+        if not valid:
+            log.warning("agent %s: invalid output after %d attempt(s) (client=%s): %s",
+                        self.agent_id, max_attempts, client_id, err)
         # Persist whatever we got; route to human review on any problem.
         self.route(client_id, obj, outputs, valid, err)
         return AgentResult(self.agent_id, client_id, outputs, obj if valid else None, valid, err)

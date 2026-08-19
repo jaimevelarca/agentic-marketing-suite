@@ -22,14 +22,16 @@ class Settings:
     vertex_region: str = os.getenv("VERTEX_REGION", "global")
 
     # --- Runtime mode (lets the suite run end-to-end offline, no GCP/EULA) ---
-    # llm_provider: "vertex" = Claude on Vertex (production); "anthropic" = Claude
-    #   on Anthropic's first-party API (ANTHROPIC_API_KEY; live demo while Vertex
-    #   quota is pending); "fixture" = canned per-agent responses from
-    #   suite/fixtures/<agent_id>.txt (offline dev/demo).
+    # llm_provider: "fixture" = canned per-agent responses from
+    #   suite/fixtures/<agent_id>.txt (offline dev/demo, DEFAULT); "anthropic" =
+    #   Claude first-party API (ANTHROPIC_API_KEY); "vertex" = Claude on Vertex.
+    #   A "gemini" provider (google-genai) arrives in roadmap Phase 3.
     # backend: "gcp" = Cloud SQL/Firestore/Pub-Sub; "memory" = in-process store
     #   (offline dev/demo + tests). The two switches are independent.
-    llm_provider: str = os.getenv("SUITE_LLM_PROVIDER", "vertex")
-    backend: str = os.getenv("SUITE_BACKEND", "gcp")
+    # SAFE-OFFLINE DEFAULTS: a bare import must never reach real GCP/LLM APIs.
+    # Production is an explicit opt-in (Dockerfile / run_live.sh export these).
+    llm_provider: str = os.getenv("SUITE_LLM_PROVIDER", "fixture")
+    backend: str = os.getenv("SUITE_BACKEND", "memory")
 
     # --- Cloud SQL (reached via local cloud-sql-proxy on 127.0.0.1) ---
     sql_instance: str = os.getenv("SQL_INSTANCE", "ai-mkt-pg")

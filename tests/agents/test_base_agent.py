@@ -81,7 +81,11 @@ def test_run_routes_and_returns(monkeypatch):
     a = _agent(schema_name=None)
     monkeypatch.setattr(a, "call", lambda turn: SAMPLE)
     routed = {}
+    from dataclasses import replace
     from infra import clients
+    # This test asserts the gcp-backend routing path (upsert_client_profile);
+    # the library default is now the safe "memory" backend, so pin it here.
+    monkeypatch.setattr(clients, "settings", replace(clients.settings, backend="gcp"))
     monkeypatch.setattr(clients, "upsert_client_profile",
                         lambda cid, obj, gate: routed.setdefault("sql", (cid, gate)))
     monkeypatch.setattr(clients, "add_review_doc",
