@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-adk = ["google-adk>=0.1"]
+adk = ["google-adk>=2.7,<3"]  # 2.x graph Workflow runtime (verified 2.7.1)
 mcp = ["mcp>=1.2"]
 dev = ["pytest>=8.0", "ruff>=0.6"]
 

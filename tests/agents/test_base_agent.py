@@ -116,3 +116,25 @@ def test_run_invalid_output_escalates_to_urgent(monkeypatch):
 def test_split_named_helper():
     out = split_named("A: alpha\nB: beta", {"a": "A:", "b": "B:"})
     assert out["a"].startswith("A:") and out["b"].startswith("B:")
+
+
+def test_schema_retry_feeds_validation_error_back(monkeypatch):
+    """Attempt 2 must include the validation error so the model can fix it
+    (blind re-asks don't fix enum drift — seen live with Gemini)."""
+    a = _agent(schema_name="DEL-17")
+    turns = []
+    bad = SAMPLE.replace('"name": "Acme Co."', '"contact": {"emails": 1}')  # schema-invalid
+
+    def fake_call(turn):
+        turns.append(turn)
+        return bad if len(turns) == 1 else SAMPLE
+
+    monkeypatch.setattr(a, "call", fake_call)
+    from infra import clients
+    monkeypatch.setattr(clients, "upsert_client_profile", lambda *args: None)
+    monkeypatch.setattr(clients, "add_review_doc", lambda *args: None)
+    res = a.run({"client_id": "acme", "x": "hi"})
+    assert len(turns) == 2
+    assert "CORRECTION REQUIRED" in turns[1]
+    assert "schema validation failed" in turns[1]
+    assert "CORRECTION REQUIRED" not in turns[0]

@@ -177,8 +177,16 @@ class BaseAgent:
         obj: dict | None = None
         valid, err = False, None
         for _attempt in range(max_attempts):
+            # Feedback retry: the re-ask carries the exact validation error, so
+            # the model can fix it (a blind re-ask does not fix enum/shape drift
+            # — observed live with Gemini on tone_selected).
+            turn = user_turn if not err else (
+                f"{user_turn}\n\n## CORRECTION REQUIRED\n"
+                f"Your previous response failed validation: {err}\n"
+                f"Re-emit ALL outputs in full, fixing exactly this issue."
+            )
             try:
-                raw = self.call(user_turn)
+                raw = self.call(turn)
             except Exception as e:  # network/model error — surface, don't crash a batch
                 log.exception("agent %s: model call failed (client=%s)", self.agent_id, client_id)
                 return AgentResult(self.agent_id, client_id, {}, None, False, f"model call failed: {e}")
