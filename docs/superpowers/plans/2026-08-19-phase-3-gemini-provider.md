@@ -27,12 +27,19 @@
 **Interfaces:**
 - Produces: `settings.gemini_model_primary|routing|deep` (env `GEMINI_MODEL_*`), `settings.vertex_gemini_location` (env `VERTEX_GEMINI_LOCATION`, default `global`); `clients._gemini_model_for(claude_model_id) -> str`; gemini branch returns `response.text` and logs `usage_metadata` token counts at INFO.
 
-- [ ] Step 1: Failing tests — tier mapping (primary/routing/deep/unknown→primary); fake client receives `system_instruction` + `max_output_tokens`; transient 429 then success → retried; non-transient error raises immediately; usage logged.
-- [ ] Step 2: Implement; `uv sync`; suite green (214 + new).
-- [ ] Step 3: Commit.
+- [x] Step 1: Failing tests — tier mapping (primary/routing/deep/unknown→primary); fake client receives `system_instruction` + `max_output_tokens`; transient 429 then success → retried; non-transient error raises immediately; usage logged.
+- [x] Step 2: Implement; `uv sync`; suite green (214 + new).
+- [x] Step 3: Commit.
 
 ### Task 2: Live golden run (exit criterion)
 
-- [ ] Step 1: Single-agent live check (agent 1.1) with `SUITE_LLM_PROVIDER=gemini SUITE_BACKEND=memory`.
-- [ ] Step 2: Full pipeline live golden run; record agents-valid count and total tokens/cost estimate in the plan.
-- [ ] Step 3: ROADMAP Phase 3 ✅ + commit + push.
+- [x] Step 1: Single-agent live check (agent 1.1) with `SUITE_LLM_PROVIDER=gemini SUITE_BACKEND=memory`.
+- [x] Step 2: Full pipeline live golden run; record agents-valid count and total tokens/cost estimate in the plan.
+- [x] Step 3: ROADMAP Phase 3 ✅ + commit + push.
+
+## Golden run result (2026-08-19)
+
+Live `gemini` provider, memory backend, AUTO_APPROVE: **19/19 agents valid**, all
+20 blocks produced. 23 LLM calls (4 feedback retries, all recovered — zero final
+invalid outputs; the pre-fix run died on enum drift at agent 1.1).
+Tokens: 388,659 in / 126,910 out ≈ **$0.77/run** at gemini-3.7-flash intro pricing.

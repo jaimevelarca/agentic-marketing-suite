@@ -51,7 +51,7 @@ Gate status becomes a real state machine on the block doc (`pending_review →
 approved/returned/blocked`), with audit subcollection.
 **Exit:** live smoke run persists a full 19-agent run to Firestore in `dev`.
 
-### Phase 3 — Gemini provider
+### Phase 3 — Gemini provider ✅ 2026-08-19 (golden run 19/19, ~$0.77/run)
 New `gemini` provider in `clients.py` via `google-genai` (Vertex backend): structured
 output with `response_format` + schema (from the existing JSON Schemas), retries with
 backoff on transport errors, per-call token/cost logging, three-tier model routing
