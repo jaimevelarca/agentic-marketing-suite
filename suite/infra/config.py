@@ -49,6 +49,16 @@ class Settings:
     model_routing: str = os.getenv("CLAUDE_MODEL_HAIKU", "claude-haiku-4-5@20251001")    # routing/classification
     model_deep: str = os.getenv("CLAUDE_MODEL_OPUS", "claude-opus-4-7")                  # binding deep reasoning ONLY
 
+    # --- Gemini on Vertex (provider "gemini"; roadmap Phase 3) ---
+    # Agents keep declaring the Claude ids above; llm_complete maps id → tier →
+    # these when SUITE_LLM_PROVIDER=gemini. Never the 2.5 line (retires Oct 2026).
+    gemini_model_primary: str = os.getenv("GEMINI_MODEL_PRIMARY", "gemini-3.7-flash")
+    gemini_model_routing: str = os.getenv("GEMINI_MODEL_ROUTING", "gemini-3.5-flash-lite")
+    gemini_model_deep: str = os.getenv("GEMINI_MODEL_DEEP", "gemini-3.1-pro-preview")
+    # Vertex endpoint location for Gemini ("global" recommended; independent of
+    # `region`, same idea as vertex_region for Claude).
+    vertex_gemini_location: str = os.getenv("VERTEX_GEMINI_LOCATION", "global")
+
     @property
     def fixtures_dir(self) -> Path:
         """Per-agent canned responses for the offline ('fixture') LLM provider."""

@@ -19,8 +19,10 @@ from functools import lru_cache
 from pathlib import Path
 
 from infra.config import settings
+from infra.log import get_logger
 
 _ROOT = Path(__file__).resolve().parents[2]
+_llm_log = get_logger("llm")
 
 
 # --- Offline store -----------------------------------------------------------
@@ -73,6 +75,74 @@ def _load_fixture(agent_id: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
+# --- Gemini on Vertex (google-genai) -----------------------------------------
+@lru_cache
+def _genai_client():
+    from google import genai
+    return genai.Client(vertexai=True, project=settings.project_id,
+                        location=settings.vertex_gemini_location)
+
+
+def _gemini_model_for(claude_model_id: str) -> str:
+    """Agents declare Claude model ids; map id → tier → Gemini model. Unknown
+    ids fall back to the primary tier."""
+    return {
+        settings.model_primary: settings.gemini_model_primary,
+        settings.model_routing: settings.gemini_model_routing,
+        settings.model_deep: settings.gemini_model_deep,
+    }.get(claude_model_id, settings.gemini_model_primary)
+
+
+_RETRY_BASE_SLEEP = 2.0  # seconds; doubles per attempt. Patched to 0 in tests.
+_MAX_LLM_ATTEMPTS = 3
+_TRANSIENT_CODES = {408, 429, 500, 502, 503, 504}
+
+
+def _is_transient(exc: Exception) -> bool:
+    return getattr(exc, "code", None) in _TRANSIENT_CODES or getattr(
+        exc, "status_code", None) in _TRANSIENT_CODES
+
+
+def _gemini_generate(*, model: str, system: str, user_turn: str, max_tokens: int,
+                     agent_id: str) -> str:
+    """Text-mode generation (the OUTPUT-1/2/3 contract lives in the prompts, so
+    no response_schema JSON mode here) with transport retries + usage logging."""
+    import time
+    client = _genai_client()
+    gemini_model = _gemini_model_for(model)
+    last_exc: Exception | None = None
+    for attempt in range(_MAX_LLM_ATTEMPTS):
+        try:
+            response = client.models.generate_content(
+                model=gemini_model,
+                contents=user_turn,
+                config={
+                    "system_instruction": system,
+                    "max_output_tokens": max_tokens,
+                },
+            )
+            break
+        except Exception as exc:
+            last_exc = exc
+            if not _is_transient(exc) or attempt == _MAX_LLM_ATTEMPTS - 1:
+                raise
+            sleep = _RETRY_BASE_SLEEP * (2 ** attempt)
+            _llm_log.warning("agent %s: transient %s from %s — retry %d/%d in %.1fs",
+                             agent_id, exc, gemini_model, attempt + 1,
+                             _MAX_LLM_ATTEMPTS - 1, sleep)
+            time.sleep(sleep)
+    else:  # pragma: no cover - defensive; loop always breaks or raises
+        raise last_exc  # type: ignore[misc]
+    usage = getattr(response, "usage_metadata", None)
+    if usage is not None:
+        _llm_log.info("agent %s: %s tokens in=%s out=%s total=%s",
+                      agent_id, gemini_model,
+                      getattr(usage, "prompt_token_count", "?"),
+                      getattr(usage, "candidates_token_count", "?"),
+                      getattr(usage, "total_token_count", "?"))
+    return response.text
+
+
 def llm_complete(*, model: str, system: str, user_turn: str, max_tokens: int,
                  agent_id: str) -> str:
     """One cached completion. Dispatches on settings.llm_provider so callers
@@ -80,6 +150,9 @@ def llm_complete(*, model: str, system: str, user_turn: str, max_tokens: int,
     with an Anthropic ephemeral cache marker (Vertex passes it through)."""
     if settings.llm_provider == "fixture":
         return _load_fixture(agent_id)
+    if settings.llm_provider == "gemini":
+        return _gemini_generate(model=model, system=system, user_turn=user_turn,
+                                max_tokens=max_tokens, agent_id=agent_id)
     if settings.llm_provider == "anthropic":
         client, model = anthropic_direct_client(), _direct_model_id(model)
     else:
