@@ -16,6 +16,13 @@
 - Retries: per-node `RetryConfig`; per-workflow default via `Workflow.retry_config`.
 - Dep pinned: `pyproject.toml` extra `adk = ["google-adk>=2.7,<3"]`.
 
+**Executed spike (2026-08-19, all verified locally against 2.7.1):**
+- Construction: `FunctionNode(func=fn, name=...)`; `Edge(from_node=<node instance or START>, to_node=<node instance>)` — edges take node INSTANCES, not name strings.
+- Entry point: `Runner(node=workflow, app_name=..., session_service=...)`; seed state via `session_service.create_session(app_name, user_id, session_id, state={...})` (the `state_delta` kwarg of `runner.run` does NOT seed state before the first node); then `runner.run(user_id=..., session_id=..., new_message=None)`.
+- State flow: functions declare `ctx: Context` and mutate `ctx.state[...]`; plain return values become `Event.output` (per-node output), NOT state. Params bind from state by name.
+- HITL verified end-to-end: gate function returns `RequestInput(prompt=..., keys=[...])` → run pauses (downstream never executes). Collect ids via `get_request_input_interrupt_ids(event)`; resume with `runner.run(..., new_message=types.Content(role="user", parts=[create_request_input_response(interrupt_id, {key: value})]))` → workflow continues.
+- Resume subtlety: with default `rerun_on_resume=False` the gate function is NOT re-executed on resume — the workflow proceeds past it. So don't rely on the gate node to write the decision into state on resume; the decision's source of truth is the Firestore gate doc (`clients.set_gate_status`), which the resume driver reads.
+
 **Sketch (finalize into tasks at phase start):**
 1. `suite/orchestration/adk_workflow.py`: build `Workflow` from `PIPELINE` (FunctionNode per step, edges from `reads`/layer order, gate nodes after human-gated steps).
 2. Firestore-backed session service (or DatabaseSessionService on the Phase 5 Cloud SQL).
