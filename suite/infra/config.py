@@ -26,22 +26,12 @@ class Settings:
     #   suite/fixtures/<agent_id>.txt (offline dev/demo, DEFAULT); "anthropic" =
     #   Claude first-party API (ANTHROPIC_API_KEY); "vertex" = Claude on Vertex.
     #   A "gemini" provider (google-genai) arrives in roadmap Phase 3.
-    # backend: "gcp" = Cloud SQL/Firestore/Pub-Sub; "memory" = in-process store
+    # backend: "gcp" = Firestore/Pub-Sub; "memory" = in-process store
     #   (offline dev/demo + tests). The two switches are independent.
     # SAFE-OFFLINE DEFAULTS: a bare import must never reach real GCP/LLM APIs.
     # Production is an explicit opt-in (Dockerfile / run_live.sh export these).
     llm_provider: str = os.getenv("SUITE_LLM_PROVIDER", "fixture")
     backend: str = os.getenv("SUITE_BACKEND", "memory")
-
-    # --- Cloud SQL (reached via local cloud-sql-proxy on 127.0.0.1) ---
-    sql_instance: str = os.getenv("SQL_INSTANCE", "ai-mkt-pg")
-    db_name: str = os.getenv("SQL_DATABASE", "suite")
-    db_user: str = os.getenv("SQL_USER", "suite_app")
-    sql_password_secret: str = os.getenv("SQL_PASSWORD_SECRET", "db-app-password")
-    # cloud-sql-proxy listen address. Override the port when 5432 is taken by a
-    # local Postgres (e.g. SQL_PROXY_PORT=5433 in local dev).
-    db_host: str = os.getenv("SQL_PROXY_HOST", "127.0.0.1")
-    db_port: str = os.getenv("SQL_PROXY_PORT", "5432")
 
     # --- Pub/Sub topics ---
     interview_topic: str = os.getenv("TOPIC_INTERVIEW", "client-interview-questions")
@@ -58,10 +48,6 @@ class Settings:
     model_primary: str = os.getenv("CLAUDE_MODEL_SONNET", "claude-sonnet-4-6")           # primary generation/reasoning
     model_routing: str = os.getenv("CLAUDE_MODEL_HAIKU", "claude-haiku-4-5@20251001")    # routing/classification
     model_deep: str = os.getenv("CLAUDE_MODEL_OPUS", "claude-opus-4-7")                  # binding deep reasoning ONLY
-
-    @property
-    def sql_instance_connection_name(self) -> str:
-        return f"{self.project_id}:{self.region}:{self.sql_instance}"
 
     @property
     def fixtures_dir(self) -> Path:
