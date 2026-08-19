@@ -78,7 +78,7 @@ español profesional, sin anglicismos). Approval writes flip the gate doc → re
 the paused ADK workflow.
 **Exit:** a human runs and approves an entire client pipeline from the browser.
 
-### Phase 6 — CI/CD & prod stack
+### Phase 6 — CI/CD & prod stack — 6a ✅ 2026-08-19 (app LIVE: console on Cloud Run + orchestrator Job; 6b pending: GitHub Actions WIF, prod stack, IAP, pinned image tags)
 GitHub Actions: tests → build images → `pulumi up` preview/apply → deploy Jobs +
 Services; `prod` stack promoted from `dev`; secrets in Secret Manager only; smoke-run
 gate on deploy.

@@ -47,3 +47,24 @@ billing-budgets API under user ADC).
 - Without the compute API the provider logs a harmless region-probe warning.
 - Prefer hardcoding the project number (54069477296) over
   `gcp.organizations.get_project` — the data source probes APIs at preview time.
+
+## Fase 6a additions (2026-08-19)
+
+- Cloud Build IAM for the default compute SA (storage.objectViewer,
+  artifactregistry.writer, logging.logWriter) — new projects grant it nothing.
+- Secrets: `django-secret-key`, `django-database-url`, `django-admin-password`
+  (pulumi-random; contents never printed — read with
+  `gcloud secrets versions access latest --secret=django-admin-password`).
+- Cloud SQL `console-pg` (Postgres 16, **ENTERPRISE** edition + db-f1-micro —
+  Enterprise Plus rejects shared-core tiers), db `console`, user `django`.
+- Cloud Run: service `console` (SA `console-web`, CPU always allocated for the
+  daemon-thread runs, Cloud SQL volume, public invoker — Django login is the
+  gate until IAP in 6b) and job `suite-orchestrator` (SA `suite-runner`,
+  gemini defaults, per-execution overrides).
+- ADC account also holds `roles/run.admin` (editor lacks setIamPolicy).
+- **Gotcha:** `.gcloudignore` uses gitignore semantics — an unrooted `infra/`
+  pattern also excluded `suite/infra` from the build context (shipped a broken
+  image). Patterns there stay rooted.
+- `:latest` images don't auto-redeploy: after a rebuild, roll the service
+  (`gcloud run services update console --image …:latest`) until CI (6b) pins
+  commit tags in Pulumi.

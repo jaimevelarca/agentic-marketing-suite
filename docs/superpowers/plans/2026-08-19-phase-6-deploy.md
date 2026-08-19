@@ -14,7 +14,17 @@
 - Deps: `web` extra gains `gunicorn` + `psycopg[binary]` (Django→Cloud SQL only; the suite itself stays SQL-free).
 
 ## Tasks
-- [ ] **T1** Dockerfiles: rewrite `deploy/Dockerfile` (suite job, adk+gemini), add `web/Dockerfile` + `web/entrypoint.sh` (migrate → ensure superuser → gunicorn); `.dockerignore` updates; `gcloud builds submit` both images to Artifact Registry.
-- [ ] **T2** Pulumi: pulumi-random; Cloud SQL instance+db+user; 3 secrets + versions; web SA + roles (datastore.user, aiplatform.user, pubsub.publisher, logging.logWriter, secretmanager.secretAccessor, cloudsql.client); Cloud Run v2 Service (web, cpu always-on, Cloud SQL volume, secret envs, public invoker) + Cloud Run v2 Job (suite-runner SA). Outputs: `web_url`.
-- [ ] **T3** Live smoke: web URL serves the login page (200); log in as `jaime` works (verified via HTTP, password never printed); suite Job executes `start --auto-approve` with fixture provider (env override) and completes.
-- [ ] **T4** Docs (`infra/README.md`, `web/README.md` prod section), ROADMAP 6a ✅, commit + push. 6b (GitHub Actions WIF + prod stack + IAP) left explicitly open.
+- [x] **T1** Dockerfiles: rewrite `deploy/Dockerfile` (suite job, adk+gemini), add `web/Dockerfile` + `web/entrypoint.sh` (migrate → ensure superuser → gunicorn); `.dockerignore` updates; `gcloud builds submit` both images to Artifact Registry.
+- [x] **T2** Pulumi: pulumi-random; Cloud SQL instance+db+user; 3 secrets + versions; web SA + roles (datastore.user, aiplatform.user, pubsub.publisher, logging.logWriter, secretmanager.secretAccessor, cloudsql.client); Cloud Run v2 Service (web, cpu always-on, Cloud SQL volume, secret envs, public invoker) + Cloud Run v2 Job (suite-runner SA). Outputs: `web_url`.
+- [x] **T3** Live smoke: web URL serves the login page (200); log in as `jaime` works (verified via HTTP, password never printed); suite Job executes `start --auto-approve` with fixture provider (env override) and completes.
+- [x] **T4** Docs (`infra/README.md`, `web/README.md` prod section), ROADMAP 6a ✅, commit + push. 6b (GitHub Actions WIF + prod stack + IAP) left explicitly open.
+
+## 6a live proof (2026-08-19)
+
+- Console: https://console-54069477296.us-central1.run.app — login page 200,
+  real login as `jaime` verified over HTTPS (password from Secret Manager,
+  never printed), tablero renders against Firestore.
+- Job: `suite-orchestrator` execution with fixture override completed the full
+  workflow — 19/19 agents valid, no pending blocks, exit 0.
+- 6b remains open: GitHub Actions (WIF) build+deploy, prod stack, IAP,
+  commit-pinned image tags in Pulumi.
