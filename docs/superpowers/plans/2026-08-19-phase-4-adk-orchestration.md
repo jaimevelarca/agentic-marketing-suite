@@ -35,26 +35,35 @@ Tests (offline): topology (19 agent nodes + gate nodes after exactly the GATED
 steps, edge chain in order); full fixture run via Runner+InMemorySessionService
 (auto_approve) → 20 blocks in final state; gated run pauses at first gate,
 resume after set_gate_status("approved") completes downstream.
-- [ ] tests → fail → implement → 221+N green → commit
+- [x] tests → fail → implement → 221+N green → commit
 
 ### Task 2: `read_gate_status` in clients.py (tiny, test-first)
 `read_gate_status(client_id, block) -> str | None` for both backends.
-- [ ] test + implement + commit (folded into Task 1's commit if convenient)
+- [x] test + implement + commit (folded into Task 1's commit if convenient)
 
 ### Task 3: `suite/infra/adk_sessions.py` — FirestoreSessionService
 Implements the 4 abstract methods + `append_event` persistence over
 `adk_sessions/{app}:{user}:{session}` root docs + `events` subcollection
 (events too large for one doc). Offline tests with FakeFirestore.
-- [ ] tests → implement → commit
+- [x] tests → implement → commit
 
 ### Task 4: `suite/orchestration/adk_entrypoint.py` + live dev proof (exit criterion)
 CLI: `start` (create session, run until pause/complete) and `resume` (rebuild
 resume Content from pending interrupt ids + gate docs, continue). Live proof
 against dev Firestore: fixture LLM + gcp backend, no auto-approve → pauses at
 gate 1.1; `clients.set_gate_status(...approved)`; `resume` → run completes.
-- [ ] live proof → record in plan → ROADMAP ✅ → commit + push
+- [x] live proof → record in plan → ROADMAP ✅ → commit + push
 
 ### Task 5: retire legacy choreography
 Delete `deploy/workflows/suite-pipeline.yaml`; note in deploy/README that
 orchestration is the ADK workflow (containerization lands in Phase 6).
-- [ ] commit
+- [x] commit
+
+## Live proof (2026-08-19, exit criterion)
+
+Fixture LLM + real dev Firestore, no auto-approve, session `live-proof-1`:
+run paused at gate 1.1; 13 approve→resume rounds (each resume a fresh process
+reading the Firestore-persisted session) walked every human gate; final status
+**completed**, 19/19 agents valid, 20 blocks, `pending_blocks` empty. The
+legacy `deploy/workflows/suite-pipeline.yaml` (L1-L2-only, sleep-loop gate) is
+deleted.

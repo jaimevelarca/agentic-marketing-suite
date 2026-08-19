@@ -17,6 +17,26 @@ from infra import clients  # noqa: E402
 
 
 # --- fake firestore ----------------------------------------------------------
+class FakeSnap:
+    def __init__(self, store: dict, path: str):
+        self._store, self._path = store, path
+
+    @property
+    def exists(self):
+        return self._path in self._store
+
+    def to_dict(self):
+        return self._store.get(self._path)
+
+    @property
+    def id(self):
+        return self._path.rsplit("/", 1)[-1]
+
+    @property
+    def reference(self):
+        return FakeDoc(self._store, self._path)
+
+
 class FakeDoc:
     def __init__(self, store: dict, path: str):
         self.store, self.path = store, path
@@ -33,15 +53,10 @@ class FakeDoc:
         self.store[self.path].update(data)
 
     def get(self):
-        class Snap:
-            def __init__(s, d):
-                s._d = d
-            @property
-            def exists(s):
-                return s._d is not None
-            def to_dict(s):
-                return s._d
-        return Snap(self.store.get(self.path))
+        return FakeSnap(self.store, self.path)
+
+    def delete(self):
+        self.store.pop(self.path, None)
 
     def collection(self, name):
         return FakeCollection(self.store, f"{self.path}/{name}")
@@ -59,6 +74,13 @@ class FakeCollection:
     def add(self, data):
         FakeCollection._n += 1
         self.store[f"{self.path}/auto{FakeCollection._n}"] = dict(data)
+
+    def stream(self):
+        prefix = self.path + "/"
+        for path in sorted(self.store):
+            # direct children only (no '/' after the prefix)
+            if path.startswith(prefix) and "/" not in path[len(prefix):]:
+                yield FakeSnap(self.store, path)
 
 
 class FakeFirestore:

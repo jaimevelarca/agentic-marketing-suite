@@ -59,7 +59,7 @@ from config. Golden-run comparison: fixture outputs vs Gemini outputs
 schema-validated across all 19 agents.
 **Exit:** `SUITE_LLM_PROVIDER=gemini` full run green in `dev`; cost per run measured.
 
-### Phase 4 — ADK 2.x orchestration on Cloud Run
+### Phase 4 — ADK 2.x orchestration ✅ 2026-08-19 (live pause/resume across processes; Cloud Run containerization → Phase 6)
 Port `pipeline.py`'s DAG to an ADK graph `Workflow` (one node per agent; router
 functions where gates branch; `NodeInterruptedError` pauses at human gates; resume on
 approval). Session/state backed by Firestore (custom `BaseSessionService` — the
