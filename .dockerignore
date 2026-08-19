@@ -1,0 +1,18 @@
+# Rooted patterns (see .gcloudignore note — unrooted dir patterns can match
+# nested paths like suite/infra depending on the tool's ignore semantics).
+.git/
+__pycache__/
+**/__pycache__/
+*.pyc
+.venv/
+infra/.venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+**/.DS_Store
+suite/runs/
+exports/
+tests/
+docs/
+web/db.sqlite3
+web/staticfiles/

@@ -14,12 +14,14 @@ source = { virtual = "." }
 dependencies = [
     { name = "pulumi" },
     { name = "pulumi-gcp" },
+    { name = "pulumi-random" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "pulumi", specifier = ">=3.150,<4" },
     { name = "pulumi-gcp", specifier = ">=9,<10" },
+    { name = "pulumi-random", specifier = ">=4.21.1" },
 ]
 
 [[package]]
@@ -282,6 +284,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/30/53/1dee075706c8b5fc1032d765949380ecdd7b026a3d3f9e91d3e8e837eaa5/pulumi_gcp-9.34.1.tar.gz", hash = "sha256:ac8de9c88697394b489ba9ce3d638d04c4adc6fb66d4e7309223c4626fb783fd", size = 11191891, upload-time = "2026-08-12T17:20:16.929Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/51/5b/983b61ea6557e18f1420578923bbd366c78778383e1687ee538ef7c38287/pulumi_gcp-9.34.1-py3-none-any.whl", hash = "sha256:ed424d4df8bc16b6452b7f76dcc5b5118677cca99c3ac6d67809209848ea287e", size = 13691792, upload-time = "2026-08-12T17:20:14.539Z" },
+]
+
+[[package]]
+name = "pulumi-random"
+version = "4.21.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "parver" },
+    { name = "pulumi" },
+    { name = "semver" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ec/95/d648a11cd6976a5251e057b7d716f060a009a4c189373d199cb627e8a278/pulumi_random-4.21.1.tar.gz", hash = "sha256:bb60cebafecaef508cbc00c4df8d9d1f70de1c87c4594bb02815b3302699f20e", size = 22616, upload-time = "2026-07-22T19:27:05.207Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/c3/84a3278781de5e00b2d5002c5f847372b029e845826a3ad2440fc0537cf9/pulumi_random-4.21.1-py3-none-any.whl", hash = "sha256:889943db1a109c1c1e7c5c2d706296a717c366c358b0bec92b77de3747af682a", size = 36076, upload-time = "2026-07-22T19:27:04.209Z" },
 ]
 
 [[package]]

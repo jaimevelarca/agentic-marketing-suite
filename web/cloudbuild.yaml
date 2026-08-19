@@ -1,0 +1,18 @@
+# Build + push the Django console image (Cloud Run service).
+# Run from repo root:
+#   gcloud builds submit --config web/cloudbuild.yaml \
+#     --substitutions=_TAG=$(git rev-parse --short HEAD)
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "web/Dockerfile",
+           "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/console:${_TAG}",
+           "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/console:latest",
+           "."]
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/console:${_TAG}"
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/console:latest"
+substitutions:
+  _REGION: us-central1
+  _TAG: dev
+options:
+  logging: CLOUD_LOGGING_ONLY

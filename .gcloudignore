@@ -1,17 +1,20 @@
-# Keep the Cloud Build upload context lean. The image (deploy/Dockerfile) only
-# needs pyproject.toml, README.md, suite/, and project/resources/schemas/.
-.git/
+# Keep the Cloud Build upload context lean. Images need: pyproject.toml,
+# README.md, suite/ (incl. the generic sample inputs), project/resources/schemas/,
+# web/ (console image), deploy/ (Dockerfile).
+# NOTE: gitignore semantics — unrooted `infra/` would also match suite/infra
+# (that bug shipped an image without the infra package). Keep patterns ROOTED.
+/.git/
 __pycache__/
-**/__pycache__/
 *.pyc
-.venv/
+/.venv/
+/infra/
+/tests/
+/docs/
+/exports/
 .pytest_cache/
 .ruff_cache/
 .DS_Store
-**/.DS_Store
-suite/runs/
-suite/inputs/
-exports/
-tests/
-workflows/
-project/resources/openapi/
+/suite/runs/
+/web/db.sqlite3
+/web/staticfiles/
+/infra/.venv/

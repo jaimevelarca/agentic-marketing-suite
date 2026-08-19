@@ -1,6 +1,6 @@
-# Cloud Run Job image for the Digital Marketing AI Suite (ADR-04).
-# One image runs any agent (or the whole pipeline) via orchestration.job_entrypoint,
-# selected at invocation time by the CLIENT_ID / AGENT_ID env vars.
+# Cloud Run Job image for the Agentic Marketing Suite orchestrator.
+# One image runs the ADK workflow (start / resume / status via
+# orchestration.adk_entrypoint), args chosen per execution.
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
@@ -13,21 +13,18 @@ WORKDIR /app
 # Dependencies first (better layer caching).
 COPY pyproject.toml README.md ./
 COPY suite ./suite
-RUN pip install .
+RUN pip install ".[adk]"
 
-# Runtime assets the code reads by path (prompt assets ship inside suite/):
-#   - per-block JSON Schemas, incl. the DEL-17 client_profile schema, all under
-#     project/resources/schemas (clients.load_schema + the legacy registry).
+# Runtime assets the code reads by path: per-block JSON Schemas
+# (clients.load_schema + the legacy DEL-17 registry).
 COPY project/resources/schemas ./project/resources/schemas
 
-# Production defaults; override per-invocation. Model backbone = Claude on the
-# Anthropic first-party API (validated path; Vertex is a one-env-var flip to
-# SUITE_LLM_PROVIDER=vertex once Vertex Claude quota is granted). NEVER bake
-# secrets — Cloud Run injects ANTHROPIC_API_KEY + the DB password from Secret
-# Manager at runtime (see deploy/cloudbuild.yaml).
-ENV SUITE_LLM_PROVIDER=anthropic \
+# Production defaults; override per execution. Never bake secrets — Vertex
+# Gemini authenticates via the runtime service account (ADC), no API key.
+ENV SUITE_LLM_PROVIDER=gemini \
     SUITE_BACKEND=gcp \
-    GCP_PROJECT_ID=ai-mkt-suite \
+    GCP_PROJECT_ID=agentic-marketing-suite \
     GCP_REGION=us-central1
 
-ENTRYPOINT ["python", "-m", "orchestration.job_entrypoint"]
+ENTRYPOINT ["python", "-m", "orchestration.adk_entrypoint"]
+CMD ["--help"]
