@@ -1,0 +1,9 @@
+[project]
+name = "agentic-marketing-suite-infra"
+version = "0.1.0"
+description = "Pulumi program for the agentic-marketing-suite GCP project"
+requires-python = ">=3.12"
+dependencies = [
+    "pulumi>=3.150,<4",
+    "pulumi-gcp>=9,<10",
+]

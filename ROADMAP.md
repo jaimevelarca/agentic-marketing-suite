@@ -27,14 +27,14 @@
 
 ## Phases
 
-### Phase 0 — Repo hygiene & truth (unblocks everything)
+### Phase 0 — Repo hygiene & truth (unblocks everything) ✅ 2026-08-19
 Strip real client data (`suite/inputs/alonso-y-cia.json` → vault), delete stale
 Drive-path build scripts (`workflows/*.js`), rewrite CLAUDE.md/AGENTS.md/README for
 the new repo + project, pin Python 3.12, drop unused deps, flip config defaults to
 safe (`fixture`/`memory`; prod is explicit opt-in), add `logging` scaffold.
 **Exit:** clean generic repo, 207 tests green, docs true.
 
-### Phase 1 — Pulumi foundation (IaC before app)
+### Phase 1 — Pulumi foundation (IaC before app) ✅ 2026-08-19 (see infra/README.md)
 `infra/` Pulumi program: state bucket (bootstrapped once by hand), API enablement,
 Artifact Registry, **Firestore database**, Secret Manager, service accounts + minimal
 IAM, Pub/Sub topics, budget alerts, Cloud Build/GitHub Actions trigger wiring.

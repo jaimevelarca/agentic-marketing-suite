@@ -1,0 +1,6 @@
+encryptionsalt: v1:BS0U3EHtxMk=:v1:HxNzxl558VaKoIp1:XmD+t5ipJS+Z99xeNj4O+yzVZz+qpA==
+config:
+  gcp:project: agentic-marketing-suite
+  gcp:region: us-central1
+  gcp:billingProject: agentic-marketing-suite
+  gcp:userProjectOverride: "true"

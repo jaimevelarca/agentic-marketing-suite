@@ -1,0 +1,6 @@
+name: agentic-marketing-suite-infra
+description: IaC for the Agentic Marketing Suite (GCP project agentic-marketing-suite)
+runtime:
+  name: python
+  options:
+    toolchain: uv
