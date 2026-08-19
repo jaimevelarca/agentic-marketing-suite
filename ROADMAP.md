@@ -69,7 +69,7 @@ Job (`adk deploy cloud_run` or own Dockerfile). Retire `deploy/workflows/*.yaml`
 **Exit:** a gated run pauses on Firestore gate docs and resumes on approval, no
 sleep-loop, end to end in `dev`.
 
-### Phase 5 — Django review & ops UI (the missing product surface)
+### Phase 5 — Django review & ops UI ✅ 2026-08-19 (browser flow proven vs dev Firestore; Cloud SQL+IAP land in Phase 6)
 Django 5.x on Cloud Run: review queue (approve/return/block with diff view of the
 block JSON), run browser, client onboarding form (writes
 `suite/inputs`-shaped doc to Firestore), cost dashboard. Cloud SQL Postgres

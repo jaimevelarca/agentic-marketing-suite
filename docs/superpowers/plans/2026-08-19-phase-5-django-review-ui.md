@@ -23,7 +23,7 @@
 `web/manage.py`, `web/core/{settings,urls,wsgi}.py`, `console` app registered,
 es-MX (`LANGUAGE_CODE="es-mx"`, `TIME_ZONE="America/Mexico_City"`), SQLite default +
 `DATABASE_URL` override, login/logout views, base template with nav.
-- [ ] scaffold; `migrate` + `runserver` smoke; commit
+- [x] scaffold; `migrate` + `runserver` smoke; commit
 
 ### Task 2: `console/services.py` — the only bridge to the suite
 `list_sessions()`, `get_session(session_id)`, `pending_blocks(state)`,
@@ -32,7 +32,7 @@ es-MX (`LANGUAGE_CODE="es-mx"`, `TIME_ZONE="America/Mexico_City"`), SQLite defau
 `start_run(client_id, inputs, auto_approve)` / `resume_run(session_id)` (daemon
 threads over `orchestration.adk_entrypoint` internals). Offline tests with
 monkeypatched clients/session service.
-- [ ] tests → implement → commit
+- [x] tests → implement → commit
 
 ### Task 3: Views + templates (es-MX)
 Panel (sessions + pending count), session detail (transcript, blocks,
@@ -41,7 +41,7 @@ Aprobar `#1ebe82` / Devolver / Bloquear + nota), Nueva corrida form
 (client_id + JSON inputs textarea prefilled from `suite/inputs/acme.json`,
 auto-approve checkbox). Offline view tests: auth required, render, decide POST
 calls `set_gate_status(actor=username)`, start POST calls `start_run`.
-- [ ] tests → implement → commit
+- [x] tests → implement → commit
 
 ### Task 4: Live browser-equivalent proof (exit criterion)
 Against dev Firestore (fixture LLM, gcp backend): drive the full flow through
@@ -49,4 +49,15 @@ the Django test client — login → nueva corrida (no auto-approve) → pauses 
 approve each pending block via the review view → Reanudar each round →
 session completed 19/19. Record in plan; ROADMAP ✅; runserver instructions in
 web/README.md for the human to do the same by hand.
-- [ ] live proof → docs → commit + push
+- [x] live proof → docs → commit + push
+
+## Live proof (2026-08-19, exit criterion)
+
+Django test client (same code paths as the browser) against dev Firestore,
+fixture LLM, clean data: login → nueva corrida (sin aprobación automática) →
+15 approve→resume rounds, every human gate paused and required a decision
+(audited with actor) → estado **terminada**, 20 bloques, 19/19 agentes válidos.
+Bonus: the proof exposed and fixed a real client-id hijack bug (inputs JSON
+client_id overriding the run's identity) plus a double-resume race (pause is
+now detected from the last event's unanswered interrupt).
+Django resolved to 6.1 (constraint is >=5).
