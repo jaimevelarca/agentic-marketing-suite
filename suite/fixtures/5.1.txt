@@ -1,0 +1,205 @@
+## OUTPUT 1 — ad_campaign_log JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "campaign_ref": "cmp-edu-convocatoria-ago",
+  "cycle_label": "2026-08",
+  "currency": "USD",
+  "markets": ["Mexico"],
+  "platform_campaigns": [
+    {
+      "platform": "meta",
+      "platform_campaign_id": "mc-meta-convocatoria-ago-01",
+      "name": "Convocatoria Agosto — Admisiones (Meta Leads)",
+      "campaign_objective": "leads",
+      "buying_type": "auction",
+      "campaign_budget_optimization": true,
+      "campaign_budget_usd": 360,
+      "ad_sets": [
+        {
+          "ad_set_id": "as-meta-director-admisiones-01",
+          "name": "Directores de admisiones — CDMX y zona metropolitana",
+          "optimization_goal": "leads",
+          "billing_event": "impressions",
+          "bid_strategy": "cost_cap",
+          "bid_cap_usd": 9,
+          "budget_type": "daily",
+          "budget_usd": 8,
+          "schedule": {
+            "start_date": "2026-08-01",
+            "end_date": "2026-08-31",
+            "dayparting_note": "Run all day; lean delivery toward 08:00-22:00 America/Mexico_City when most decision-makers are active."
+          },
+          "targeting": {
+            "segment_ref": "seg-director-admisiones",
+            "geo": [
+              {"country": "Mexico", "regions": ["Ciudad de Mexico", "Estado de Mexico", "Jalisco", "Nuevo Leon"], "exclusions": []}
+            ],
+            "age_min": 30,
+            "age_max": 60,
+            "genders": ["all"],
+            "languages": ["es-MX"],
+            "interests": ["Administracion educativa", "Educacion privada", "Direccion escolar", "Marketing educativo"],
+            "keywords": [],
+            "custom_audiences": [],
+            "placements": ["facebook_feed", "instagram_feed", "instagram_reels", "instagram_stories"],
+            "exclusions_note": "No custom/lookalike audiences yet — pre-launch BU has no seed list or pixel history. Start with interest targeting; build a lookalike once the lead list grows (hand off to 6.3)."
+          },
+          "creatives": [
+            {
+              "copy_asset_ref": "cpy-acme-co-01",
+              "visual_asset_ref": null,
+              "landing_page_ref": "lp-admisiones-agosto",
+              "destination_url": "/lp/guia-admisiones-agosto",
+              "format": "single_image",
+              "primary_text_ref": "hook + primary_caption of cpy-acme-co-01; visual_assets not yet produced (4.2 pending)."
+            }
+          ],
+          "expected_cpl_usd": 22,
+          "notes": "Single well-funded ad set so Meta exits the learning phase (>=50 conversions/week is unrealistic on this budget, so cost_cap keeps CPL bounded). One ad set, not many, to avoid starving learning on a small budget."
+        }
+      ],
+      "conversion_tracking": {
+        "pixel_or_tag": "Meta Pixel — to be installed on /lp/guia-admisiones-agosto before launch (flag in setup_notes).",
+        "conversion_events": ["lead", "form_submit"],
+        "utm_template": "utm_source=meta&utm_medium=paid_social&utm_campaign=convocatoria-ago&utm_content={{ad.name}}"
+      },
+      "setup_notes": "Meta carries broad lead-gen reach for the admissions-director segment. CBO on so the platform optimizes the single ad set's daily budget. Pixel install on the landing page is a launch precondition."
+    },
+    {
+      "platform": "google",
+      "platform_campaign_id": "mc-google-convocatoria-ago-01",
+      "name": "Convocatoria Agosto — Busqueda Admisiones (Google Search)",
+      "campaign_objective": "leads",
+      "buying_type": "auction",
+      "campaign_budget_optimization": false,
+      "campaign_budget_usd": 240,
+      "ad_sets": [
+        {
+          "ad_set_id": "ag-google-busqueda-admisiones-01",
+          "name": "Busqueda — inscripciones escuela privada",
+          "optimization_goal": "conversions",
+          "billing_event": "link_clicks",
+          "bid_strategy": "target_cpa",
+          "bid_cap_usd": 20,
+          "budget_type": "daily",
+          "budget_usd": 8,
+          "schedule": {
+            "start_date": "2026-08-01",
+            "end_date": "2026-08-31",
+            "dayparting_note": null
+          },
+          "targeting": {
+            "segment_ref": "seg-director-admisiones",
+            "geo": [
+              {"country": "Mexico", "regions": ["Ciudad de Mexico", "Jalisco", "Nuevo Leon"], "exclusions": []}
+            ],
+            "age_min": 25,
+            "age_max": 60,
+            "genders": ["all"],
+            "languages": ["es-MX"],
+            "interests": [],
+            "keywords": [
+              "software de admisiones escolares",
+              "como aumentar inscripciones escuela privada",
+              "marketing para colegios privados",
+              "captar prospectos admisiones",
+              "agencia marketing educativo mexico"
+            ],
+            "custom_audiences": [],
+            "placements": ["search"],
+            "exclusions_note": "Add negative keywords pre-launch: 'gratis', 'empleo', 'becas' to avoid low-intent traffic."
+          },
+          "creatives": [
+            {
+              "copy_asset_ref": "cpy-acme-co-02",
+              "visual_asset_ref": null,
+              "landing_page_ref": "lp-admisiones-agosto",
+              "destination_url": "/lp/guia-admisiones-agosto",
+              "format": "search_text",
+              "primary_text_ref": "Responsive search ad headlines/descriptions from cpy-acme-co-02 (high-intent search angle)."
+            }
+          ],
+          "expected_cpl_usd": 28,
+          "notes": "High-intent demand capture: people already searching admissions/enrollment solutions. target_cpa $20 with a $20 cap until conversion data accrues, then 6.3 can tighten."
+        }
+      ],
+      "conversion_tracking": {
+        "pixel_or_tag": "Google tag (gtag) + conversion action 'lead' — to be installed on the landing page before launch.",
+        "conversion_events": ["lead", "form_submit"],
+        "utm_template": "utm_source=google&utm_medium=cpc&utm_campaign=convocatoria-ago&utm_term={keyword}"
+      },
+      "setup_notes": "Google Search captures high-intent demand to complement Meta's reach. Responsive search ad uses approved copy; negative keywords recommended to protect spend."
+    }
+  ],
+  "budget_reconciliation": {
+    "authorized_paid_budget_usd": 600,
+    "total_planned_spend_usd": 600,
+    "unallocated_usd": 0,
+    "by_platform_usd": {"meta": 360, "google": 240},
+    "period": "monthly",
+    "overspend_guardrail": "Set an account-level monthly spend cap of $600 total ($360 Meta / $240 Google). Daily caps ($8 + $8 = $16/day) roll up to ~$496/30d, leaving headroom under the $600 monthly ceiling."
+  },
+  "authorization": {
+    "status": "awaiting_authorization",
+    "requires_human_authorization": true,
+    "authorized_by": null,
+    "authorized_at": null,
+    "total_amount_at_stake_usd": 600
+  },
+  "assumptions": [
+    "Authorized paid-media budget of $600/mo taken from campaign_registry cmp-edu-convocatoria-ago budget split; no active_strategy was injected in this run so the campaign budget is treated as the envelope.",
+    "expected_cpl_usd ($22 Meta / $28 Google) are SMB private-education benchmarks, not client history — pre-launch BU has no campaign_history. Treat as estimates; 6.1 will replace with actuals.",
+    "TikTok omitted this cycle: the budget is small and the campaign is high-intent lead-gen, where Meta + Google Search outperform top-funnel TikTok awareness. Revisit at T3 / larger budgets."
+  ],
+  "coherence_flags": [
+    "Tracking not yet live: Meta Pixel and the Google conversion tag must be installed on /lp/guia-admisiones-agosto BEFORE launch, or lead optimization will not work. Reviewer must confirm install as an authorization precondition.",
+    "No ad creatives (visual_assets) yet — Agent 4.2 output pending. Ads reference approved copy only; visual_asset_ref is null. Authorize copy-driven launch or wait for visuals."
+  ],
+  "setup_notes": "Two-platform paid setup for the August enrollment campaign (cmp-edu-convocatoria-ago), targeting the admissions-director segment in Mexico. Meta ($360/mo) for lead-gen reach, Google Search ($240/mo) for high-intent demand capture; both point at the approved landing page lp-admisiones-agosto and reuse approved copy_assets. Total planned spend $600/mo equals the authorized budget (unallocated $0). gate_status=pending_review and authorization awaiting human — NO SPEND occurs until the operator authorizes. Preconditions flagged: tracking install + (optionally) visual creatives. USD only; no internal cost/margin figures."
+}
+```
+
+## OUTPUT 2 — Launch Brief
+
+LAUNCH BRIEF — Acme Co. BU · Campaign cmp-edu-convocatoria-ago (Convocatoria Agosto — Educacion Privada)
+
+This run prepares a two-platform paid-media launch — nothing is live until the operator authorizes the $600/month spend. The campaign drives admissions-director leads for private schools in Mexico during the August enrollment window, pointing all paid traffic at the approved landing page lp-admisiones-agosto (/lp/guia-admisiones-agosto) and reusing the approved ad copy from 4.1.
+
+Platform split and why: Meta gets $360/mo (60%) for broad lead-gen reach against the admissions-director interest profile — one well-funded ad set rather than several tiny ones, so the platform can actually exit its learning phase. Google Search gets $240/mo (40%) to capture high-intent demand: people already searching "como aumentar inscripciones escuela privada" or "marketing para colegios privados" convert at a lower CPL than cold reach. TikTok is deliberately omitted this cycle — on a small budget for a high-intent lead-gen goal, top-funnel TikTok awareness would dilute the spend; we revisit it at larger budgets.
+
+Targeting logic: both ad sets serve the single campaign segment, seg-director-admisiones, geo-fenced to the metro markets where private-school decision-makers concentrate (CDMX, Estado de Mexico, Jalisco, Nuevo Leon), ages 30–60, ES-MX. Meta uses education-administration interests (no custom/lookalike audiences yet — the pre-launch BU has no seed list or pixel history); Google uses five high-intent ES-MX keywords with negative keywords ('gratis', 'empleo', 'becas') recommended to protect spend.
+
+Creative and conversion wiring: each ad references an approved copy asset (cpy-acme-co-01 for Meta, -02 for the Google responsive search ad) and the lp-admisiones-agosto landing page. Visual creatives are not yet produced (4.2 pending), so visual_asset_ref is null and the launch is copy-driven for now. Conversion tracking optimizes the 'lead' / 'form_submit' events with per-platform UTM templates so 6.1 can attribute landing-page form submits back to each ad set.
+
+The money: expected CPL is $22 (Meta) / $28 (Google) — SMB private-education benchmarks, not client history — implying roughly 23–24 leads/month at full spend, to be reconciled by 6.1 against the strategy's target CPL. Daily caps ($8 + $8) roll up under the $600 monthly ceiling; we recommend an account-level $600 spend cap as a hard guardrail. Two preconditions must be cleared before launch: the Meta Pixel and Google conversion tag must be installed on the landing page, and the operator must decide whether to launch copy-only or wait for visuals.
+
+## OUTPUT 3 — Financial Authorization Gate Summary
+
+=== AGENT 5.1 — FINANCIAL AUTHORIZATION GATE SUMMARY ===
+Client: Acme Co. BU
+Campaign: cmp-edu-convocatoria-ago (Convocatoria Agosto — Educacion Privada)
+Gate status: PENDING REVIEW
+
+--- SPEND REQUESTED FOR AUTHORIZATION ---
+Total monthly USD: $600  (NO SPEND OCCURS UNTIL A HUMAN AUTHORIZES)
+By platform: Meta $360 · Google $240 · TikTok $0
+Authorized budget: $600 · Unallocated: $0
+
+--- BUDGET RECONCILIATION CHECK ---
+Pass. Planned spend $600 = authorized budget $600 (unallocated $0; not over budget). Daily caps ($8 Meta + $8 Google = $16/day) roll up to ~$496/30d, inside the $600 monthly ceiling. Recommended guardrail: account-level $600/mo spend cap.
+
+--- TARGETING & CREATIVE READINESS ---
+Meta / as-meta-director-admisiones-01 — segment seg-director-admisiones · geo MX metro (CDMX/EdoMex/Jalisco/NL) · optimization leads · copy cpy-acme-co-01 present · landing lp-admisiones-agosto present · visuals null (4.2 pending).
+Google / ag-google-busqueda-admisiones-01 — segment seg-director-admisiones · geo MX metro · optimization conversions (target_cpa $20) · copy cpy-acme-co-02 present · landing lp-admisiones-agosto present · negative keywords recommended.
+Constraints respected: USD-only budgets; targeting inside authorized market (Mexico); no pricing claims, no political/religious, no fabricated assets.
+
+--- KPI EXPECTATION ---
+Expected CPL $22 (Meta) / $28 (Google) — benchmark estimates, not client history. Blended ~23–24 leads/mo at full spend. 6.1 reconciles actual CPL/lead volume against the kpi_contracts target CPL once data accrues.
+
+--- RECOMMENDED ACTION ---
+RETURN — clear two preconditions before authorizing: (1) install the Meta Pixel and Google conversion tag on /lp/guia-admisiones-agosto (lead optimization depends on it), and (2) decide launch copy-only now vs wait for 4.2 visual creatives. On authorization, push the setup to Meta + Google and hand off to 6.1 (measurement) and 6.3 (optimization). No spend until then.

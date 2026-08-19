@@ -1,0 +1,226 @@
+## OUTPUT 1 — approval_log JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-07-20T09:00:00Z",
+  "gate_status": "auto_approved",
+  "cycle_month": "2026-08",
+  "source_block": "content_calendar",
+  "entries": [
+    {
+      "item_id": "cal-2026-08-w1-ig-reel-01",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "instagram",
+      "format": "reel",
+      "funnel_stage": "awareness",
+      "topic": "Como una escuela privada llena su convocatoria de agosto sin bajar la colegiatura",
+      "scheduled_for": "2026-08-04T15:00:00Z",
+      "review_required": false,
+      "route": "auto_publish",
+      "priority": "low",
+      "reviewer_role": "none",
+      "review_by": "2026-08-03T15:00:00Z",
+      "status": "auto_approved",
+      "overdue": false,
+      "flags": ["autonomous_organic"],
+      "rationale": "Low-risk organic awareness reel with no constraint touch; cleared via the autonomous-organic rule (mirrors Agent 5.2).",
+      "matched_rule": "RULE 4 — autonomous organic"
+    },
+    {
+      "item_id": "cal-2026-08-w1-ig-carousel-02",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "instagram",
+      "format": "carousel",
+      "funnel_stage": "consideration",
+      "topic": "3 senales de que tu proceso de admisiones esta perdiendo prospectos",
+      "scheduled_for": "2026-08-06T15:00:00Z",
+      "review_required": true,
+      "route": "human_review",
+      "priority": "normal",
+      "reviewer_role": "operator",
+      "review_by": "2026-08-04T15:00:00Z",
+      "status": "queued",
+      "overdue": false,
+      "flags": [],
+      "rationale": "Consideration-stage organic carousel falls outside the auto-publish lane (not awareness); standard operator review.",
+      "matched_rule": "RULE 5 — standard review"
+    },
+    {
+      "item_id": "cal-2026-08-w2-lp-01",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "landing_page",
+      "format": "landing_page",
+      "funnel_stage": "consideration",
+      "topic": "Guia: el embudo de admisiones de una escuela privada, paso a paso",
+      "scheduled_for": "2026-08-11T12:00:00Z",
+      "review_required": true,
+      "route": "human_review",
+      "priority": "high",
+      "reviewer_role": "operator",
+      "review_by": "2026-08-08T12:00:00Z",
+      "status": "queued",
+      "overdue": false,
+      "flags": ["conversion_asset"],
+      "rationale": "Landing page carries conversion risk; routed to high-priority human review with a 72h buffer.",
+      "matched_rule": "RULE 2 — financial / binding"
+    },
+    {
+      "item_id": "cal-2026-08-w2-meta-ad-01",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "meta_ads",
+      "format": "ad_creative",
+      "funnel_stage": "consideration",
+      "topic": "Caso: como medimos el costo por prospecto inscrito mes a mes",
+      "scheduled_for": "2026-08-13T15:00:00Z",
+      "review_required": true,
+      "route": "escalate",
+      "priority": "urgent",
+      "reviewer_role": "partner",
+      "review_by": "2026-08-10T15:00:00Z",
+      "status": "queued",
+      "overdue": false,
+      "flags": ["pricing_claims", "paid_media"],
+      "rationale": "Paid creative makes a cost-per-enrolled-lead claim touching pricing_claims; partner sign-off required per approval_chain.",
+      "matched_rule": "RULE 1 — hard-constraint escalation"
+    },
+    {
+      "item_id": "cal-2026-08-w3-wa-01",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "whatsapp",
+      "format": "whatsapp_broadcast",
+      "funnel_stage": "conversion",
+      "topic": "Recordatorio: cierre de convocatoria de agosto, ultimos lugares",
+      "scheduled_for": "2026-08-18T16:00:00Z",
+      "review_required": true,
+      "route": "hold",
+      "priority": "high",
+      "reviewer_role": "operator",
+      "review_by": "2026-08-16T16:00:00Z",
+      "status": "blocked",
+      "overdue": false,
+      "flags": ["data_privacy", "dependency_hold"],
+      "rationale": "First WhatsApp broadcast depends on the warm list from the week-2 landing page (still in review); held until that asset clears.",
+      "matched_rule": "RULE 3 — first-deploy email/WhatsApp (+ dependency hold)"
+    },
+    {
+      "item_id": "cal-2026-08-w3-email-01",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "channel": "email",
+      "format": "email_single",
+      "funnel_stage": "conversion",
+      "topic": "Inscribete antes del cierre: lo que incluye el acompanamiento de admisiones",
+      "scheduled_for": "2026-08-19T14:00:00Z",
+      "review_required": true,
+      "route": "human_review",
+      "priority": "high",
+      "reviewer_role": "operator",
+      "review_by": "2026-08-17T14:00:00Z",
+      "status": "queued",
+      "overdue": false,
+      "flags": ["data_privacy", "first_deploy"],
+      "rationale": "First conversion email of the cycle; high-priority operator review with opt-in/data-privacy check.",
+      "matched_rule": "RULE 3 — first-deploy email/WhatsApp"
+    },
+    {
+      "item_id": "cal-2026-08-w1-li-article-01",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "channel": "linkedin",
+      "format": "article",
+      "funnel_stage": "awareness",
+      "topic": "Que puede y que no puede hacer la IA generativa en el marketing de una escuela",
+      "scheduled_for": "2026-08-05T13:00:00Z",
+      "review_required": true,
+      "route": "human_review",
+      "priority": "normal",
+      "reviewer_role": "operator",
+      "review_by": "2026-07-19T13:00:00Z",
+      "status": "queued",
+      "overdue": true,
+      "flags": ["brand_safety", "overdue"],
+      "rationale": "Long-form authority article (not auto-publishable) needs an AI-overpromise brand-safety check; its review-by has already passed.",
+      "matched_rule": "RULE 5 — standard review"
+    },
+    {
+      "item_id": "cal-2026-08-w4-li-ad-01",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "channel": "linkedin",
+      "format": "ad_creative",
+      "funnel_stage": "conversion",
+      "topic": "Solicita un diagnostico de marketing con IA para tu institucion",
+      "scheduled_for": "2026-08-27T13:00:00Z",
+      "review_required": true,
+      "route": "human_review",
+      "priority": "high",
+      "reviewer_role": "partner",
+      "review_by": "2026-08-24T13:00:00Z",
+      "status": "queued",
+      "overdue": false,
+      "flags": ["paid_media"],
+      "rationale": "Paid LinkedIn creative offering a diagnostic; high-priority review with partner spend sign-off per approval_chain.",
+      "matched_rule": "RULE 2 — financial / binding"
+    }
+  ],
+  "alerts": [
+    {
+      "type": "overdue",
+      "item_id": "cal-2026-08-w1-li-article-01",
+      "message": "LinkedIn authority article was due for review 2026-07-19 and is still queued; clear it now or its 2026-08-05 publish slips."
+    },
+    {
+      "type": "dependency_hold",
+      "item_id": "cal-2026-08-w3-wa-01",
+      "message": "WhatsApp closing broadcast is held until the week-2 landing page (cal-2026-08-w2-lp-01) is approved and the warm list exists."
+    }
+  ],
+  "summary": {
+    "total_items": 8,
+    "auto_published": 1,
+    "human_review": 5,
+    "escalated": 1,
+    "on_hold": 1,
+    "overdue": 1,
+    "by_priority": {
+      "urgent": 1,
+      "high": 4,
+      "normal": 2,
+      "low": 1
+    }
+  },
+  "notes": "Routed from content_calendar (8 scheduled items across 2 campaigns). 1 organic awareness reel auto-published; 5 to human review; 1 escalated (pricing claim in a paid creative, partner sign-off); 1 held (first WhatsApp send depends on the week-2 landing page). One overdue item flagged. Human-review + escalate load = 6, within the 25-item/cycle single-operator guardrail. Pricing_claims, data_privacy and brand_safety constraints from client_profile drove the escalation/flags."
+}
+```
+
+## OUTPUT 2 — Queue Brief
+
+QUEUE BRIEF — Acme Co. BU · Cycle 2026-08
+
+This cycle's calendar carries 8 scheduled items across the two August campaigns. Routing breaks down as: 1 auto-published, 5 in standard/high human review, 1 escalated, and 1 on hold — a total human-review load of 6 items, comfortably inside the single-operator guardrail (25/client/cycle), so no triage of the queue itself is needed beyond ordering.
+
+What the operator should clear first: the escalated Meta creative (cmp-edu-convocatoria-ago) makes a cost-per-enrolled-lead claim that touches the pricing-claims constraint, so it is urgent and needs partner sign-off per the approval chain — it is also the tightest binding deadline (review-by 2026-08-10). Next is the week-2 landing page (high, review-by 2026-08-08): it is the hinge of the conversion funnel and the WhatsApp closing broadcast is held until it clears. The first conversion email and the week-4 paid LinkedIn diagnostic creative round out the high-priority lane.
+
+Two alerts need attention. First, the LinkedIn authority article is overdue — its review-by (2026-07-19) has already passed against today's run, so it must be cleared immediately or its 2026-08-05 publish slips. Second, the WhatsApp closing broadcast is on hold by design: it depends on the warm list the week-2 landing page builds, so it will not move until that asset is approved.
+
+The one auto-published item is the back-to-school awareness reel — low-risk organic, no constraint touch, cleared via the autonomous-organic rule (the same policy Agent 5.2 publishes under). Everything client-facing was echoed verbatim from the calendar in ES-MX; no copy was rewritten here.
+
+## OUTPUT 3 — Ops / Queue Summary
+
+=== AGENT 3.3 — REVIEW QUEUE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Gate posture: AUTO-APPROVED (queue manager)
+
+--- ROUTING TOTALS ---
+Total items: 8
+Auto-published: 1 · Human-review: 5 · Escalated: 1 · On-hold: 1
+Overdue: 1
+By priority: urgent=1 · high=4 · normal=2 · low=1
+Human-review + escalate load: 6 (within the 25/client/cycle single-operator guardrail)
+
+--- ALERTS ---
+- OVERDUE: LinkedIn authority article (cal-2026-08-w1-li-article-01) — review-by 2026-07-19 already passed; clear now or the 2026-08-05 publish slips.
+- DEPENDENCY HOLD: WhatsApp closing broadcast (cal-2026-08-w3-wa-01) — blocked on the week-2 landing page; releases when that asset is approved.
+
+--- RECOMMENDED ACTION ---
+TRIAGE — one escalation (partner sign-off on a pricing claim) and one overdue item are present. Clear the urgent Meta creative and the overdue LinkedIn article first, then the week-2 landing page (it unblocks the held WhatsApp broadcast), then the remaining high-priority email/paid items. The auto-published reel needs no action.

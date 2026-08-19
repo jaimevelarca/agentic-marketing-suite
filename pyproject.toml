@@ -1,0 +1,41 @@
+[project]
+name = "ai-mkt-suite"
+version = "0.1.0"
+description = "Digital Marketing AI Suite — Acme Co."
+requires-python = ">=3.11"
+readme = "README.md"
+
+dependencies = [
+    "anthropic[vertex]>=0.96",
+    "google-cloud-aiplatform>=1.70",
+    "google-cloud-firestore>=2.27",
+    "google-cloud-pubsub>=2.23",
+    "google-cloud-secret-manager>=2.20",
+    # DB access: code uses psycopg v3 + pool over cloud-sql-proxy (127.0.0.1).
+    "psycopg[binary]>=3.2",
+    "psycopg-pool>=3.2",
+    # S5 RESOLVED (in-cloud connection method, 2026-06): the suite reaches Cloud SQL
+    # via the sync psycopg pool over the Cloud Run unix socket (/cloudsql/<conn>), so
+    # the async cloud-sql-python-connector + asyncpg are not required and were removed.
+    # (The prior dep was also mis-named — the PyPI package is `cloud-sql-python-connector`,
+    # not `google-cloud-sql-connector` — which broke `pip install .` in the deploy image.)
+    "pydantic>=2.8",
+    "jsonschema>=4.23",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+adk = ["google-adk>=0.1"]
+mcp = ["mcp>=1.2"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["suite"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

@@ -1,0 +1,16 @@
+{
+  "id": "1.3",
+  "name": "Competitive Intelligence",
+  "layer": "L1",
+  "slug": "competitive_intelligence",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "competitive_map",
+  "schema_name": "competitive_map",
+  "reads": [
+    "client_profile"
+  ],
+  "gate": "review-only",
+  "human_gated": true
+}

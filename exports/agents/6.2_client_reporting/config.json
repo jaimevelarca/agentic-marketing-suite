@@ -1,0 +1,18 @@
+{
+  "id": "6.2",
+  "name": "Client Reporting",
+  "layer": "L6",
+  "slug": "client_reporting",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "client_health_score",
+  "schema_name": "client_health_score",
+  "reads": [
+    "performance_history",
+    "active_strategy",
+    "client_profile"
+  ],
+  "gate": "pre-client",
+  "human_gated": true
+}

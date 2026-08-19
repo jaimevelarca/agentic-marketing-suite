@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/trend_signals/v1",
+  "version": "1.0.0",
+  "title": "trend_signals",
+  "description": "Memory schema for Agent 1.4 (Trend Radar) output. Time-indexed marketing trend signals written autonomously (no human gate) and read by Layer 2 (Strategy) and Layer 3 (Content Planning). Each signal carries relevance/velocity scores, a TTL, and an estimated peak date, plus confidence metadata (DEL-09 pattern). | Last updated: 2026-05-29",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "signals"
+  ],
+  "definitions": {
+    "confidence_metadata": {
+      "description": "DEL-09 confidence pattern — required on every signal. Honesty about uncertainty is the only safety mechanism for this autonomous agent.",
+      "type": "object",
+      "required": [
+        "data_source",
+        "confidence_score",
+        "tier",
+        "verification_status",
+        "first_set_date"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "data_source": {
+          "type": "string",
+          "enum": ["client", "enriched", "estimated", "benchmark"]
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D"]
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": ["verified", "enriched", "ai-proposed", "estimated"]
+        },
+        "first_set_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "source_detail": {
+          "type": "string",
+          "description": "How the signal and its scores were derived. Required (by prompt convention) for Tier C/D."
+        }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "signal_id",
+        "topic",
+        "category",
+        "markets",
+        "relevance_score",
+        "velocity",
+        "recommended_format",
+        "estimated_peak_date",
+        "ttl_days",
+        "confidence"
+      ],
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Stable lowercase-hyphenated slug derived from the topic."
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The trend, in the audience's language (ES for LATAM markets)."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "seasonal",
+            "cultural-moment",
+            "platform-format",
+            "industry-news",
+            "audience-behavior",
+            "competitor-move",
+            "evergreen-spike"
+          ]
+        },
+        "markets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["MX", "CO", "DR", "PR"]
+          }
+        },
+        "relevance_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Fit to THIS client's offers/goals/audience — not global virality."
+        },
+        "velocity": {
+          "type": "string",
+          "enum": ["rising", "peaking", "declining", "steady"]
+        },
+        "velocity_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "recommended_format": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "recommended_channels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "facebook",
+              "tiktok",
+              "linkedin",
+              "youtube",
+              "whatsapp",
+              "email",
+              "google-search"
+            ]
+          }
+        },
+        "detected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "estimated_peak_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Calendar peak for seasonal signals; an estimate (flag via confidence) for news."
+        },
+        "ttl_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Days the signal stays actionable from the run date."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Run date + ttl_days. After this date the signal is stale."
+        },
+        "rationale": { "type": "string" },
+        "suggested_angle": { "type": "string" },
+        "confidence": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated. Example: acme-co"
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this trend_signals block was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "auto_approved",
+      "description": "Trend Radar is autonomous: normal runs commit as 'auto_approved'. 'pending_review' only on the anomaly-escalation path."
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Reference date for this run; all time fields are computed relative to it."
+    },
+    "markets_covered": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["MX", "CO", "DR", "PR"]
+      }
+    },
+    "signal_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "signals": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 12,
+      "items": { "$ref": "#/definitions/signal" },
+      "description": "Time-indexed trend signals, ordered by blended relevance + velocity (most actionable first)."
+    }
+  }
+}

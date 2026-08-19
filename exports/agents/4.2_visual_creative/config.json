@@ -1,0 +1,18 @@
+{
+  "id": "4.2",
+  "name": "Visual Creative",
+  "layer": "L4",
+  "slug": "visual_creative",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "visual_assets",
+  "schema_name": "visual_assets",
+  "reads": [
+    "content_calendar",
+    "copy_assets",
+    "client_profile"
+  ],
+  "gate": "batch-review",
+  "human_gated": true
+}

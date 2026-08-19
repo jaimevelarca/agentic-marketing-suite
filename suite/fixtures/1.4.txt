@@ -1,0 +1,203 @@
+## OUTPUT 1 — trend_signals JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "auto_approved",
+  "as_of_date": "2026-05-29",
+  "markets_covered": ["MX", "CO", "DR", "PR"],
+  "signal_count": 6,
+  "signals": [
+    {
+      "signal_id": "regreso-a-clases-2026",
+      "topic": "Regreso a clases 2026 — decisión de escuela y financiamiento",
+      "category": "seasonal",
+      "markets": ["MX"],
+      "relevance_score": 0.92,
+      "velocity": "rising",
+      "velocity_score": 0.55,
+      "recommended_format": ["reel", "carousel", "story-poll"],
+      "recommended_channels": ["instagram", "facebook", "whatsapp"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-08-10",
+      "ttl_days": 80,
+      "expires_at": "2026-08-17",
+      "rationale": "Mexican private-education buying cycle peaks in August; SMB schools (the pilot ICP) ramp admissions content now. Direct fit to the Suite's anchor vertical.",
+      "suggested_angle": "Mostrar cómo una escuela SMB llena cupos de agosto con campañas automatizadas — caso antes/despues de inscripciones.",
+      "confidence": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-29",
+        "source_detail": "Client-supplied seasonal_theme 'agosto: regreso a clases' anchored to MX school calendar."
+      }
+    },
+    {
+      "signal_id": "ia-en-marketing-educativo",
+      "topic": "IA aplicada al marketing de admisiones (escuelas privadas)",
+      "category": "industry-news",
+      "markets": ["MX", "CO"],
+      "relevance_score": 0.88,
+      "velocity": "rising",
+      "velocity_score": 0.7,
+      "recommended_format": ["carousel", "short-video", "blog"],
+      "recommended_channels": ["linkedin", "instagram", "email"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-07-15",
+      "ttl_days": 45,
+      "expires_at": "2026-07-13",
+      "rationale": "Recurring theme across the client's tracked feeds and hashtags; decision-makers at SMB schools are actively evaluating AI. Sits exactly on the Suite's value proposition.",
+      "suggested_angle": "Desmitificar la IA para directores de escuela: 3 tareas de marketing que ya puede hacer un agente sin reemplazar al equipo.",
+      "confidence": {
+        "data_source": "enriched",
+        "confidence_score": 0.72,
+        "tier": "B",
+        "verification_status": "enriched",
+        "first_set_date": "2026-05-29",
+        "source_detail": "Client RSS feed (educacionfutura.com) + tracked hashtag #IAenEducacion, mapped to LinkedIn/IG for the decision-maker audience."
+      }
+    },
+    {
+      "signal_id": "becas-y-financiamiento-escolar",
+      "topic": "Becas y planes de financiamiento para el ciclo 2026-2027",
+      "category": "seasonal",
+      "markets": ["MX", "DR"],
+      "relevance_score": 0.81,
+      "velocity": "steady",
+      "velocity_score": 0.3,
+      "recommended_format": ["carousel", "story-poll", "reel"],
+      "recommended_channels": ["instagram", "facebook", "whatsapp"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-07-20",
+      "ttl_days": 60,
+      "expires_at": "2026-07-28",
+      "rationale": "Scholarship messaging consistently drives lead volume for SMB schools ahead of enrollment; a reliable demand lever the Suite can showcase.",
+      "suggested_angle": "Plantilla de post 'simulador de beca en 3 pasos' que una escuela puede publicar para capturar leads tibios.",
+      "confidence": {
+        "data_source": "client",
+        "confidence_score": 0.85,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-29",
+        "source_detail": "Client-tracked hashtag #BecasDisponibles + seasonal_theme on financiamiento; DR added on the comparable July admissions window."
+      }
+    },
+    {
+      "signal_id": "reels-formato-educativo-corto",
+      "topic": "Reels educativos de menos de 20 segundos (formato que la plataforma impulsa)",
+      "category": "platform-format",
+      "markets": ["MX", "CO", "PR"],
+      "relevance_score": 0.64,
+      "velocity": "peaking",
+      "velocity_score": 0.6,
+      "recommended_format": ["reel", "short-video"],
+      "recommended_channels": ["instagram", "tiktok"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-06-20",
+      "ttl_days": 30,
+      "expires_at": "2026-06-28",
+      "rationale": "Short vertical video continues to over-index in reach for LATAM SMB accounts; a cheap, high-distribution format the Suite's Layer 4 can produce at volume.",
+      "suggested_angle": "Serie 'una duda de papas resuelta en 15 segundos' — un reel diario que alimenta el calendario sin costo de produccion alto.",
+      "confidence": {
+        "data_source": "estimated",
+        "confidence_score": 0.52,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "source_detail": "Inferred from general LATAM SMB platform behavior; no live view-count feed available, so velocity is an estimate (Tier C)."
+      }
+    },
+    {
+      "topic": "Quincena de fin de mes — ventana de decision de pago de inscripcion",
+      "signal_id": "quincena-decision-de-pago",
+      "category": "audience-behavior",
+      "markets": ["MX"],
+      "relevance_score": 0.58,
+      "velocity": "steady",
+      "velocity_score": 0.25,
+      "recommended_format": ["story-poll", "carousel"],
+      "recommended_channels": ["whatsapp", "instagram"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-06-15",
+      "ttl_days": 21,
+      "expires_at": "2026-06-19",
+      "rationale": "Payday (quincena) cycles in Mexico shape when families commit to enrollment payments; timing nurture sends to the 15th/30th lifts conversion for SMB schools.",
+      "suggested_angle": "Programar el recordatorio de inscripcion y el link de pago para que llegue el dia 15 y el dia 30, no a mitad de quincena.",
+      "confidence": {
+        "data_source": "benchmark",
+        "confidence_score": 0.34,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-29",
+        "source_detail": "MX SMB payday-cycle benchmark; no client funnel data yet to confirm the timing lift (Tier D)."
+      }
+    },
+    {
+      "signal_id": "buen-fin-2026-preinscripcion",
+      "topic": "Buen Fin 2026 — promociones de preinscripcion anticipada",
+      "category": "cultural-moment",
+      "markets": ["MX"],
+      "relevance_score": 0.49,
+      "velocity": "steady",
+      "velocity_score": 0.2,
+      "recommended_format": ["carousel", "reel"],
+      "recommended_channels": ["instagram", "facebook", "email"],
+      "detected_at": "2026-05-29T00:00:00Z",
+      "estimated_peak_date": "2026-11-13",
+      "ttl_days": 120,
+      "expires_at": "2026-09-26",
+      "rationale": "El Buen Fin is a major MX commercial moment; some SMB schools run early-enrollment promos around it. Lower relevance now (far off) but worth pre-flagging on the calendar.",
+      "suggested_angle": "Empaquetar una promo de preinscripcion 'precio Buen Fin' con cupo limitado para capturar intencion temprana.",
+      "confidence": {
+        "data_source": "estimated",
+        "confidence_score": 0.45,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "source_detail": "Inferred from MX retail calendar applied to private education; peak date is the known Buen Fin window, relevance is an estimate (Tier C)."
+      }
+    }
+  ]
+}
+```
+
+---
+
+## OUTPUT 2 — Trend Brief
+
+=== TREND RADAR — CONTENT BRIEF ===
+Client: Acme Co. BU
+As of: 2026-05-29
+Markets: MX (primary) · CO · DR · PR
+
+RIDE NOW (rising / peaking, high relevance):
+- IA aplicada al marketing de admisiones — rising, the strongest fit to our own pitch. Run a LinkedIn carousel + IG short-video aimed at school directors this week; window to mid-July.
+- Reels educativos <20s — peaking platform format. Cheap reach; stand up a daily reel series now while distribution is favorable (window ~30 days).
+
+ON THE CALENDAR (seasonal, plan ahead):
+- Regreso a clases 2026 — peaks Aug 10; start admissions content now, ramp through July. Highest-relevance seasonal signal.
+- Becas y financiamiento 2026-2027 — peaks ~Jul 20; reliable lead lever, prep scholarship templates in June.
+- Buen Fin preinscripcion — far off (Nov 13) but flagged so Layer 2 can slot an early-enrollment promo.
+
+FADING / DROP:
+- None expired this run; all six signals are live.
+
+IGNORE THIS CYCLE:
+- Generic "AI hype" news with no education tie — high volume, low relevance to SMB schools; omitted to keep the radar actionable.
+
+---
+
+## OUTPUT 3 — Ops / Autonomous-Run Summary
+
+=== TREND RADAR — AUTONOMOUS RUN SUMMARY ===
+Run date: 2026-05-29
+Signals live: 6  (new: 6 · refreshed: 0 · expired/dropped: 0)
+Source coverage: seasonal_themes: y · hashtags: y · rss_feeds: y · operator_notes: n
+Constraint filters applied: none triggered — no political/religious, brand-safety, competitor, or blackout collisions among the surfaced topics.
+Data gaps / caveats: No live trend/web feed — velocity on platform-format and cultural-moment signals is reasoned, not measured (tagged Tier C/D). client_profile present and approved; goals/KPIs still Tier C upstream, which only lightly affects relevance scoring.
+
+--- RECOMMENDED ACTION ---
+AUTO-COMMITTED — no human gate. Signals written to trend_signals for Layer 2/3.

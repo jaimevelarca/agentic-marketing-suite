@@ -1,0 +1,334 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/campaign_registry/v1",
+  "version": "1.0.0",
+  "title": "campaign_registry",
+  "description": "Canonical memory schema for Agent 2.2 (Campaign Planner) output. The campaign_registry block decomposes an approved active_strategy into named campaigns (theme, messaging pillars, timing, per-campaign budget split, success metrics) for Layers 3-6. Reads: active_strategy, client_profile, audience_segments. Human gate: review. Last updated: 2026-05-29",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "cycle_label",
+    "strategy_ref",
+    "campaigns",
+    "budget_summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "channel_budget": {
+      "type": "object",
+      "required": [
+        "channel",
+        "budget_usd"
+      ],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "description": "Channel name, e.g. meta_ads, google_ads, tiktok_ads, organic_social, email, whatsapp."
+        },
+        "budget_usd": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "success_metric": {
+      "type": "object",
+      "required": [
+        "metric",
+        "target",
+        "unit"
+      ],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "KPI name traceable to the strategy kpi_contracts, e.g. leads, cpl, roas, reach, conversion_rate."
+        },
+        "target": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "Numeric target for this campaign (pro-rated by budget share for quantity KPIs)."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of the target, e.g. leads/month, usd, ratio, percent, impressions."
+        }
+      }
+    },
+    "campaign": {
+      "type": "object",
+      "required": [
+        "campaign_id",
+        "name",
+        "theme",
+        "objective",
+        "funnel_stage",
+        "priority",
+        "primary_segment_ids",
+        "messaging_pillars",
+        "timing",
+        "budget_usd",
+        "success_metrics"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "campaign_id": {
+          "type": "string",
+          "description": "Stable id, e.g. camp-2026q3-01."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short client-facing campaign name in ES-MX."
+        },
+        "theme": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One-line strategic angle in ES-MX."
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What this specific campaign must achieve; tied to the strategy objective."
+        },
+        "funnel_stage": {
+          "type": "string",
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention"
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "primary_segment_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Segment ids from audience_segments, or ['all'] if segments unavailable."
+        },
+        "secondary_segment_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "messaging_pillars": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "maxItems": 4,
+          "description": "2-4 recurring ES-MX value statements the content team reinforces."
+        },
+        "timing": {
+          "type": "object",
+          "required": [
+            "start_date",
+            "end_date"
+          ],
+          "properties": {
+            "start_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "end_date": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "paid": {
+          "type": "boolean",
+          "description": "True if the campaign uses paid media; false for organic-only."
+        },
+        "budget_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "budget_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "channel_budget": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/channel_budget"
+          }
+        },
+        "success_metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/success_metric"
+          },
+          "minItems": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique client id. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this registry was created."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Human gate status. Must be 'approved' before Layer 3 reads this block. 'blocked' = upstream strategy not approved."
+    },
+    "blocking_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Populated only when gate_status == 'blocked'."
+    },
+    "cycle_label": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Marketing cycle this registry covers, e.g. 2026-Q3 or 2026-09."
+    },
+    "cycle": {
+      "type": "object",
+      "properties": {
+        "period": {
+          "type": "string",
+          "enum": [
+            "monthly",
+            "quarterly"
+          ]
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "blackouts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "strategy_ref": {
+      "type": "object",
+      "required": [
+        "total_budget_usd"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "strategy_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "objective": {
+          "type": "string"
+        },
+        "total_budget_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Allocatable monthly marketing budget from the approved strategy."
+        },
+        "channel_priority": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kpi_contracts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "campaigns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/campaign"
+      },
+      "description": "Ordered campaign list. May be empty ONLY when gate_status == 'blocked'."
+    },
+    "budget_summary": {
+      "type": "object",
+      "required": [
+        "total_budget_usd",
+        "total_allocated_usd",
+        "unallocated_usd"
+      ],
+      "properties": {
+        "total_budget_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "total_allocated_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unallocated_usd": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD"
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Material inferences the reviewer must validate."
+    },
+    "coherence_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Problems that need a human decision (e.g. budget insufficient for objective)."
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "2.2",
+  "name": "Campaign Planner",
+  "layer": "L2",
+  "slug": "campaign_planner",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "campaign_registry",
+  "schema_name": "campaign_registry",
+  "reads": [
+    "active_strategy",
+    "client_profile",
+    "audience_segments"
+  ],
+  "gate": "review",
+  "human_gated": true
+}

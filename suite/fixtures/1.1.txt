@@ -1,0 +1,415 @@
+## OUTPUT 1 — client_profile JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-28T00:00:00Z",
+  "gate_status": "pending_review",
+  "lifecycle_stage": "pre-launch",
+  "name": {
+    "legal": "the AI Marketing Suite vendor",
+    "trade": "Acme Co.",
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.95,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "industry": {
+    "primary": "technology_consulting",
+    "secondary": "private_education",
+    "naics_code": null,
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.9,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "size": {
+    "range": "11-50",
+    "exact": null,
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.5,
+      "tier": "C",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Partner-stage BU; headcount inferred from two-partner core team"
+    }
+  },
+  "revenue_range": {
+    "value": null,
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.4,
+      "tier": "C",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Pre-launch GenAI BU; revenue not yet booked"
+    }
+  },
+  "website_url": {
+    "primary": "https://www.acme.com.mx",
+    "additional": [],
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.95,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "social_profiles": {
+    "instagram": {
+      "value": null,
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.3,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-28",
+        "source_detail": "Profiles audit pending (S1-T4)"
+      }
+    },
+    "linkedin": {
+      "value": null,
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.3,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-28",
+        "source_detail": "Profiles audit pending (S1-T4)"
+      }
+    }
+  },
+  "locations": {
+    "countries": [
+      "Mexico"
+    ],
+    "cities": [
+      "Ciudad de Mexico"
+    ],
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.9,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "target_markets": {
+    "ranked": [
+      "Mexico",
+      "Colombia",
+      "Dominican Republic",
+      "Puerto Rico"
+    ],
+    "excluded": [],
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.85,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "offers": {
+    "description": "A six-layer, nineteen-agent Digital Marketing AI Suite that automates the full digital-marketing lifecycle for SMBs, sold on tiered subscription with a single human reviewer per 6-10 clients.",
+    "price_range": {
+      "low_usd": 799,
+      "high_usd": 2999,
+      "model": "subscription"
+    },
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.9,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  },
+  "usp": {
+    "statement": "Agency-grade, ROI-tracked digital marketing run by AI agents at SMB prices, with one human keeping quality high across many clients.",
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.8,
+      "tier": "B",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Draft USP pending S1-T8 partner sign-off"
+    }
+  },
+  "sales_cycle": {
+    "weeks_min": 2,
+    "weeks_max": 8,
+    "metadata": {
+      "data_source": "benchmark",
+      "confidence_score": 0.35,
+      "tier": "D",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "B2B SaaS SMB benchmark; no client pipeline data yet"
+    }
+  },
+  "goals": {
+    "primary_objective": "Sign 5 paying pilot clients in private education (Mexico) through one full marketing cycle within 90 days of commercial launch.",
+    "success_metric": "5 signed pilot clients at Tier 2 ($1,699/mo)",
+    "kpi_targets": {
+      "leads_per_month": null,
+      "cpl_usd": null,
+      "conversion_rate_pct": null,
+      "roas_target": null,
+      "reach_per_month": null
+    },
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.45,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Derived from PROJECT.md success criteria; SMART objective + KPIs pending partner session (S1-T1..T3)"
+    }
+  },
+  "budget": {
+    "monthly": {
+      "min": 0,
+      "max": 100
+    },
+    "annual": null,
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.4,
+      "tier": "C",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Only the $100/mo GCP infra cap is set (I-02); marketing budget pending S1-T3"
+    }
+  },
+  "visual_identity": {
+    "guidelines_url": null,
+    "logo_url": null,
+    "primary_colors_hex": [],
+    "fonts": [],
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.3,
+      "tier": "D",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Brand assets not yet packaged (S1-T7)"
+    }
+  },
+  "brand_voice_tokens": {
+    "tokens": [
+      "professional",
+      "direct",
+      "data-driven",
+      "pragmatic"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
+    "tone_selected": null,
+    "samples": [],
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.5,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Tone exercise pending (S1-T10)"
+    }
+  },
+  "constraints": {
+    "competitor_mentions": {
+      "response": "none",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "pricing_claims": {
+      "response": "No public USD margin or cost-to-serve figures in client-facing material (confidentiality rule).",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "legal_regulatory": {
+      "response": "none",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "political_religious": {
+      "response": "Avoid political and religious content.",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "brand_safety_topics": {
+      "response": "none",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "blackout_dates": {
+      "response": "none",
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.4,
+        "tier": "C",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-28",
+        "source_detail": "No blackout calendar provided yet"
+      }
+    },
+    "approval_chain": {
+      "response": "Both partners (Javier Hernandez, Jaime Salcedo) approve commercial output.",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "geographic_restrictions": {
+      "response": "Focus MX first, then CO, DR, PR.",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "tone_boundaries": {
+      "response": "Professional, no hype, ROI-grounded claims only.",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    },
+    "data_privacy": {
+      "response": "USD invoicing; client data confidential; COGS/margins internal-only.",
+      "metadata": {
+        "data_source": "client",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "verification_status": "verified",
+        "first_set_date": "2026-05-28"
+      }
+    }
+  },
+  "analytics": {
+    "ga4_installed": null,
+    "ga4_access_granted": null,
+    "semrush_available": null,
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.3,
+      "tier": "D",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-28",
+      "source_detail": "GA4 verification pending (S1-T5)"
+    }
+  },
+  "campaign_history": {
+    "has_history": false,
+    "platforms": [],
+    "avg_monthly_spend_usd": null,
+    "avg_cpl_usd": null,
+    "avg_roas": null,
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.85,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28",
+      "source_detail": "Pre-launch BU; no campaign history"
+    }
+  },
+  "crm_data": {
+    "has_crm": true,
+    "platform": "HubSpot",
+    "record_count": null,
+    "export_provided": false,
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.7,
+      "tier": "B",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-28",
+      "source_detail": "HubSpot is the chosen CRM (ADR-04); no export yet"
+    }
+  },
+  "content_library": {
+    "has_content": false,
+    "post_count": null,
+    "best_performing_provided": false,
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.8,
+      "tier": "A",
+      "verification_status": "verified",
+      "first_set_date": "2026-05-28"
+    }
+  }
+}
+```
+
+## OUTPUT 2 — Interview Questions for Client
+
+INTERVIEW QUESTIONS (to resolve the lowest-confidence fields before Layer 2):
+1. What is the SMART 90-day objective and the exact KPI targets (leads/mo, CPL, conversion)? (goals — Tier C)
+2. What is the monthly marketing budget, separate from the $100/mo infra cap? (budget — Tier C)
+3. Which social profiles are dedicated to the GenAI BU vs. shared with Acme Co.? (social_profiles — Tier D)
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 1.1 — HUMAN GATE SUMMARY ===
+Client: Acme Co. BU
+Date: 2026-05-28
+Lifecycle stage: pre-launch
+Gate status: PENDING REVIEW
+
+--- DATA QUALITY SUMMARY ---
+Tier A: identity, website, offers, target markets, campaign history (none).
+Tier C: goals, budget, brand voice — inferred from strategy docs, pending partner sign-off.
+Tier D: social profiles, visual identity, analytics — audits/packaging still open.
+
+--- WHAT THE REVIEWER MUST CONFIRM ---
+- The SMART 90-day objective + KPIs (blocks Layer 2 strategy) — S1-T1/T2.
+- The marketing budget (distinct from the $100/mo infra cap) — S1-T3.
+
+--- RECOMMENDED ACTION ---
+RETURN — resolve the three Tier-C/D blockers above, then APPROVE for Layer 2.

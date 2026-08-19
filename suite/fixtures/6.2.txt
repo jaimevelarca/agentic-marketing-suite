@@ -1,0 +1,177 @@
+## OUTPUT 1 — client_health_score JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "report_language": "es-MX",
+  "reporting_period": {
+    "label": "Mayo 2026 (piloto)",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-31",
+    "market": "Mexico"
+  },
+  "health_score": {
+    "composite": 62,
+    "band": "watch",
+    "trend": null,
+    "previous_composite": null,
+    "components": {
+      "kpi_attainment": 48,
+      "engagement": 71,
+      "retention_signal": 80
+    }
+  },
+  "roi_summary": {
+    "narrative": "Mayo fue el primer mes con pauta de prueba: por cada dólar invertido generamos $0.0 en ingresos atribuidos todavía, pero capturamos 12 leads calificados de educación privada a un costo de $7.50 por lead, sentando la base de conversión para el siguiente ciclo.",
+    "marketing_spend_usd": 90.0,
+    "attributed_revenue_usd": 0.0,
+    "roas": 0.0,
+    "leads": 12,
+    "cpl_usd": 7.5,
+    "confidence": "partial"
+  },
+  "kpi_scorecard": [
+    {
+      "kpi": "leads_per_month",
+      "unit": "count",
+      "target": 15,
+      "actual": 12,
+      "attainment_pct": 80.0,
+      "status": "behind",
+      "lower_is_better": false
+    },
+    {
+      "kpi": "cpl_usd",
+      "unit": "usd",
+      "target": 10.0,
+      "actual": 7.5,
+      "attainment_pct": 133.0,
+      "status": "ahead",
+      "lower_is_better": true
+    },
+    {
+      "kpi": "conversion_rate_pct",
+      "unit": "pct",
+      "target": 4.0,
+      "actual": null,
+      "attainment_pct": null,
+      "status": "no_data",
+      "lower_is_better": false
+    },
+    {
+      "kpi": "reach_per_month",
+      "unit": "count",
+      "target": 8000,
+      "actual": 9420,
+      "attainment_pct": 117.8,
+      "status": "ahead",
+      "lower_is_better": false
+    }
+  ],
+  "highlights": [
+    "Alcanzamos a 9,420 personas del segmento de educación privada en CDMX, 18% por encima de la meta del mes.",
+    "El costo por lead cerró en $7.50, 25% por debajo del objetivo de $10 — la pauta de prueba es eficiente.",
+    "Publicamos 14 piezas de contenido y la lista de correo creció a 64 contactos."
+  ],
+  "lowlights": [
+    "Llegamos a 12 de los 15 leads objetivo (80%): el formulario de la landing tuvo fricción; ya está en ajuste para junio."
+  ],
+  "next_actions": [
+    {
+      "action": "Optimizar el formulario de captura y reducir campos de 6 a 3 para subir la conversión de visitante a lead.",
+      "owner": "suite",
+      "expected_impact": "Cerrar la brecha de leads y llegar a la meta de 15 en junio."
+    },
+    {
+      "action": "Activar la secuencia de nurture por correo para los 12 leads y medir conversión a demo.",
+      "owner": "suite",
+      "expected_impact": "Generar el primer ingreso atribuido y poblar conversion_rate_pct."
+    },
+    {
+      "action": "Confirmar el presupuesto de pauta de junio para escalar el alcance manteniendo el CPL.",
+      "owner": "client",
+      "expected_impact": "Más leads al mismo costo unitario."
+    }
+  ],
+  "retention": {
+    "renewal_date": null,
+    "churn_risk": "low",
+    "upsell_opportunity": "Cliente piloto interno; si la conversión a demo aparece en junio, candidato natural a Tier 2 al lanzar comercialmente."
+  },
+  "recommendation": {
+    "action": "approve_and_send",
+    "rationale": "Figures reconcile to 6.1 (spend $90, 12 leads, CPL $7.50, reach 9,420); honest about the leads miss; no internal economics present — clean to send after operator review."
+  }
+}
+```
+
+## OUTPUT 2 — Monthly Client Report (es-MX, client-facing)
+
+# Reporte Mensual de Marketing — Mayo 2026 · Acme Co. BU
+
+**Período:** 1–31 de mayo de 2026 · **Mercado:** México · **Unidad:** Generative AI Business Unit
+
+## Resumen ejecutivo
+
+Mayo fue el primer mes con pauta de prueba. Capturamos **12 leads calificados** del segmento de educación privada a un **costo por lead de $7.50** — 25% por debajo de la meta — y alcanzamos a **9,420 personas**, 18% por encima del objetivo. Aún no hay ingresos atribuidos porque la conversión a demo arranca en junio: sentamos la base; ahora la activamos.
+
+## Resultados vs. objetivos
+
+| KPI | Meta | Resultado | Estado |
+|---|---|---|---|
+| Leads por mes | 15 | 12 | Por debajo |
+| Costo por lead (USD) | $10.00 | $7.50 | Por encima |
+| Tasa de conversión | 4.0% | — | Sin datos |
+| Alcance por mes | 8,000 | 9,420 | Por encima |
+
+## ROI del mes
+
+Inversión en pauta: **$90 USD**. Ingresos atribuidos: **$0** (la conversión inicia en junio). El indicador a vigilar este mes fue la eficiencia de adquisición: **$7.50 por lead** es un punto de partida sólido para escalar sin disparar el costo.
+
+## Lo que funcionó
+
+- Alcance 18% por encima de la meta (9,420 personas del público objetivo en CDMX).
+- CPL de $7.50, 25% por debajo del objetivo — la pauta de prueba es eficiente.
+- 14 piezas de contenido publicadas y la lista de correo creció a 64 contactos.
+
+## Lo que ajustaremos
+
+- Llegamos a 12 de 15 leads (80%). El formulario de la landing tenía fricción; lo simplificamos de 6 a 3 campos para junio.
+
+## Próximos pasos
+
+1. Optimizar el formulario de captura para cerrar la brecha de leads (responsable: Suite).
+2. Activar la secuencia de nurture por correo para los 12 leads y medir conversión a demo (responsable: Suite).
+3. Confirmar el presupuesto de pauta de junio para escalar el alcance manteniendo el CPL (responsable: Cliente).
+
+*Generative AI Business Unit · Confidencial · www.acme.com.mx*
+
+## OUTPUT 3 — Pre-Client Gate Summary
+
+=== AGENT 6.2 — PRE-CLIENT GATE SUMMARY ===
+Client: Acme Co. BU · Period: Mayo 2026 · Market: Mexico · Lifecycle: pre-launch · Gate status: PENDING REVIEW
+
+--- HEALTH ---
+Composite: 62/100 (band: watch · trend: n/a — first report).
+Sub-scores: kpi_attainment 48 · engagement 71 · retention_signal 80.
+
+--- ROI / KPI RECONCILIATION ---
+Spend $90 · Attributed revenue $0 (conversion starts June) · ROAS 0.0 · Leads 12 · CPL $7.50.
+KPI scorecard: 2 ahead (CPL, reach), 1 behind (leads 12/15), 1 no_data (conversion_rate). Data confidence: partial.
+
+--- ACCOUNT SIGNALS (INTERNAL) ---
+Churn risk: low · Renewal date: n/a (internal pilot) · Upsell: Tier 2 candidate if June demo conversions appear.
+
+--- CONFIDENTIALITY ---
+Confirmed: no Acme Co. COGS / margins / cost-to-serve / bonus figures in OUTPUT 1 or OUTPUT 2. Only client marketing economics reported.
+
+--- WHAT THE REVIEWER MUST CONFIRM ---
+1. Spend/leads/CPL/reach match Agent 6.1's performance_history for May.
+2. The leads miss is framed honestly with a concrete fix.
+3. Tone matches brand voice (professional, ROI-grounded, no hype).
+
+--- RECOMMENDED ACTION ---
+APPROVE & SEND — figures reconcile, misses are honest, report is confidentiality-clean. Operator approval flips gate_status to approved before delivery.

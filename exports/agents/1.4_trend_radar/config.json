@@ -1,0 +1,16 @@
+{
+  "id": "1.4",
+  "name": "Trend Radar",
+  "layer": "L1",
+  "slug": "trend_radar",
+  "model": "claude-haiku-4-5@20251001",
+  "model_tier": "routing",
+  "max_tokens": 16000,
+  "memory_block": "trend_signals",
+  "schema_name": "trend_signals",
+  "reads": [
+    "client_profile"
+  ],
+  "gate": "autonomous",
+  "human_gated": false
+}

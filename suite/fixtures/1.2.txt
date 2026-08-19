@@ -1,0 +1,790 @@
+## OUTPUT 1 — audience_segments JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "lifecycle_stage": "pre-launch",
+  "based_on_profile_gate": "approved",
+  "segments": [
+    {
+      "segment_id": "seg-acme-co-01",
+      "client_id": "acme-co",
+      "created_at": "2026-05-29T00:00:00Z",
+      "priority_rank": 1,
+      "confidence_tier": "C",
+      "name": {
+        "value": "Líderes de Marketing en Educación Privada",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.55,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29",
+          "source_detail": "Anchor ICP per Session 0 GTM decision (private education, Mexico first). No CRM/GA4 data yet — inferred from offer + objective + target market.",
+          "last_verified_date": null,
+          "will_be_replaced_by": "GA4 audience + lead data after 30 days"
+        }
+      },
+      "description": {
+        "value": "Directores y coordinadores de marketing de colegios, universidades y centros de formación privados (11–500 empleados). Necesitan llenar cupos cada ciclo con un equipo pequeño y presupuesto acotado. Deciden contratar cuando una herramienta promete bajar el costo por inscripción sin sumar headcount. Más fuerte en CDMX, Guadalajara y Monterrey; presencia secundaria en Bogotá.",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.55,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29",
+          "source_detail": "Derived from client_profile industry.secondary=private_education + target_markets ranking.",
+          "last_verified_date": null
+        }
+      },
+      "demographics": {
+        "age_range": {
+          "value": "32–52",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Typical age band for marketing decision-makers in LATAM SMB education."
+          }
+        },
+        "gender_skew": {
+          "value": "balanced (light female skew in education marketing roles)",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.35,
+            "tier": "D",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Industry benchmark; no client data."
+          }
+        },
+        "income_level": {
+          "value": "SMB con presupuesto de marketing $1,000–$5,000 USD/mes",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Inferred from Suite price tiers ($799–$2,999) being affordable to this segment."
+          }
+        },
+        "education_level": {
+          "value": "Licenciatura o posgrado",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Decision-maker profile benchmark."
+          }
+        },
+        "geography_primary": {
+          "value": "Ciudad de Mexico (≈55% del mercado direccionable)",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Primary market from client_profile target_markets ranking."
+          }
+        }
+      },
+      "size": {
+        "estimated_addressable": {
+          "value": 4200,
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Private schools/universities in MX metros with a dedicated marketing function × est. share that fits SMB size band.",
+            "will_be_replaced_by": "GA4 audience + lead data after 30 days"
+          }
+        },
+        "estimated_reachable_pct": {
+          "value": 12,
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Reachable share given a launch budget and LinkedIn + Meta + search targeting."
+          }
+        }
+      },
+      "buying_dynamics": {
+        "primary_pain": {
+          "value": "Necesito más inscripciones este ciclo y mi equipo de marketing no da abasto para producir y pautar contenido constante.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.55,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Core enrollment-pressure pain for the education vertical."
+          }
+        },
+        "secondary_pain": {
+          "value": "No quiero pagar una agencia cara ni amarrarme a un contrato anual sin ver ROI.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Price/risk objection typical for SMB switching from agencies."
+          }
+        },
+        "triggers": {
+          "value": [
+            "Se acerca el periodo de inscripciones y las metas de cupo van atrasadas",
+            "El último proveedor de marketing no entregó reportes claros de ROI",
+            "Un colegio competidor lanzó una campaña agresiva en redes"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Seasonal + competitive triggers for education marketing buyers."
+          }
+        },
+        "objections": {
+          "value": [
+            "¿Una IA realmente entiende el tono de mi institución?",
+            "¿Quién revisa el contenido antes de publicarlo?",
+            "El precio en USD me preocupa por el tipo de cambio"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Trust/quality/FX objections specific to an AI-run marketing offer in LATAM."
+          }
+        },
+        "decision_maker": {
+          "value": "Director(a) de marketing o de admisiones; firma final del director general en cuentas pequeñas",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Typical approval chain in SMB private education."
+          }
+        },
+        "decision_timeline": {
+          "value": "2–6 semanas",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "B2B SMB SaaS sales-cycle benchmark from client_profile.sales_cycle."
+          }
+        }
+      },
+      "channel_and_format": {
+        "preferred_channels": {
+          "value": [
+            { "channel": "linkedin", "rationale": "Reaches marketing/admissions directors directly with authority content.", "priority": 1 },
+            { "channel": "meta_ads", "rationale": "Retargeting + lookalikes against school-marketing interest audiences.", "priority": 2 },
+            { "channel": "google_search", "rationale": "Captures bottom-funnel intent ('agencia marketing escolar', 'aumentar inscripciones').", "priority": 3 }
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Channel mix inferred from B2B education buyer behavior; no DEL-06 social data yet."
+          }
+        },
+        "format_preference": {
+          "value": ["case-study", "carousel", "webinar"],
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Authority/proof formats convert best for considered B2B education buys."
+          }
+        },
+        "best_content_themes": {
+          "value": [
+            "Casos de aumento de inscripciones con ROI medible",
+            "Cómo un equipo chico produce contenido constante con IA",
+            "Comparativa: agencia tradicional vs. Suite de marketing con IA"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "messaging_angle": {
+          "value": "authority + transformation (resultados de inscripción con un equipo pequeño)",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "commercial_value": {
+        "ltv_signal": {
+          "value": "high",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Recurring subscription + low churn expected once enrollment KPIs improve; natural Tier 2 fit."
+          }
+        },
+        "conversion_likelihood": {
+          "value": "medium",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Considered B2B buy; trust must be earned, but pain is acute at enrollment time."
+          }
+        },
+        "priority_score": {
+          "value": 0.78,
+          "rationale": "Highest LTV (recurring, anchor ICP) and acute seasonal pain; reachability is good on LinkedIn/Meta/search even on a launch budget. Ranks #1 despite a medium-length cycle."
+        }
+      },
+      "validation_plan": "Validar tras 30 días de tráfico y leads. Layer 6 recomendará conservar, fusionar o dividir el segmento según conversión real por canal y por ciudad.",
+      "embedding_text": "Directores y coordinadores de marketing de instituciones educativas privadas (colegios, universidades, centros de formación) en México, principalmente CDMX, Guadalajara y Monterrey, con equipos pequeños y presupuesto de marketing de mil a cinco mil dólares mensuales. Su dolor central es llenar cupos cada ciclo de inscripción sin sumar personal; deciden contratar cuando una solución promete bajar el costo por inscripción con ROI medible y revisión humana del contenido. Responden a contenido de autoridad y casos de éxito en LinkedIn, retargeting en Meta y búsqueda de intención en Google. Objeciones: confianza en la IA, tono institucional y tipo de cambio del precio en USD."
+    },
+    {
+      "segment_id": "seg-acme-co-02",
+      "client_id": "acme-co",
+      "created_at": "2026-05-29T00:00:00Z",
+      "priority_rank": 2,
+      "confidence_tier": "C",
+      "name": {
+        "value": "Operadores de Crecimiento E-commerce",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.5,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29",
+          "source_detail": "Second GTM ICP priority; digital-native, high content velocity need."
+        }
+      },
+      "description": {
+        "value": "Dueños y growth leads de tiendas e-commerce SMB que necesitan volumen alto de contenido y campañas pagadas con seguimiento estricto de ROAS. Deciden rápido cuando ven que pueden multiplicar producción de creativos sin contratar más gente.",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.5,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29"
+        }
+      },
+      "demographics": {
+        "income_level": {
+          "value": "SMB e-commerce, ingresos $200K–$2M USD/año",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Inferred revenue band for SMB e-commerce buyers of the Suite."
+          }
+        },
+        "geography_primary": {
+          "value": "Mexico (nacional, ventas en línea)",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "size": {
+        "estimated_addressable": {
+          "value": 9000,
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.38,
+            "tier": "D",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "MX SMB e-commerce stores with active paid media, industry sizing only — no client signal.",
+            "will_be_replaced_by": "GA4 audience + lead data after 30 days"
+          }
+        },
+        "estimated_reachable_pct": {
+          "value": 8,
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Reachable share on Meta/TikTok/search at launch budget."
+          }
+        }
+      },
+      "buying_dynamics": {
+        "primary_pain": {
+          "value": "Necesito producir muchos más creativos y campañas para escalar ventas, pero no tengo equipo ni tiempo.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Content-velocity pain typical of growth-stage e-commerce."
+          }
+        },
+        "secondary_pain": {
+          "value": "Quemo presupuesto en anuncios sin saber qué creativo realmente convierte.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "triggers": {
+          "value": [
+            "Temporada alta de ventas (Buen Fin, fin de año)",
+            "El ROAS cayó y hay que renovar creativos rápido"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.48,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "objections": {
+          "value": [
+            "¿La IA va a entender mi marca y mis productos?",
+            "Ya uso varias herramientas, ¿por qué cambiar?"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "decision_maker": {
+          "value": "Dueño(a) o growth lead — decisión rápida, autoservicio",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.5,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "decision_timeline": {
+          "value": "1–3 semanas",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Faster cycle than education; digital-native buyer."
+          }
+        }
+      },
+      "channel_and_format": {
+        "preferred_channels": {
+          "value": [
+            { "channel": "instagram", "rationale": "Where e-commerce growth operators discover tools and creative inspiration.", "priority": 1 },
+            { "channel": "tiktok_ads", "rationale": "High-velocity creative testing native to this audience.", "priority": 2 },
+            { "channel": "google_search", "rationale": "Intent capture for 'generar creativos con IA', 'escalar ads ecommerce'.", "priority": 3 }
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.48,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "format_preference": {
+          "value": ["reel", "carousel", "testimonial"],
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "best_content_themes": {
+          "value": [
+            "Antes/después de ROAS al automatizar creativos",
+            "Cómo producir 30 creativos en una tarde con IA"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "messaging_angle": {
+          "value": "savings + transformation (más creativos, mejor ROAS, mismo equipo)",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "commercial_value": {
+        "ltv_signal": {
+          "value": "medium",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Recurring but more price-sensitive and churn-prone than education."
+          }
+        },
+        "conversion_likelihood": {
+          "value": "high",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Fast, self-serve decision; acute and frequent pain."
+          }
+        },
+        "priority_score": {
+          "value": 0.7,
+          "rationale": "Fast decision cycle and high conversion likelihood offset a medium LTV and higher churn. Strong #2 — good early-revenue source while education deals mature."
+        }
+      },
+      "validation_plan": "Validar con ROAS real por creativo y churn a 60 días; Layer 6 confirmará si compensa el menor LTV con mayor velocidad de cierre.",
+      "embedding_text": "Dueños y líderes de crecimiento de tiendas e-commerce SMB en México con ingresos anuales de doscientos mil a dos millones de dólares, digital-nativos y enfocados en ROAS. Su dolor es producir suficiente volumen de creativos y campañas para escalar ventas sin contratar equipo, y dejar de quemar presupuesto en anuncios que no convierten. Deciden rápido, en autoservicio, especialmente antes de temporadas altas como Buen Fin. Se les alcanza en Instagram, TikTok Ads y búsqueda de intención, con reels, carruseles y testimonios que muestran mejoras de ROAS. Objeciones: si la IA entiende su marca y por qué cambiar de herramientas."
+    },
+    {
+      "segment_id": "seg-acme-co-03",
+      "client_id": "acme-co",
+      "created_at": "2026-05-29T00:00:00Z",
+      "priority_rank": 3,
+      "confidence_tier": "C",
+      "name": {
+        "value": "Equipos de Adquisición en Servicios Financieros",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.45,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29",
+          "source_detail": "Third GTM ICP; higher CPL tolerance, longer cycle, strong LTV."
+        }
+      },
+      "description": {
+        "value": "Responsables de adquisición de clientes en fintechs y despachos de servicios financieros SMB. Toleran CPL alto porque el valor de cliente es alto, pero el ciclo es largo y la regulación exige cuidado en los claims. Deciden por comité.",
+        "metadata": {
+          "data_source": "estimated",
+          "confidence_score": 0.45,
+          "tier": "C",
+          "verification_status": "ai-proposed",
+          "first_set_date": "2026-05-29"
+        }
+      },
+      "demographics": {
+        "income_level": {
+          "value": "SMB servicios financieros, presupuesto marketing $2,000–$8,000 USD/mes",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "geography_primary": {
+          "value": "Mexico (CDMX) con interés en Colombia",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "size": {
+        "estimated_addressable": {
+          "value": 2600,
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.35,
+            "tier": "D",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "MX/CO SMB financial-services firms with a marketing function; benchmark sizing only.",
+            "will_be_replaced_by": "GA4 audience + lead data after 30 days"
+          }
+        },
+        "estimated_reachable_pct": {
+          "value": 6,
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.38,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "buying_dynamics": {
+        "primary_pain": {
+          "value": "Mi CPL es alto y necesito un flujo constante de leads calificados sin violar reglas de compliance.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "secondary_pain": {
+          "value": "El contenido financiero debe pasar revisión legal y eso frena la producción.",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "triggers": {
+          "value": [
+            "Lanzamiento de un nuevo producto financiero",
+            "Presión trimestral por metas de adquisición"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "objections": {
+          "value": [
+            "¿El contenido generado cumple con regulación financiera?",
+            "¿Hay revisión humana antes de publicar claims sensibles?"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "decision_maker": {
+          "value": "Comité: marketing + cumplimiento + dirección",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "decision_timeline": {
+          "value": "1–3 meses",
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.4,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Longer committee-based cycle with compliance review."
+          }
+        }
+      },
+      "channel_and_format": {
+        "preferred_channels": {
+          "value": [
+            { "channel": "linkedin", "rationale": "Authority + thought leadership reaches compliance-conscious B2B finance buyers.", "priority": 1 },
+            { "channel": "google_search", "rationale": "High-intent capture for acquisition/CPL queries.", "priority": 2 },
+            { "channel": "email", "rationale": "Nurture across a long, committee-driven cycle.", "priority": 3 }
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "format_preference": {
+          "value": ["case-study", "webinar", "email"],
+          "metadata": {
+            "data_source": "benchmark",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "estimated",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "best_content_themes": {
+          "value": [
+            "Reducir CPL con contenido compliant",
+            "Revisión humana del contenido como ventaja de la Suite"
+          ],
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        },
+        "messaging_angle": {
+          "value": "authority + risk-reduction (revisión humana + compliance)",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29"
+          }
+        }
+      },
+      "commercial_value": {
+        "ltv_signal": {
+          "value": "high",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.45,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "High customer value and stickiness once compliant workflow is trusted."
+          }
+        },
+        "conversion_likelihood": {
+          "value": "low",
+          "metadata": {
+            "data_source": "estimated",
+            "confidence_score": 0.42,
+            "tier": "C",
+            "verification_status": "ai-proposed",
+            "first_set_date": "2026-05-29",
+            "source_detail": "Long committee cycle + compliance friction lower near-term conversion."
+          }
+        },
+        "priority_score": {
+          "value": 0.52,
+          "rationale": "High LTV but slow, committee-driven, compliance-heavy decisions and lower reachability put it third for a launch budget focused on near-term pilots."
+        }
+      },
+      "validation_plan": "Validar con CPL real y tasa de avance por comité; si el ciclo es demasiado largo para la meta de 90 días, posponer a una fase posterior.",
+      "embedding_text": "Responsables de adquisición de clientes en fintechs y despachos de servicios financieros SMB en México (CDMX) con interés en Colombia, con presupuestos de marketing de dos mil a ocho mil dólares mensuales. Toleran un CPL alto porque el valor de cliente es elevado, pero enfrentan ciclos largos por decisión de comité y por la revisión legal de claims financieros. Buscan un flujo constante de leads calificados sin violar compliance. Se les alcanza en LinkedIn con contenido de autoridad, búsqueda de intención y email de nurture. Sus objeciones giran en torno al cumplimiento regulatorio y a si existe revisión humana antes de publicar contenido sensible."
+    }
+  ]
+}
+```
+
+---
+
+## OUTPUT 2 — Segment Narratives
+
+### Segment 1: Líderes de Marketing en Educación Privada — Priority Rank 1
+
+Hablamos de la persona que dirige o coordina el marketing de un colegio, universidad o centro de formación privado en México —sobre todo en CDMX, Guadalajara y Monterrey— con un equipo chico y un presupuesto que no le alcanza para una agencia grande. Vive con la presión de llenar cupos cada ciclo de inscripción, y su mayor miedo es llegar a la fecha límite con las metas atrasadas. Le importa el ROI demostrable: quiere ver que el costo por inscripción baja sin sumar personal. Decide cuando confía en que el contenido tendrá revisión humana y respetará el tono institucional. Para alcanzarla, prioriza LinkedIn con casos de éxito y contenido de autoridad, retargeting en Meta y búsqueda de intención en Google. El ángulo que funciona es autoridad + transformación: "tu equipo pequeño puede generar más inscripciones". Cuida sus objeciones de confianza en la IA y de tipo de cambio del precio en USD.
+
+### Segment 2: Operadores de Crecimiento E-commerce — Priority Rank 2
+
+Es el dueño o el growth lead de una tienda en línea SMB que vive y muere por el ROAS. Su dolor es producir suficientes creativos y campañas para escalar sin contratar gente, y dejar de quemar presupuesto en anuncios que no convierten. Es digital-nativo, decide rápido y casi siempre solo, especialmente antes de temporadas altas como el Buen Fin. Le hablas en su idioma mostrando antes/después de ROAS y la velocidad con la que puede producir decenas de creativos en una tarde. Lo alcanzas en Instagram, TikTok Ads y búsqueda de intención, con reels, carruseles y testimonios. El ángulo ganador es ahorro + transformación: más creativos, mejor ROAS, el mismo equipo. Atiende sus objeciones de si la IA entenderá su marca y por qué debería cambiar de las herramientas que ya usa. Es tu mejor fuente de ingreso temprano mientras maduran las cuentas de educación.
+
+### Segment 3: Equipos de Adquisición en Servicios Financieros — Priority Rank 3
+
+Es quien responde por la adquisición de clientes en una fintech o despacho financiero SMB. Tolera un CPL alto porque cada cliente vale mucho, pero su mundo está lleno de fricción: ciclos largos, decisión por comité y revisión legal de cada claim. Su dolor central es mantener un flujo constante de leads calificados sin violar compliance, y su freno es que el contenido financiero debe pasar por legal antes de salir. Valora exactamente lo que diferencia a la Suite: revisión humana del contenido antes de publicar. Lo alcanzas en LinkedIn con autoridad, búsqueda de intención y email de nurture sostenido a lo largo del ciclo. El ángulo es autoridad + reducción de riesgo. Queda en tercer lugar no por falta de valor, sino porque su ritmo lento encaja peor con la meta de 90 días enfocada en cerrar pilotos pronto.
+
+---
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 1.2 — HUMAN GATE SUMMARY ===
+Client: Acme Co. BU
+Date: 2026-05-29
+Lifecycle stage: pre-launch
+Based on client_profile gate: approved
+Segments proposed: 3
+Gate status: PENDING REVIEW
+
+--- DATA QUALITY SUMMARY ---
+- client_profile: available, approved — anchor for industry, offer, price, target markets, objective (Tier A inputs to reasoning).
+- CRM Export: Not available (pre-launch, no customer records).
+- GA4 Data: Not available (analytics verification pending, S1-T5).
+- Social Analytics (DEL-06): Not available (profiles audit pending, S1-T4).
+- Survey / NPS: Not available.
+- Persona Documents: Not available.
+- Net: all three segments are Tier C — reasoned from offer + market + 90-day objective, not from customer data. Two size estimates fall to Tier D (benchmark-only).
+
+--- SEGMENT RANKING RATIONALE ---
+- #1 Líderes de Marketing en Educación Privada: highest LTV (recurring, anchor ICP per GTM decision) and acute seasonal enrollment pain; good reachability on LinkedIn/Meta/search at launch budget. Ranked first despite a 2–6 week cycle.
+- #2 Operadores de Crecimiento E-commerce: faster, self-serve decision and high conversion likelihood offset a medium LTV and higher churn — the early-revenue source while education deals mature.
+- #3 Equipos de Adquisición en Servicios Financieros: high LTV but slow committee cycle + compliance friction + lower reachability; deprioritized for a launch focused on closing pilots inside 90 days.
+- Most uncertain swap: #1 vs #2 if the partners want fastest cash over anchor-ICP focus — flag for partner input.
+
+--- SEGMENTS REQUIRING SPECIAL ATTENTION ---
+- All segments are Tier C with two Tier-D size estimates — this is a direct translation of the Session 0 strategic ICP order (education > e-commerce > financial services), not customer data. Confirm it matches the partners' early GTM focus.
+- Financial Services (#3): genuine uncertainty whether its long cycle fits the 90-day pilot goal at all — consider deferring to a later phase.
+
+--- WHAT THE REVIEWER SHOULD CHECK ---
+□ Does the ranking match how the partners describe their ideal first customer?
+□ Are important segments missing (e.g. multi-location SMB owners as a catch-all)?
+□ Do objections and triggers match what partners have heard in early conversations?
+□ Do channel preferences match the budget once the marketing budget (S1-T3) is set?
+□ For these Tier C/D segments: does each target audience make sense for the Suite's offer and price in MX?
+
+--- RECOMMENDED ACTION ---
+RETURN — confirm the ICP order against partner GTM intent and decide whether to defer Financial Services; then rank and APPROVE for Layer 2.

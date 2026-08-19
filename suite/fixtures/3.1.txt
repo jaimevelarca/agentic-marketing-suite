@@ -1,0 +1,279 @@
+## OUTPUT 1 — content_plan JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "cycle_month": "2026-08",
+  "cycle_weeks": 4,
+  "markets": ["Mexico", "Colombia", "Dominican Republic", "Puerto Rico"],
+  "campaigns": [
+    {
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "messaging_pillars": ["ROI medible", "Operacion sin friccion"],
+      "target_segment_ids": ["seg-director-admisiones", "seg-marketing-escuela"],
+      "channels": ["instagram", "meta_ads", "email", "whatsapp", "landing_page"],
+      "weekly_intensity": 3,
+      "weeks": [
+        {
+          "week": 1,
+          "items": [
+            {
+              "topic": "Como una escuela privada llena su convocatoria de agosto sin bajar la colegiatura",
+              "format": "reel",
+              "channel": "instagram",
+              "funnel_stage": "awareness",
+              "cta": "Conoce mas",
+              "messaging_pillar": "ROI medible",
+              "target_segment_id": "seg-director-admisiones",
+              "week": 1,
+              "trend_ref": "trend-regreso-clases-ago",
+              "rationale": "Awareness hook tied to the back-to-school window for the admissions-director segment.",
+              "notes_for_creator": "Open with the enrollment-gap pain point; no pricing claims."
+            },
+            {
+              "topic": "3 senales de que tu proceso de admisiones esta perdiendo prospectos",
+              "format": "carousel",
+              "channel": "instagram",
+              "funnel_stage": "consideration",
+              "cta": "Descarga la guia de admisiones",
+              "messaging_pillar": "Operacion sin friccion",
+              "target_segment_id": "seg-marketing-escuela",
+              "week": 1,
+              "trend_ref": null,
+              "rationale": "Consideration piece that surfaces the funnel-leak problem the Suite solves.",
+              "notes_for_creator": "Link to the lead-magnet landing page in week 1."
+            }
+          ]
+        },
+        {
+          "week": 2,
+          "items": [
+            {
+              "topic": "Guia: el embudo de admisiones de una escuela privada, paso a paso",
+              "format": "landing_page",
+              "channel": "landing_page",
+              "funnel_stage": "consideration",
+              "cta": "Descarga la guia",
+              "messaging_pillar": "Operacion sin friccion",
+              "target_segment_id": "seg-marketing-escuela",
+              "week": 2,
+              "trend_ref": null,
+              "rationale": "Lead-magnet landing page captures consideration-stage demand for nurture.",
+              "notes_for_creator": "Single email-gated download; feed leads to the WhatsApp nurture."
+            },
+            {
+              "topic": "Caso: como medimos el costo por prospecto inscrito mes a mes",
+              "format": "ad_creative",
+              "channel": "meta_ads",
+              "funnel_stage": "consideration",
+              "cta": "Agenda una llamada",
+              "messaging_pillar": "ROI medible",
+              "target_segment_id": "seg-director-admisiones",
+              "week": 2,
+              "trend_ref": null,
+              "rationale": "Paid consideration creative drives demo bookings within the campaign budget share.",
+              "notes_for_creator": "Use a ROI proof point, not a discount; respect pricing-claims constraint."
+            }
+          ]
+        },
+        {
+          "week": 3,
+          "items": [
+            {
+              "topic": "Recordatorio: cierre de convocatoria de agosto, ultimos lugares",
+              "format": "whatsapp_broadcast",
+              "channel": "whatsapp",
+              "funnel_stage": "conversion",
+              "cta": "Solicita tu lugar",
+              "messaging_pillar": "Operacion sin friccion",
+              "target_segment_id": "seg-marketing-escuela",
+              "week": 3,
+              "trend_ref": null,
+              "rationale": "Conversion nudge to the warm list captured by the week-2 lead magnet.",
+              "notes_for_creator": "Personalize by program; honor opt-in and data-privacy constraint."
+            },
+            {
+              "topic": "Inscribete antes del cierre: lo que incluye el acompanamiento de admisiones",
+              "format": "email_single",
+              "channel": "email",
+              "funnel_stage": "conversion",
+              "cta": "Inscribete hoy",
+              "messaging_pillar": "ROI medible",
+              "target_segment_id": "seg-director-admisiones",
+              "week": 3,
+              "trend_ref": null,
+              "rationale": "Direct conversion email to consideration-stage leads ahead of the deadline.",
+              "notes_for_creator": "Clear single CTA; link to the application form."
+            }
+          ]
+        },
+        {
+          "week": 4,
+          "items": [
+            {
+              "topic": "Refiere a otra escuela y gana un diagnostico de admisiones gratis",
+              "format": "static_post",
+              "channel": "instagram",
+              "funnel_stage": "retention",
+              "cta": "Refiere a un colega",
+              "messaging_pillar": "ROI medible",
+              "target_segment_id": "seg-director-admisiones",
+              "week": 4,
+              "trend_ref": null,
+              "rationale": "Retention/referral beat that turns closed accounts into a new pipeline source.",
+              "notes_for_creator": "Frame around peer trust among school administrators."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "campaign_name": "Autoridad GenAI para PyMEs Educativas",
+      "messaging_pillars": ["Autoridad GenAI"],
+      "target_segment_ids": ["seg-director-general"],
+      "channels": ["linkedin", "blog", "youtube"],
+      "weekly_intensity": 1,
+      "weeks": [
+        {
+          "week": 1,
+          "items": [
+            {
+              "topic": "Que puede y que no puede hacer la IA generativa en el marketing de una escuela",
+              "format": "article",
+              "channel": "linkedin",
+              "funnel_stage": "awareness",
+              "cta": "Sigue a Acme Co.",
+              "messaging_pillar": "Autoridad GenAI",
+              "target_segment_id": "seg-director-general",
+              "week": 1,
+              "trend_ref": "trend-ia-generativa-pyme",
+              "rationale": "Thought-leadership awareness piece riding the GenAI interest trend for decision-makers.",
+              "notes_for_creator": "Educational tone; avoid overpromising AI capabilities (brand-safety constraint)."
+            }
+          ]
+        },
+        {
+          "week": 2,
+          "items": [
+            {
+              "topic": "Como un solo responsable de marketing puede operar 6 campanas con agentes de IA",
+              "format": "blog_post",
+              "channel": "blog",
+              "funnel_stage": "consideration",
+              "cta": "Lee el articulo completo",
+              "messaging_pillar": "Autoridad GenAI",
+              "target_segment_id": "seg-director-general",
+              "week": 2,
+              "trend_ref": null,
+              "rationale": "Consideration content explaining the single-operator model behind the offer.",
+              "notes_for_creator": "Show the workflow, not the internal cost structure."
+            }
+          ]
+        },
+        {
+          "week": 3,
+          "items": [
+            {
+              "topic": "Demo en video: del brief a la campana publicada en una semana",
+              "format": "short_video",
+              "channel": "youtube",
+              "funnel_stage": "consideration",
+              "cta": "Agenda una llamada",
+              "messaging_pillar": "Autoridad GenAI",
+              "target_segment_id": "seg-director-general",
+              "week": 3,
+              "trend_ref": null,
+              "rationale": "Mid-funnel proof video that moves authority-stage viewers toward a demo.",
+              "notes_for_creator": "Keep under 90s; end with the demo-booking CTA."
+            }
+          ]
+        },
+        {
+          "week": 4,
+          "items": [
+            {
+              "topic": "Solicita un diagnostico de marketing con IA para tu institucion",
+              "format": "ad_creative",
+              "channel": "linkedin",
+              "funnel_stage": "conversion",
+              "cta": "Solicita tu diagnostico",
+              "messaging_pillar": "Autoridad GenAI",
+              "target_segment_id": "seg-director-general",
+              "week": 4,
+              "trend_ref": null,
+              "rationale": "Conversion creative closing the authority campaign with a low-friction offer.",
+              "notes_for_creator": "Diagnostic is the entry offer; no margin/COGS references."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_items": 11,
+    "campaigns_covered": 2,
+    "items_by_week": {"1": 3, "2": 3, "3": 3, "4": 2},
+    "items_by_channel": {
+      "instagram": 3,
+      "meta_ads": 1,
+      "landing_page": 1,
+      "whatsapp": 1,
+      "email": 1,
+      "linkedin": 2,
+      "blog": 1,
+      "youtube": 1
+    },
+    "items_by_funnel_stage": {
+      "awareness": 2,
+      "consideration": 5,
+      "conversion": 3,
+      "retention": 1
+    },
+    "trend_driven_items": 2
+  },
+  "planning_notes": "Two campaigns from campaign_registry covered over a 4-week August cycle. Funnel laddered awareness -> consideration -> conversion -> retention. Two trend-driven items (back-to-school window, GenAI-for-SMB interest), ~18% of total, within the <=20% trend cap. All pillars trace to active_strategy ('ROI medible', 'Operacion sin friccion', 'Autoridad GenAI'). Paid items (meta_ads x1, linkedin ad_creative x1) sit inside each campaign's share. No blackout windows in August in client_profile; pricing-claims and brand-safety constraints respected (no discounts, no AI overpromises)."
+}
+```
+
+## OUTPUT 2 — Editorial Brief
+
+EDITORIAL BRIEF — Acme Co. BU · Cycle 2026-08
+
+The August cycle runs two campaigns drawn from the approved campaign_registry, both serving the strategy's private-education focus in Mexico (with CO/DR/PR as secondary markets).
+
+Campaign A — "Convocatoria Agosto" (high intensity, 3/wk equivalent) is the demand-and-conversion engine timed to the back-to-school enrollment window. It builds a clean funnel ladder: week 1 awareness + consideration on Instagram (the back-to-school reel is the one trend-driven beat here), week 2 stands up the lead-magnet landing page plus a paid consideration creative on Meta, week 3 converts the captured list via WhatsApp and email ahead of the deadline, and week 4 adds a referral/retention post to recycle closed accounts into new pipeline. Every item maps to "ROI medible" or "Operacion sin friccion".
+
+Campaign B — "Autoridad GenAI para PyMEs Educativas" (low intensity, 1/wk) is the slower authority play aimed at the general-director segment. It opens with a LinkedIn thought-leadership article (riding the GenAI-for-SMB interest trend), explains the single-operator model in a blog post, proves it with a short demo video, and closes with a conversion creative offering a diagnostic. All four ladder to the "Autoridad GenAI" pillar.
+
+Funnel mix across the 11 items: 2 awareness / 5 consideration / 3 conversion / 1 retention — consideration-heavy because the pilot has no warm list yet and must build one before pushing conversion hard. Trend usage is intentionally light (2 of 11, ~18%): one seasonal (regreso a clases), one topical (IA generativa para PyMEs). Coverage: both registry campaigns are represented, and each owned channel appears at least once except YouTube/blog which belong only to Campaign B and are covered there.
+
+Notes for the Layer 4 creators: keep all client-facing topics/CTAs in ES-MX; no pricing/discount claims (pricing-claims constraint), no AI overpromises (brand-safety), and never surface internal cost/margin figures. The week-2 landing page is the hinge — it must be live before the week-3 conversion push.
+
+## OUTPUT 3 — Editorial Review Gate Summary
+
+=== AGENT 3.1 — EDITORIAL REVIEW GATE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Gate status: PENDING REVIEW
+
+--- PLAN TOTALS ---
+Campaigns covered: 2 of 2 in registry
+Total items: 11
+By week: W1=3 · W2=3 · W3=3 · W4=2
+By channel: instagram=3 · linkedin=2 · meta_ads=1 · landing_page=1 · whatsapp=1 · email=1 · blog=1 · youtube=1
+By funnel stage: awareness=2 · consideration=5 · conversion=3 · retention=1
+Trend-driven items: 2 (~18%, within the 20% cap)
+
+--- BUDGET & COHERENCE CHECK ---
+Pass. Paid items are limited to 1 Meta creative (Campaign A) + 1 LinkedIn creative (Campaign B), each inside its campaign's budget share per active_strategy. All pillars trace to the approved strategy. Consideration-heavy mix is deliberate — the pilot has no warm list, so the cycle prioritizes building one before scaling conversion spend.
+
+--- CONSTRAINT / BLACKOUT CHECK ---
+Pass. No items fall in an August blackout window (none declared in client_profile). Pricing-claims constraint respected (no discounts/colegiatura cuts). Brand-safety respected (no AI overpromises). No competitor mentions, no political/religious content.
+
+--- RECOMMENDED ACTION ---
+RETURN — confirm two strategic choices before scheduling: (1) the consideration-heavy weighting given no warm list, and (2) the week-2 landing page deadline (must be live before the week-3 WhatsApp/email conversion push). On approval, release to Agent 3.2 for calendar scheduling.

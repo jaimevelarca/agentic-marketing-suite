@@ -1,0 +1,178 @@
+## OUTPUT 1 — content_learnings JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-09-02T09:00:00Z",
+  "gate_status": "pending_review",
+  "cycle_month": "2026-08",
+  "source_block": "performance_history",
+  "optimization_actions": [
+    {
+      "action_id": "opt-2026-08-ab-ig-carousel-hook",
+      "action_type": "ab_conclude",
+      "scope": "experiment",
+      "target_ids": ["exp-ig-carousel-hook-aug", "cmp-edu-convocatoria-ago"],
+      "evidence": "Variant B (cost-per-enrolled-lead proof-point hook) vs Variant A (generic brand hook) over the cycle: B 312 clicks / 41 leads at CPL $13.90, A 298 clicks / 22 leads at CPL $26.40 — both arms above the ~100-click / ~30-conversion floor on B; B beats the CPL target (<=$18) and A misses it.",
+      "confidence": "high",
+      "expected_effect": "Blended IG-carousel CPL -25-35% next cycle by rolling 100% of carousel traffic to the proof-point hook.",
+      "auto_apply": true,
+      "requires_human": false,
+      "feeds": ["L4"],
+      "rationale": "Clear, statistically meaningful A/B winner on a metric tied to the KPI contract; concluding and rolling to the winner is bounded and reversible."
+    },
+    {
+      "action_id": "opt-2026-08-pause-li-article-awareness",
+      "action_type": "pause",
+      "scope": "creative",
+      "target_ids": ["cal-2026-08-w1-li-article-01"],
+      "evidence": "LinkedIn authority article: 4,100 impressions, CTR 0.31% and 3 leads at CPL $61 over the cycle vs the channel target CPL <=$30 — well below target on a sufficient impression sample; trailing two cycles show the same decay.",
+      "confidence": "high",
+      "expected_effect": "Removes a $61-CPL drag; reallocated budget improves blended CPL.",
+      "auto_apply": true,
+      "requires_human": false,
+      "feeds": ["L3", "L5"],
+      "rationale": "Consistent underperformance vs target across two cycles on an adequate sample; pausing the creative is reversible and within bounded authority."
+    },
+    {
+      "action_id": "opt-2026-08-creative-refresh-meta-ad",
+      "action_type": "creative_refresh",
+      "scope": "creative",
+      "target_ids": ["cal-2026-08-w2-meta-ad-01"],
+      "evidence": "Meta ad CTR fell from 1.9% (cycle start) to 0.8% (cycle end) on a still-converting audience (frequency 4.2) — classic creative fatigue, not audience exhaustion (CPL stable at $17, just below the $18 target).",
+      "confidence": "medium",
+      "expected_effect": "Restore CTR toward ~1.5% and hold CPL under target with 2-3 fresh creative variants.",
+      "auto_apply": true,
+      "requires_human": false,
+      "feeds": ["L4"],
+      "rationale": "Fatigue signal (rising frequency, falling CTR, stable CPL) warrants new creative from Layer 4; one change on this scope this cycle."
+    },
+    {
+      "action_id": "opt-2026-08-reallocate-li-to-meta",
+      "action_type": "budget_reallocate",
+      "scope": "channel",
+      "target_ids": ["channel-linkedin", "channel-meta"],
+      "evidence": "LinkedIn blended CPL $58 vs Meta $16 over the cycle; LinkedIn is the worst channel against the CPL target and Meta the best. Moving the freed LinkedIn-article spend to the winning Meta carousel campaign is the highest-leverage shift available.",
+      "confidence": "high",
+      "expected_effect": "Blended CPL -10-15% next cycle by concentrating spend on the channel beating its KPI.",
+      "auto_apply": false,
+      "requires_human": true,
+      "feeds": ["L5"],
+      "rationale": "The proposed move is 33% of the LinkedIn channel budget — above the 20% bounded line — so it is a binding spend decision and requires partner sign-off before it applies."
+    },
+    {
+      "action_id": "opt-2026-08-hold-wa-broadcast-test",
+      "action_type": "hold",
+      "scope": "experiment",
+      "target_ids": ["exp-wa-send-time-aug"],
+      "evidence": "WhatsApp send-time A/B has only 41 total opens / 6 conversions so far — below the ~100-click / ~30-conversion floor; the gap between arms (3.1% vs 2.7% conversion) is inside the noise.",
+      "confidence": "low",
+      "expected_effect": "No change yet; keep both arms running to reach a decidable sample.",
+      "auto_apply": true,
+      "requires_human": false,
+      "feeds": ["L5"],
+      "rationale": "Sample too thin to conclude; holding avoids overfitting to noise. Logged in open_hypotheses to recheck next cycle."
+    }
+  ],
+  "budget_reallocations": [
+    {
+      "from": "channel-linkedin",
+      "to": "channel-meta",
+      "amount_usd": 200,
+      "pct_of_source_budget": 0.33,
+      "increases_total_spend": false,
+      "requires_human": true,
+      "rationale": "Pure shift (total spend unchanged) from the worst CPL channel (LinkedIn, $58) to the best (Meta, $16). At 33% of the LinkedIn budget it exceeds the 20% bounded limit, so it is proposed, not applied, pending partner sign-off."
+    }
+  ],
+  "learnings": [
+    {
+      "learning_id": "lrn-mx-edu-carousel-proof",
+      "category": "copy",
+      "lesson": "In the MX private-education segment, carousels that lead with a concrete cost-per-enrolled-lead proof point convert ~2x better than generic brand hooks (CPL $13.90 vs $26.40). Lead with the proof point.",
+      "evidence": "exp-ig-carousel-hook-aug: Variant B 41 leads @ $13.90 vs A 22 leads @ $26.40 over 312/298 clicks.",
+      "confidence": "high",
+      "feeds": ["L3", "L4"],
+      "first_observed": "2026-07",
+      "reconfirmed": "2026-08"
+    },
+    {
+      "learning_id": "lrn-li-article-awareness-weak",
+      "category": "channel",
+      "lesson": "LinkedIn long-form authority articles underperform as a paid awareness driver for this SMB-education offer (CPL ~$60, well above the $30 target). Keep LinkedIn for organic authority, not paid lead-gen.",
+      "evidence": "cal-2026-08-w1-li-article-01: CTR 0.31%, 3 leads @ $61 over 4,100 impressions; same decay two cycles running.",
+      "confidence": "high",
+      "feeds": ["L3", "L5"],
+      "first_observed": "2026-07",
+      "reconfirmed": "2026-08"
+    },
+    {
+      "learning_id": "lrn-meta-creative-fatigue-3wk",
+      "category": "creative",
+      "lesson": "Meta ad creative in this account fatigues by ~week 3 (CTR roughly halves as frequency passes ~4); schedule a creative refresh every ~2-3 weeks rather than waiting for CPL to break.",
+      "evidence": "cal-2026-08-w2-meta-ad-01: CTR 1.9% -> 0.8% at frequency 4.2 with CPL stable at $17.",
+      "confidence": "medium",
+      "feeds": ["L3", "L4"],
+      "first_observed": "2026-08",
+      "reconfirmed": null
+    }
+  ],
+  "open_hypotheses": [
+    {
+      "hypothesis": "WhatsApp closing-reminder broadcasts convert better sent at 16:00 local than at 10:00 in the MX education funnel.",
+      "test": "exp-wa-send-time-aug — keep both send-time arms running until each reaches ~100 opens / ~30 conversions.",
+      "since": "2026-08"
+    }
+  ],
+  "retired_learnings": [],
+  "summary": {
+    "total_actions": 5,
+    "auto_applied": 4,
+    "human_required": 1,
+    "by_action_type": {
+      "ab_conclude": 1,
+      "pause": 1,
+      "creative_refresh": 1,
+      "budget_reallocate": 1,
+      "hold": 1
+    },
+    "total_learnings": 3,
+    "reallocations": 1,
+    "reallocations_requiring_human": 1
+  },
+  "notes": "Evidence base: performance_history for cycle 2026-08 (Meta + LinkedIn + WhatsApp across the two August campaigns) vs the kpi_contracts CPL targets. Carried forward all three prior learnings; reconfirmed two (carousel-proof, LinkedIn-weak -> promoted toward high) and added the Meta fatigue lesson. One change per scope this cycle; the WhatsApp send-time test is held below the sample floor to avoid overfitting. Single binding item: the LinkedIn->Meta channel reallocation is 33% of the source budget (>20% line), so the block is pending_review; the other four actions are bounded and auto-applied. No total-spend increase proposed; all moves stay within the client's stated budget ceiling. No internal COGS/margin figures referenced."
+}
+```
+
+## OUTPUT 2 — Optimization Brief
+
+OPTIMIZATION BRIEF — Acme Co. BU · Cycle 2026-08
+
+Performance this cycle was a clear story of one channel and one creative angle carrying the account. The Instagram carousel A/B test reached a decisive result: the variant that leads with a concrete cost-per-enrolled-lead proof point booked 41 leads at $13.90 CPL versus 22 leads at $26.40 for the generic brand hook — roughly 2x more efficient, on a sample well past the decision floor, and beating the $18 CPL contract. That test is concluded and the proof-point hook is now the default for carousels; the lesson is written back to Layer 4 (copy) and Layer 3 (planning).
+
+Four of the five actions this cycle are bounded and have been auto-applied: the carousel A/B conclusion, pausing the LinkedIn authority article (CPL ~$61 against a $30 target, the same decay two cycles running), refreshing the fatigued Meta creative (CTR halved from 1.9% to 0.8% as frequency crossed 4 while CPL held — a creative problem, not an audience one), and holding the WhatsApp send-time test, which is still too thin (41 opens / 6 conversions) to call without overfitting.
+
+The one item that needs your sign-off is a budget move. LinkedIn is the worst channel against target ($58 blended CPL) and Meta is the best ($16); the highest-leverage shift is to take the freed LinkedIn-article spend and concentrate it on the winning Meta carousel campaign. That move is $200, which is 33% of the LinkedIn channel budget — above the 20% line that separates a bounded reallocation from a binding spend decision — so it is proposed, not applied. It is a pure shift (total spend unchanged, within the client's ceiling), and approving it should pull blended CPL down a further 10-15% next cycle. Partner sign-off per the approval chain is the only thing holding it.
+
+Net expected effect if the reallocation is approved: blended CPL down meaningfully against the August baseline, with the proof-point hook and the refreshed Meta creative compounding the gain. The durable lessons going back to L3/L4 are: lead carousels with a cost-per-lead proof point; keep LinkedIn for organic authority, not paid lead-gen; and pre-schedule a Meta creative refresh every ~2-3 weeks.
+
+## OUTPUT 3 — Ops / Gate Summary
+
+=== AGENT 6.3 — OPTIMIZATION SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Gate posture: PENDING REVIEW (binding budget move)
+
+--- ACTION TOTALS ---
+Total actions: 5
+Auto-applied: 4 · Human-required: 1
+By type: ab_conclude=1 · pause=1 · creative_refresh=1 · budget_reallocate=1 · hold=1
+Learnings written: 3 (2 reconfirmed, 1 new) · Open hypotheses: 1
+Reallocations: 1 (1 requires a human)
+
+--- HUMAN-REQUIRED ITEMS ---
+- BUDGET REALLOCATE: channel-linkedin -> channel-meta, $200 = 33% of the LinkedIn channel budget (>20% bounded line). Pure shift, no total-spend increase, within ceiling. Expected blended CPL -10-15%. Needs partner sign-off per approval_chain before it applies.
+
+--- RECOMMENDED ACTION ---
+REVIEW — one budget reallocation exceeds the 20% bounded limit; operator/partner must approve the LinkedIn->Meta shift before it applies. The other four actions (A/B conclusion, LinkedIn pause, Meta creative refresh, WhatsApp test hold) are bounded and have been auto-applied; learnings written back to L3/L4 for next cycle.

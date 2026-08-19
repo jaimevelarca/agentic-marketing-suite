@@ -1,0 +1,254 @@
+## OUTPUT 1 — visual_assets JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "cycle_month": "2026-08",
+  "markets": ["Mexico", "Colombia", "Dominican Republic", "Puerto Rico"],
+  "assets": [
+    {
+      "asset_id": "va-001",
+      "content_item_id": "cmp-edu-convocatoria-ago-w1-reel",
+      "asset_type": "video",
+      "engine": "kling-2.5",
+      "format": "reel",
+      "channel": "instagram",
+      "aspect_ratio": "9:16",
+      "funnel_stage": "awareness",
+      "messaging_pillar": "ROI medible",
+      "target_segment_id": "seg-director-admisiones",
+      "prompt": "Vertical 9:16 short-form reel, 8 seconds. Opening shot: a warm, modern Mexican private-school admissions office, early morning light, an empty waiting bench with a few application folders; slow push-in. Cut to a friendly admissions director (Latina woman, 40s, professional blazer) reviewing a tablet that shows a clean rising line chart. Authentic LATAM setting, not stocky, credible mid-market private school. Soft daylight, brand teal accents on the UI. Leave the lower third clear for an overlay caption. Cinematic, optimistic, calm pacing.",
+      "negative_prompt": "distorted hands, extra fingers, garbled text, watermark, low-res, deformed faces, cluttered background, US-corporate sterility, sombrero, donkey, stereotype clichés, competitor logos, political or religious symbols, on-screen price or discount numbers",
+      "in_image_text": "Llena tu convocatoria de agosto sin bajar la colegiatura",
+      "slides": [],
+      "duration_seconds": 8,
+      "source_still_ref": null,
+      "alt_text": "Directora de admisiones de una escuela privada revisa en una tableta una gráfica de prospectos al alza en una oficina luminosa.",
+      "safe_zone_notes": "Keep the lower 250px clear of subject — Instagram caption + CTA bar overlaps there.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Awareness reel for the admissions-director segment, tied to the back-to-school enrollment window opening Campaign A.",
+      "status": "planned",
+      "revision_reason": null
+    },
+    {
+      "asset_id": "va-002",
+      "content_item_id": "cmp-edu-convocatoria-ago-w1-carousel",
+      "asset_type": "carousel",
+      "engine": "ideogram-3.0",
+      "format": "carousel",
+      "channel": "instagram",
+      "aspect_ratio": "4:5",
+      "funnel_stage": "consideration",
+      "messaging_pillar": "Operacion sin friccion",
+      "target_segment_id": "seg-marketing-escuela",
+      "prompt": "Four-slide 4:5 Instagram carousel for a private-school marketing lead. Consistent brand system: teal (#0F4C5C) and orange (#E36414) accents, generous white space, clean sans-serif typography, simple flat iconography. Cover slide is typographic with a clear headline; content slides each illustrate one funnel leak with a small icon + short label; final slide is a CTA card. Photographic insets optional but secondary to legible text.",
+      "negative_prompt": "garbled text, misspelled words, distorted hands, watermark, low-res, cluttered layout, competitor logos, political or religious symbols, on-screen price or discount numbers",
+      "in_image_text": null,
+      "slides": [
+        {
+          "slide": 1,
+          "engine": "ideogram-3.0",
+          "role": "cover",
+          "prompt": "Typographic cover slide, teal background, bold white headline centered, small orange underline accent, Acme Co. wordmark bottom-left.",
+          "in_image_text": "3 señales de que tu proceso de admisiones está perdiendo prospectos"
+        },
+        {
+          "slide": 2,
+          "engine": "ideogram-3.0",
+          "role": "content",
+          "prompt": "White slide, single teal funnel icon top, short bold label below, one line of body copy.",
+          "in_image_text": "1. Tardas más de 24 h en responder una solicitud"
+        },
+        {
+          "slide": 3,
+          "engine": "ideogram-3.0",
+          "role": "content",
+          "prompt": "White slide, single orange icon top, short bold label below, one line of body copy.",
+          "in_image_text": "2. No sabes en qué etapa se enfría cada prospecto"
+        },
+        {
+          "slide": 4,
+          "engine": "ideogram-3.0",
+          "role": "cta",
+          "prompt": "Teal CTA card, white headline, orange button shape with white label text.",
+          "in_image_text": "Descarga la guía de admisiones"
+        }
+      ],
+      "duration_seconds": null,
+      "source_still_ref": null,
+      "alt_text": "Carrusel de cuatro láminas que enumera tres señales de fuga de prospectos en admisiones y cierra con una invitación a descargar la guía.",
+      "safe_zone_notes": "Keep headlines within the central 80% — Instagram crops carousel edges in feed preview.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Consideration carousel surfacing the funnel-leak problem; Ideogram chosen because every slide is text-led.",
+      "status": "planned",
+      "revision_reason": null
+    },
+    {
+      "asset_id": "va-003",
+      "content_item_id": "cmp-edu-convocatoria-ago-w2-adcreative",
+      "asset_type": "image",
+      "engine": "flux-2-pro",
+      "format": "ad_creative",
+      "channel": "meta_ads",
+      "aspect_ratio": "1:1",
+      "funnel_stage": "consideration",
+      "messaging_pillar": "ROI medible",
+      "target_segment_id": "seg-director-admisiones",
+      "prompt": "Square 1:1 Meta ad creative, photoreal. A confident Mexican school administrator (man, 50s, business-casual) in a bright office, looking at a tablet that shows a tasteful enrollment dashboard with a clear cost-per-enrolled-prospect trend. Warm natural light, brand teal accent on the UI, shallow depth of field. Composition leaves the top third open for an overlay headline. Credible mid-market private-school environment, authentic LATAM, optimistic and professional.",
+      "negative_prompt": "distorted hands, extra fingers, garbled text, watermark, low-res, deformed faces, cluttered background, US-corporate sterility, stereotype clichés, competitor logos, political or religious symbols, explicit price or discount numbers",
+      "in_image_text": "Mide tu costo por prospecto inscrito, mes a mes",
+      "slides": [],
+      "duration_seconds": null,
+      "source_still_ref": null,
+      "alt_text": "Administrador escolar observa en una tableta un tablero de inscripciones con la tendencia del costo por prospecto inscrito.",
+      "safe_zone_notes": "Overlay headline goes in the top third; keep Meta's 20% text guideline in mind for the baked headline.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Paid consideration creative that proves ROI measurement to drive demo bookings within Campaign A's budget share.",
+      "status": "planned",
+      "revision_reason": null
+    },
+    {
+      "asset_id": "va-004",
+      "content_item_id": "cmp-edu-convocatoria-ago-w2-landinghero",
+      "asset_type": "image",
+      "engine": "flux-2-pro",
+      "format": "hero_image",
+      "channel": "landing_page",
+      "aspect_ratio": "16:9",
+      "funnel_stage": "consideration",
+      "messaging_pillar": "Operacion sin friccion",
+      "target_segment_id": "seg-marketing-escuela",
+      "prompt": "Wide 16:9 landing-page hero, photoreal. A small marketing team at a private school collaborating around a laptop showing a clean admissions funnel diagram; bright airy room, plants, warm LATAM daylight. Left third kept clean for headline + CTA overlay. Brand teal and orange used sparingly as accent props (a notebook, a sticky note). Aspirational but believable, not luxury.",
+      "negative_prompt": "distorted hands, extra fingers, garbled text, watermark, low-res, deformed faces, cluttered background, US-corporate sterility, stereotype clichés, competitor logos, political or religious symbols, price or discount numbers",
+      "in_image_text": null,
+      "slides": [],
+      "duration_seconds": null,
+      "source_still_ref": null,
+      "alt_text": "Equipo de marketing escolar colabora alrededor de una laptop que muestra el embudo de admisiones en una oficina luminosa.",
+      "safe_zone_notes": "Headline + form overlay live in the left third; keep faces in the right two-thirds.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Hero image for the week-2 lead-magnet landing page — the hinge asset that must be live before the week-3 conversion push.",
+      "status": "planned",
+      "revision_reason": null
+    },
+    {
+      "asset_id": "va-005",
+      "content_item_id": "cmp-autoridad-genai-pyme-w3-shortvideo",
+      "asset_type": "video",
+      "engine": "runway-gen-4.5",
+      "format": "short_video",
+      "channel": "youtube",
+      "aspect_ratio": "16:9",
+      "funnel_stage": "consideration",
+      "messaging_pillar": "Autoridad GenAI",
+      "target_segment_id": "seg-director-general",
+      "prompt": "16:9 short demo video, ~9 seconds, animating an approved still of a marketing workflow board. Gentle parallax push across labeled stages 'Brief -> Plan -> Creativo -> Publicado', subtle highlight sweep in brand teal as each stage lights up. Clean, modern, educational tone; no on-screen people. End on the final stage with space for an end-card CTA.",
+      "negative_prompt": "garbled text, watermark, low-res, jittery motion, flicker, competitor logos, political or religious symbols, AI-overpromise imagery (robots replacing humans), price or discount numbers",
+      "in_image_text": "Del brief a la campaña publicada en una semana",
+      "slides": [],
+      "duration_seconds": 9,
+      "source_still_ref": "va-pending-workflow-still",
+      "alt_text": "Animación de un tablero de flujo de trabajo que avanza de brief a campaña publicada, resaltando cada etapa en color de marca.",
+      "safe_zone_notes": "Reserve the last 1.5s for an end-card CTA overlay added in post.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Mid-funnel proof video for the general-director segment; Runway chosen for controlled image-to-video animation of an approved still.",
+      "status": "planned",
+      "revision_reason": null
+    },
+    {
+      "asset_id": "va-006",
+      "content_item_id": "cmp-autoridad-genai-pyme-w4-adcreative",
+      "asset_type": "image",
+      "engine": "ideogram-3.0",
+      "format": "ad_creative",
+      "channel": "linkedin",
+      "aspect_ratio": "1.91:1",
+      "funnel_stage": "conversion",
+      "messaging_pillar": "Autoridad GenAI",
+      "target_segment_id": "seg-director-general",
+      "prompt": "LinkedIn 1.91:1 ad creative, typographic-led on a teal field with an orange accent bar. Bold legible headline left, a simple line illustration of a diagnostic checklist right, Acme Co. wordmark bottom. Professional, restrained, authority tone.",
+      "negative_prompt": "garbled text, misspelled words, watermark, low-res, cluttered layout, competitor logos, political or religious symbols, price or discount numbers, robots-replacing-humans imagery",
+      "in_image_text": "Solicita un diagnóstico de marketing con IA para tu institución",
+      "slides": [],
+      "duration_seconds": null,
+      "source_still_ref": null,
+      "alt_text": "Anuncio de LinkedIn con un titular sobre solicitar un diagnóstico de marketing con IA y una ilustración de una lista de verificación.",
+      "safe_zone_notes": "Keep the headline within the left 60%; LinkedIn overlays the CTA button on the lower edge.",
+      "brand_color_refs": ["#0F4C5C", "#E36414"],
+      "rationale": "Conversion creative closing the authority campaign with a low-friction diagnostic offer; Ideogram for the text-heavy layout.",
+      "status": "planned",
+      "revision_reason": null
+    }
+  ],
+  "summary": {
+    "total_assets": 6,
+    "by_engine": {
+      "kling-2.5": 1,
+      "ideogram-3.0": 2,
+      "flux-2-pro": 2,
+      "runway-gen-4.5": 1
+    },
+    "by_asset_type": {
+      "image": 3,
+      "carousel": 1,
+      "video": 2
+    },
+    "by_channel": {
+      "instagram": 2,
+      "meta_ads": 1,
+      "landing_page": 1,
+      "youtube": 1,
+      "linkedin": 1
+    },
+    "video_asset_count": 2,
+    "needs_revision_count": 0
+  },
+  "production_notes": "Six visual specs cover the visual-bearing items of the approved August content_plan across both campaigns. Engine mix: Ideogram 3.0 for the two text-led assets (carousel + LinkedIn creative) for reliable legible Spanish text; Flux 2 Pro for the two photoreal stills (Meta creative + landing hero); Kling 2.5 for the awareness reel; Runway Gen-4.5 to animate an approved workflow still. Pure-text items (week-3 WhatsApp broadcast and email_single) were intentionally skipped — no visual required. Brand colors teal #0F4C5C and orange #E36414 pinned on every asset (placeholder hexes; refresh once visual_identity is packaged, S1-T7). Constraints respected: no competitor logos, no price/discount graphics (pricing_claims), no AI-overpromise imagery (brand_safety), all in-image text in ES-MX taken from the planned copy. fal.ai cost implication: 2 video assets are the costliest lines in this batch — confirm both are worth the spend before approving."
+}
+```
+
+## OUTPUT 2 — Creative Brief
+
+CREATIVE BRIEF — Acme Co. BU · Cycle 2026-08
+
+This batch realizes the visual-bearing items of the approved August content_plan: six specs across the two campaigns, with the two pure-text items (the week-3 WhatsApp broadcast and the conversion email) deliberately left without visuals.
+
+Creative through-line: every asset shows a credible, warm, mid-market Mexican private-school world — admissions directors, small marketing teams, tasteful dashboards — never the sterile US-corporate stock look and never stereotype clichés. The brand system (teal #0F4C5C, orange #E36414, generous white space, clean sans-serif) carries across all six so the batch reads as one campaign.
+
+Engine mix and why: Ideogram 3.0 handles the two text-led pieces (the week-1 funnel-leak carousel and the LinkedIn conversion creative) because legible Spanish typography is the whole point of those assets and Ideogram renders in-image text far more reliably than Flux. Flux 2 Pro handles the two photoreal stills (the Meta consideration creative and the landing-page hero) where the human/environment realism matters and text is added in post. Kling 2.5 produces the 8-second vertical awareness reel that opens Campaign A. Runway Gen-4.5 animates an approved workflow still into a 9-second demo for Campaign B, where controlled image-to-video motion beats text-to-video.
+
+Funnel ladder: the reel opens awareness; the carousel, Meta creative, landing hero, and demo video carry consideration; the LinkedIn creative closes conversion. The landing-page hero (va-004) is the hinge — it must be rendered and live before the week-3 conversion push.
+
+Brand styling: all six pin the two brand hexes; these are placeholders until the visual identity is packaged (S1-T7), so the reviewer should confirm the palette and supply the logo file before render.
+
+fal.ai cost note: the two video assets (Kling reel, Runway demo) are the costliest lines in the batch. Both earn their place — one opens the high-intensity campaign, the other is the authority campaign's proof point — but the reviewer should confirm the spend before approving, since video is the second-largest variable cost line in production.
+
+## OUTPUT 3 — Batch Review Gate Summary
+
+=== AGENT 4.2 — BATCH REVIEW GATE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Gate status: PENDING REVIEW
+
+--- BATCH TOTALS ---
+Total assets: 6
+By engine: ideogram-3.0=2 · flux-2-pro=2 · kling-2.5=1 · runway-gen-4.5=1
+By type: image=3 · carousel=1 · video=2
+By channel: instagram=2 · meta_ads=1 · landing_page=1 · youtube=1 · linkedin=1
+Video assets: 2 (costliest fal.ai lines)
+Needs revision: 0
+
+--- CONSTRAINT / BRAND-SAFETY CHECK ---
+Pass. No competitor logos. No price/discount numbers baked into any asset (pricing_claims constraint). No AI-overpromise imagery — no "robots replacing humans" (brand_safety). No political/religious symbols. All in-image text is ES-MX, drawn from the planned copy. No internal cost/margin/bonus figures anywhere.
+
+--- BRAND ASSET FLAG ---
+Brand colors used are placeholder hexes (#0F4C5C / #E36414) and no logo file is referenced — visual_identity is not yet packaged (S1-T7). Confirm palette + supply the logo before render.
+
+--- fal.ai COST NOTE ---
+2 video assets drive most of the render spend in this batch; confirm both are worth it before approving. Stills/carousel are low-cost.
+
+--- RECOMMENDED ACTION ---
+RETURN — (1) confirm/replace the placeholder brand palette and supply the logo file (S1-T7), and (2) confirm the two video assets are worth the fal.ai spend. On approval, release the batch to Layer 5 (5.2 Social Publisher) to match each rendered file to its scheduled slot.

@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/content_plan/v1",
+  "version": "1.0.0",
+  "title": "content_plan",
+  "description": "Memory block written by Agent 3.1 (Monthly Marketing Deck). The week-by-week editorial blueprint per campaign — topics, formats, channels, CTAs, funnel stages — that Agent 3.2 (Content Scheduler) turns into a dated content_calendar and that Layer 4 production agents read to brief every asset. Reads: active_strategy, campaign_registry, audience_segments, trend_signals. Human gate: editorial review.",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "cycle_month",
+    "markets",
+    "campaigns",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "content_item": {
+      "type": "object",
+      "required": [
+        "topic",
+        "format",
+        "channel",
+        "funnel_stage",
+        "cta",
+        "messaging_pillar",
+        "week"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "topic": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Concrete editorial angle, client-facing, in ES-MX (or client primary language). Not finished copy."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "reel",
+            "carousel",
+            "static_post",
+            "story",
+            "short_video",
+            "long_video",
+            "article",
+            "blog_post",
+            "email_sequence",
+            "email_single",
+            "whatsapp_broadcast",
+            "landing_page",
+            "ad_creative",
+            "infographic",
+            "live_event"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "instagram",
+            "facebook",
+            "tiktok",
+            "linkedin",
+            "youtube",
+            "email",
+            "whatsapp",
+            "blog",
+            "landing_page",
+            "google_ads",
+            "meta_ads",
+            "tiktok_ads"
+          ]
+        },
+        "funnel_stage": {
+          "type": "string",
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention"
+          ]
+        },
+        "cta": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short call-to-action, client-facing, in ES-MX (or client primary language)."
+        },
+        "messaging_pillar": {
+          "type": "string",
+          "minLength": 1,
+          "description": "An approved messaging pillar from active_strategy."
+        },
+        "target_segment_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Audience segment id from audience_segments this item speaks to."
+        },
+        "week": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "trend_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Id/label of the trend_signals entry that motivated a timely item; null when evergreen."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "One short sentence (EN, operator-facing) tying the item to its objective/segment."
+        },
+        "notes_for_creator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional one line (EN) of guidance for the Layer 4 production agent."
+        }
+      }
+    },
+    "week_plan": {
+      "type": "object",
+      "required": [
+        "week",
+        "items"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "week": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/content_item"
+          }
+        }
+      }
+    },
+    "campaign_plan": {
+      "type": "object",
+      "required": [
+        "campaign_id",
+        "campaign_name",
+        "messaging_pillars",
+        "channels",
+        "weeks"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "campaign_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "campaign_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "messaging_pillars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "target_segment_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "weekly_intensity": {
+          "type": "number",
+          "minimum": 0
+        },
+        "weeks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/week_plan"
+          },
+          "minItems": 1
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this content_plan was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Editorial review gate status. Must be 'approved' before Agent 3.2 schedules the plan."
+    },
+    "cycle_month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this plan covers, YYYY-MM."
+    },
+    "cycle_weeks": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6,
+      "description": "Number of weeks in the cycle (default 4)."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Target markets for this cycle, ordered by priority."
+    },
+    "campaigns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/campaign_plan"
+      },
+      "description": "Per-campaign weekly content plans. May be empty only when gate_status is 'blocked'."
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_items",
+        "campaigns_covered"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "campaigns_covered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "items_by_week": {
+          "type": "object"
+        },
+        "items_by_channel": {
+          "type": "object"
+        },
+        "items_by_funnel_stage": {
+          "type": "object"
+        },
+        "trend_driven_items": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "planning_notes": {
+      "type": "string",
+      "description": "EN — assumptions, gaps, coherence flags, blocked reasons."
+    }
+  }
+}

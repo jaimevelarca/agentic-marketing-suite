@@ -1,0 +1,603 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/ad_campaign_log/v1",
+  "version": "1.0.0",
+  "title": "ad_campaign_log",
+  "description": "Memory block written by Agent 5.1 (Campaign Launcher). A paid-media campaign SETUP SPEC for Meta / Google / TikTok Ads: per-platform campaigns -> ad sets/ad groups with objective, budget, schedule, targeting, optimization, and creative references, plus a budget reconciliation against the authorized cycle budget. This is a SPEC TO BE HUMAN-AUTHORIZED, never an auto-launch instruction: gate_status is always 'pending_review' until a human grants financial authorization. Read by Layer 6 (6.1 Performance Analytics reconciles spend/ROAS/CPL against the kpi_contracts; 6.3 Optimization Engine reallocates within bounds). Reads: campaign_registry (2.2), copy_assets (4.1), page_assets (4.3), active_strategy (2.1). Human gate: financial authorization. First authored: 2026-05-29",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "campaign_ref",
+    "currency",
+    "platform_campaigns",
+    "budget_reconciliation",
+    "authorization"
+  ],
+  "definitions": {
+    "money_usd": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Amount in USD. USD invoicing across all four markets (constraint); local currency is reference only."
+    },
+    "geo_target": {
+      "type": "object",
+      "required": [
+        "country"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "Target country, e.g. Mexico, Colombia, Dominican Republic, Puerto Rico."
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional states/regions/cities, ES-MX names (e.g. Ciudad de Mexico, Jalisco, Nuevo Leon)."
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "targeting": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "segment_ref",
+        "geo",
+        "age_min",
+        "age_max"
+      ],
+      "properties": {
+        "segment_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Audience segment id from audience_segments / campaign_registry that this ad set targets, or 'all' if segments unavailable."
+        },
+        "geo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/geo_target"
+          },
+          "minItems": 1
+        },
+        "age_min": {
+          "type": "integer",
+          "minimum": 13,
+          "maximum": 65
+        },
+        "age_max": {
+          "type": "integer",
+          "minimum": 13,
+          "maximum": 65
+        },
+        "genders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "all",
+              "female",
+              "male"
+            ]
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "BCP-47-ish tags, e.g. es-MX, es."
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Platform interest/affinity targets (ES-MX where consumer-facing labels)."
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Search keywords (Google Search ad groups) — ES-MX. Empty for non-search ad sets."
+        },
+        "custom_audiences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Named retargeting / custom / lookalike audiences (EN config labels). Empty when none authorized."
+        },
+        "placements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Platform placements (e.g. feed, reels, stories, search, youtube_shorts, tiktok_feed) or ['automatic']."
+        },
+        "exclusions_note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "EN. Audiences/placements explicitly excluded and why."
+        }
+      }
+    },
+    "creative_ref": {
+      "type": "object",
+      "required": [
+        "copy_asset_ref",
+        "format"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "copy_asset_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Id of the approved copy_assets entry (4.1) used as the ad copy. Null only when no copy_assets were available (flag in setup_notes)."
+        },
+        "visual_asset_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Id of the visual_assets entry (4.2) used as the ad creative, or null if not yet produced."
+        },
+        "landing_page_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "page_id from page_assets (4.3) this ad points traffic at. Null only when no landing page is available (flag it)."
+        },
+        "destination_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Final landing URL or recommended route the ad sends traffic to."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "single_image",
+            "carousel",
+            "video",
+            "search_text",
+            "collection",
+            "lead_form"
+          ],
+          "description": "Ad format on this platform."
+        },
+        "primary_text_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Pointer to the specific copy field/variant used (EN note), e.g. 'hook + primary_caption of cpy-...-01'."
+        }
+      }
+    },
+    "ad_set": {
+      "type": "object",
+      "required": [
+        "ad_set_id",
+        "name",
+        "optimization_goal",
+        "billing_event",
+        "budget_type",
+        "budget_usd",
+        "schedule",
+        "targeting",
+        "creatives"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "ad_set_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable id, e.g. as-meta-convocatoria-admisiones-01. On Google this is an ad group; on TikTok an ad group."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Ad set / ad group name. ES-MX where client-facing."
+        },
+        "optimization_goal": {
+          "type": "string",
+          "enum": [
+            "leads",
+            "link_clicks",
+            "landing_page_views",
+            "conversions",
+            "reach",
+            "impressions",
+            "video_views",
+            "messaging"
+          ],
+          "description": "What the platform optimizes delivery toward; must serve the campaign objective."
+        },
+        "billing_event": {
+          "type": "string",
+          "enum": [
+            "impressions",
+            "link_clicks",
+            "conversions"
+          ],
+          "description": "What the platform charges for."
+        },
+        "bid_strategy": {
+          "type": "string",
+          "enum": [
+            "lowest_cost",
+            "cost_cap",
+            "bid_cap",
+            "target_cpa",
+            "target_roas",
+            "maximize_conversions",
+            "maximize_clicks"
+          ],
+          "description": "Bid strategy; cost/bid caps recommended on conversion ad sets with a known target CPL."
+        },
+        "bid_cap_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Optional bid/cost cap or target CPA in USD when bid_strategy uses one; null otherwise."
+        },
+        "budget_type": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "lifetime"
+          ],
+          "description": "daily = recurring per-day cap; lifetime = total over the schedule."
+        },
+        "budget_usd": {
+          "$ref": "#/definitions/money_usd"
+        },
+        "schedule": {
+          "type": "object",
+          "required": [
+            "start_date"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "start_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "end_date": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            },
+            "dayparting_note": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "EN. Optional ad-scheduling note (e.g. business hours MX time)."
+            }
+          }
+        },
+        "targeting": {
+          "$ref": "#/definitions/targeting"
+        },
+        "creatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/creative_ref"
+          },
+          "minItems": 1,
+          "description": "References to the approved copy/visual/landing assets the ads in this ad set use."
+        },
+        "expected_cpl_usd": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Modeled cost-per-lead for this ad set, EN/benchmark; null if unknown."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "EN. Setup rationale, assumptions, platform-specific caveats."
+        }
+      }
+    },
+    "platform_campaign": {
+      "type": "object",
+      "required": [
+        "platform",
+        "platform_campaign_id",
+        "name",
+        "campaign_objective",
+        "buying_type",
+        "campaign_budget_usd",
+        "ad_sets"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "meta",
+            "google",
+            "tiktok"
+          ],
+          "description": "Ad platform. meta = Meta Marketing API; google = Google Ads API; tiktok = TikTok Ads API."
+        },
+        "platform_campaign_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable spec-side id for this platform campaign (becomes the platform's campaign on launch), e.g. mc-meta-convocatoria-ago-01."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Platform campaign name. ES-MX where client-facing."
+        },
+        "campaign_objective": {
+          "type": "string",
+          "enum": [
+            "leads",
+            "sales",
+            "traffic",
+            "awareness",
+            "engagement",
+            "app_promotion",
+            "messaging"
+          ],
+          "description": "Platform-level campaign objective; must serve the marketing-campaign objective in campaign_registry."
+        },
+        "buying_type": {
+          "type": "string",
+          "enum": [
+            "auction",
+            "reservation"
+          ],
+          "default": "auction"
+        },
+        "campaign_budget_optimization": {
+          "type": "boolean",
+          "description": "True if budget is set at the campaign level (Meta CBO / Google campaign budget); false if per ad set."
+        },
+        "campaign_budget_usd": {
+          "$ref": "#/definitions/money_usd"
+        },
+        "ad_sets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ad_set"
+          },
+          "minItems": 1,
+          "description": "Ad sets (Meta) / ad groups (Google, TikTok) within this campaign."
+        },
+        "conversion_tracking": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "pixel_or_tag": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Tracking asset (Meta Pixel / Google tag / TikTok Pixel) id or status note."
+            },
+            "conversion_events": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Events optimized/measured, e.g. lead, form_submit, page_view."
+            },
+            "utm_template": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "UTM tagging template for landing-page attribution in Layer 6."
+            }
+          }
+        },
+        "setup_notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "EN. Platform-specific setup notes, assumptions, missing-asset flags."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this campaign setup belongs to. Lowercase-hyphenated. Example: acme-co."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this setup spec was produced."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "FINANCIAL-AUTH gate. ALWAYS 'pending_review' on emit — paid media spends client money and must be human-authorized before launch. 'blocked' = a required upstream block (campaign_registry) is missing/empty or no funded paid campaign exists. Agent 5.1 must NEVER emit 'approved' or 'auto_approved'."
+    },
+    "campaign_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "campaign_id (from campaign_registry) this paid-media setup serves. 'none' only on the blocked path."
+    },
+    "cycle_label": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Marketing cycle this setup covers, e.g. 2026-Q3 or 2026-08."
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "USD"
+      ],
+      "description": "All budgets are USD. USD invoicing across the four markets (constraint); local currency is reference only."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Markets this setup targets, e.g. Mexico, Colombia, Dominican Republic, Puerto Rico."
+    },
+    "platform_campaigns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/platform_campaign"
+      },
+      "description": "Per-platform campaign setup specs. Empty array ONLY when gate_status == 'blocked'."
+    },
+    "budget_reconciliation": {
+      "type": "object",
+      "required": [
+        "authorized_paid_budget_usd",
+        "total_planned_spend_usd",
+        "unallocated_usd",
+        "period"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "authorized_paid_budget_usd": {
+          "$ref": "#/definitions/money_usd",
+          "description": "Paid-media budget available from the approved strategy / campaign_registry for this period, in USD."
+        },
+        "total_planned_spend_usd": {
+          "$ref": "#/definitions/money_usd",
+          "description": "Sum of all platform campaign budgets in this spec for the period. MUST NOT exceed authorized_paid_budget_usd."
+        },
+        "unallocated_usd": {
+          "type": "number",
+          "description": "authorized_paid_budget_usd minus total_planned_spend_usd. Negative is an over-budget error the reviewer must reject."
+        },
+        "by_platform_usd": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/money_usd"
+          },
+          "description": "Planned spend per platform (keys: meta, google, tiktok)."
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "monthly",
+            "lifetime"
+          ],
+          "description": "The period the budget figures are expressed in. Daily caps roll up to the monthly authorized budget."
+        },
+        "overspend_guardrail": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "EN. The cap/guardrail recommended to the operator (e.g. 'set account spend limit = authorized monthly budget')."
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "required": [
+        "status",
+        "requires_human_authorization"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "awaiting_authorization",
+            "authorized",
+            "rejected"
+          ],
+          "default": "awaiting_authorization",
+          "description": "Financial-authorization state. Always 'awaiting_authorization' on emit; flips to 'authorized' only by a human action recorded downstream, never by 5.1."
+        },
+        "requires_human_authorization": {
+          "type": "boolean",
+          "description": "MUST be true. This agent never self-authorizes spend."
+        },
+        "authorized_by": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Human who authorized the spend. Null until authorized."
+        },
+        "authorized_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "total_amount_at_stake_usd": {
+          "$ref": "#/definitions/money_usd",
+          "description": "Total monthly USD the operator is authorizing if approved (== total_planned_spend_usd normalized to monthly)."
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "EN. Material inferences the reviewer must validate (targeting estimates, benchmark CPLs, missing assets)."
+    },
+    "coherence_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "EN. Problems needing a human decision (budget insufficient for objective, missing landing page, missing creative)."
+    },
+    "setup_notes": {
+      "type": "string",
+      "description": "EN. Overall setup rationale, constraint handling, and any blocked reasons."
+    }
+  }
+}

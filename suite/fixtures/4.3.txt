@@ -1,0 +1,192 @@
+## OUTPUT 1 — page_assets JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "campaign_ref": "cmp-edu-convocatoria-ago",
+  "pages": [
+    {
+      "page_id": "lp-admisiones-agosto",
+      "page_name": "Landing — Convocatoria Agosto (Director de Admisiones)",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "target_segment_id": "seg-director-admisiones",
+      "goal": "lead_capture",
+      "funnel_stage": "consideration",
+      "language": "es-MX",
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero",
+          "headline": "Llena tu convocatoria de agosto sin bajar la colegiatura",
+          "body": "Una guia y un diagnostico de admisiones para escuelas privadas que quieren mas prospectos inscritos, con resultados medibles mes a mes.",
+          "cta": "Descarga la guia de admisiones",
+          "source_copy_ref": "copy-hero-convocatoria-ago",
+          "notes_for_designer": "Hero image: an admissions director reviewing a dashboard; descriptive alt text required. Keep the single primary CTA above the fold."
+        },
+        {
+          "id": "social-proof",
+          "type": "social_proof",
+          "headline": "Operado por especialistas en marketing con inteligencia artificial",
+          "body": "Acme Co. opera campanas de marketing para PyMEs con agentes de IA y un especialista que cuida la calidad. (Cliente piloto pre-lanzamiento: aun sin testimonios publicos.)",
+          "cta": null,
+          "source_copy_ref": null,
+          "notes_for_designer": "No fabricated logos or testimonials. Use honest authority signals only; swap in real testimonials once available."
+        },
+        {
+          "id": "problem",
+          "type": "problem",
+          "headline": "Tu proceso de admisiones esta perdiendo prospectos",
+          "body": "Formularios largos, seguimiento manual y campanas sin medicion hacen que se enfrien los interesados antes de inscribirse.",
+          "cta": null,
+          "source_copy_ref": "copy-problem-fuga-prospectos",
+          "notes_for_designer": null
+        },
+        {
+          "id": "value-prop",
+          "type": "value_prop",
+          "headline": "Mas inscripciones medibles, sin friccion operativa",
+          "body": "Captura, califica y da seguimiento a cada prospecto de admisiones de forma automatica, con un costo por prospecto inscrito que puedes ver mes a mes.",
+          "cta": null,
+          "source_copy_ref": "copy-valueprop-roi-medible",
+          "notes_for_designer": null
+        },
+        {
+          "id": "benefits",
+          "type": "benefits",
+          "headline": "Lo que obtienes",
+          "body": "Captura de prospectos 24/7 desde tus campanas. Seguimiento por WhatsApp y correo sin trabajo manual. Reporte mensual del costo por prospecto inscrito. Recomendaciones de mejora cada mes.",
+          "cta": null,
+          "source_copy_ref": null,
+          "notes_for_designer": "Render as 4 benefit blocks (outcome-first), one icon each."
+        },
+        {
+          "id": "how-it-works",
+          "type": "how_it_works",
+          "headline": "Como funciona",
+          "body": "1) Diagnosticamos tu embudo de admisiones. 2) Activamos captura y seguimiento automaticos. 3) Optimizamos cada mes con datos reales.",
+          "cta": null,
+          "source_copy_ref": null,
+          "notes_for_designer": "Three numbered steps; keep effort/risk low in tone."
+        },
+        {
+          "id": "faq",
+          "type": "faq",
+          "headline": "Preguntas frecuentes",
+          "body": "Funciona para escuelas chicas? Si, esta pensado para instituciones de 11 a 500 colaboradores. Cuanto tarda en verse? Empiezas a capturar prospectos desde la primera semana. Necesito personal tecnico? No, nosotros lo operamos. Mis datos estan seguros? Si, tratamos tus datos conforme a la normativa de privacidad aplicable.",
+          "cta": null,
+          "source_copy_ref": null,
+          "notes_for_designer": "Answer top objections of the admissions-director segment; no pricing claims."
+        },
+        {
+          "id": "final-cta",
+          "type": "final_cta",
+          "headline": "Empieza a llenar tu convocatoria de agosto",
+          "body": "Descarga la guia y recibe un diagnostico de admisiones para tu institucion.",
+          "cta": "Descarga la guia de admisiones",
+          "source_copy_ref": "copy-hero-convocatoria-ago",
+          "notes_for_designer": "Repeat the exact primary CTA from the hero."
+        }
+      ],
+      "form": {
+        "fields": [
+          {"name": "nombre", "label": "Nombre", "type": "text", "required": true},
+          {"name": "email", "label": "Correo electronico", "type": "email", "required": true},
+          {"name": "institucion", "label": "Nombre de la institucion", "type": "text", "required": true},
+          {"name": "rol", "label": "Tu rol", "type": "select", "required": false, "options": ["Director de admisiones", "Marketing", "Direccion general", "Otro"]},
+          {"name": "consentimiento", "label": "Acepto el aviso de privacidad y el tratamiento de mis datos para ser contactado", "type": "checkbox", "required": true}
+        ],
+        "primary_cta": {"label": "Descarga la guia de admisiones", "action": "submit_form", "destination": "/gracias-guia-admisiones"},
+        "secondary_cta": {"label": "Prefiero hablar por WhatsApp", "action": "whatsapp", "destination": "https://wa.me/5215555555555?text=Quiero%20la%20guia%20de%20admisiones"},
+        "trust_elements": ["Sin compromiso", "Respuesta el mismo dia habil", "Tus datos estan protegidos"]
+      },
+      "seo": {
+        "slug": "guia-admisiones-agosto",
+        "meta_title": "Guia de admisiones agosto para escuelas privadas | Acme Co.",
+        "meta_description": "Descarga la guia y un diagnostico para llenar tu convocatoria de agosto con mas prospectos inscritos, sin bajar la colegiatura. Resultados medibles.",
+        "og_title": "Llena tu convocatoria de agosto sin bajar la colegiatura",
+        "og_description": "Guia y diagnostico de admisiones para escuelas privadas. Mas inscripciones medibles, sin friccion.",
+        "primary_keyword": "admisiones escuela privada"
+      },
+      "tech": {
+        "recommended_route": "/lp/guia-admisiones-agosto",
+        "mobile_first": true,
+        "analytics_events": ["page_view", "form_start", "form_submit", "cta_click", "whatsapp_click"],
+        "load_budget_note": "Hero image <=150KB (WebP); defer below-fold sections; target LCP <2.5s on 4G mobile."
+      },
+      "ab_tests": [
+        {
+          "test_id": "ab-hero-headline",
+          "hypothesis": "A pain-plus-outcome headline ('sin bajar la colegiatura') converts better than a neutral benefit headline because the admissions-director segment's top anxiety is discounting tuition to fill seats.",
+          "element": "hero_headline",
+          "variant_a": "Llena tu convocatoria de agosto sin bajar la colegiatura",
+          "variant_b": "Mas inscripciones para tu escuela privada este agosto",
+          "primary_metric": "form_submit_rate",
+          "min_sample_note": "Call at >=200 form submits per variant or 2 weeks, whichever comes first."
+        },
+        {
+          "test_id": "ab-form-length",
+          "hypothesis": "Dropping the optional 'rol' field shortens the form and lifts submit rate at the consideration stage without hurting lead quality.",
+          "element": "form_length",
+          "variant_a": "5 fields (nombre, email, institucion, rol, consentimiento)",
+          "variant_b": "4 fields (nombre, email, institucion, consentimiento)",
+          "primary_metric": "form_submit_rate",
+          "min_sample_note": "Call at >=200 form submits per variant; monitor downstream lead quality in 5.3 before rolling out."
+        }
+      ],
+      "build_notes": "Single lead-capture page for the August enrollment campaign, targeting the admissions-director segment. Reused 4 approved copy_assets (hero x2 references to one asset, problem, value_prop); FAQ, benefits, how-it-works, social proof, and form microcopy newly authored (source_copy_ref null). Pre-launch: no testimonials, social-proof gap flagged. Mobile-first; consent checkbox required (data_privacy); pricing-claims constraint respected (no price/discount on page). Accessibility: hero alt text required, form labels tied to inputs, single ES-MX language throughout."
+    }
+  ],
+  "summary": {
+    "total_pages": 1,
+    "total_sections": 8,
+    "total_variants": 2,
+    "pages_by_goal": {"lead_capture": 1},
+    "reused_copy_refs": 4
+  },
+  "build_notes": "Built one landing page for campaign cmp-edu-convocatoria-ago from campaign_registry + audience_segments (seg-director-admisiones) + copy_assets. Approved copy reused on hero (x2 placements of copy-hero-convocatoria-ago), problem, and value_prop sections; remaining sections authored fresh and marked source_copy_ref=null. Two single-element A/B tests proposed (hero headline, form length), both measurable with the declared analytics_events. Constraints honored: no pricing claims, no fabricated proof, required privacy consent on the form. Page is a complete draft pending human full review before Agent 5.1 points traffic at it."
+}
+```
+
+## OUTPUT 2 — Build Brief
+
+BUILD BRIEF — Acme Co. BU · Campaign cmp-edu-convocatoria-ago
+
+This run produces one landing page, lp-admisiones-agosto, the conversion hinge of the August enrollment campaign. It serves a single objective — lead capture — for a single segment, the admissions director of a private school (seg-director-admisiones), and repeats exactly one primary CTA ("Descarga la guia de admisiones") in the hero and the final CTA. The page is consideration-stage: it offers a gated guide plus a diagnostic in exchange for a short, consented form, feeding the warm list that the week-3 WhatsApp/email conversion push (content_plan) will close.
+
+Conversion logic: the hero leads with the segment's sharpest anxiety reframed as an outcome ("sin bajar la colegiatura"), reusing the approved hero copy asset. Honest authority replaces social proof because the client is pre-launch with no testimonials — we explicitly flag the gap rather than fabricate one. The problem and value-prop sections reuse approved copy_assets so the page message matches the rest of the funnel; benefits, how-it-works, FAQ, and all form microcopy are newly authored (marked source_copy_ref=null) because copy_assets did not cover them. The FAQ answers the segment's top objections — fit for small schools, time-to-value, no technical staff needed, data security — without making any pricing claim.
+
+Form and consent: five fields, only one optional, with a required privacy-consent checkbox pointing to the aviso de privacidad (Mexico LFPDPPP expectation and the client's data_privacy constraint). A WhatsApp secondary CTA gives a lower-commitment path. Trust elements sit beside the form.
+
+A/B plan: two single-element tests, each measurable with the page's analytics_events. ab-hero-headline tests pain-plus-outcome vs neutral-benefit framing on form_submit_rate. ab-form-length tests dropping the optional role field. We design the tests; Agent 6.3 declares winners once the data is in.
+
+Accessibility & performance notes for the front-end (and Agent 4.2 for imagery): mobile-first layout, descriptive alt text on the hero image, form labels tied to inputs, sufficient contrast on the brand palette, a hero-image weight budget (<=150KB WebP) and an LCP target under 2.5s on 4G — LATAM traffic is mobile-dominant. The page is single-language ES-MX throughout; no internal cost/margin figures appear anywhere.
+
+## OUTPUT 3 — Human Review Gate Summary
+
+=== AGENT 4.3 — HUMAN REVIEW GATE SUMMARY ===
+Client: Acme Co. BU
+Campaign: cmp-edu-convocatoria-ago (Convocatoria Agosto — Educacion Privada)
+Gate status: PENDING REVIEW
+
+--- PAGE TOTALS ---
+Pages: 1
+Sections: 8 (hero · social_proof · problem · value_prop · benefits · how_it_works · faq · final_cta)
+A/B variants: 2 challengers across 2 tests
+Pages by goal: lead_capture=1
+Copy reuse: 4 sections reuse approved copy_assets · 4 sections newly authored (source_copy_ref=null)
+
+--- CONVERSION-READINESS CHECK ---
+Pass. One clear primary CTA repeated in hero and final_cta ("Descarga la guia de admisiones"). Form length (5 fields, 1 optional) appropriate to the consideration stage. Trust elements present beside the form. Required privacy-consent checkbox present. Secondary WhatsApp CTA offers a lower-commitment path.
+
+--- CONSTRAINT CHECK ---
+Pass. No pricing/discount claims on the page (pricing_claims). No fabricated testimonials, logos, or metrics — pre-launch social-proof gap flagged and handled with honest authority signals. Data-privacy consent enforced on the form (data_privacy). No competitor mentions, no political/religious content. Single ES-MX language throughout.
+
+--- A/B TEST PLAN ---
+ab-hero-headline — changes hero_headline (pain+outcome vs neutral benefit) · metric form_submit_rate · call at >=200 submits/variant or 2 weeks.
+ab-form-length — changes form_length (drop optional 'rol' field) · metric form_submit_rate · call at >=200 submits/variant, watch lead quality.
+
+--- RECOMMENDED ACTION ---
+RETURN — confirm two items before publishing: (1) the social-proof section is acceptable as honest authority while no testimonials exist, and (2) the WhatsApp destination number/link is the correct live line. On approval, release to Agent 5.1 (point August paid traffic here) and 5.3 (wire the form to HubSpot).

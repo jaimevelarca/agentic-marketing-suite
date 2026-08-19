@@ -1,0 +1,58 @@
+# Cloud Build: build + push the Suite image to Artifact Registry, then (optionally)
+# update the Cloud Run Job that runs agents.
+#
+#   gcloud builds submit --config deploy/cloudbuild.yaml \
+#     --substitutions=_TAG=$(git rev-parse --short HEAD)
+#
+# Prereqs: Artifact Registry repo `suite`, a runtime service account, and the
+# `db-app-password` + `anthropic-api-key` Secret Manager entries. Full first-deploy
+# checklist in deploy/README.md.
+
+substitutions:
+  _REGION: us-central1
+  _REPO: suite
+  _IMAGE: digital-marketing-suite
+  _TAG: latest
+  _JOB: suite-agent-job
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - deploy/Dockerfile
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}
+      - .
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}
+
+  # Update the Cloud Run Job to the new image. The Job's per-invocation env
+  # (CLIENT_ID/AGENT_ID) is supplied at execution time by Cloud Workflows/Pub-Sub,
+  # not here. The DB password is mounted from Secret Manager (db-app-password).
+  - id: deploy-job
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - update
+      - ${_JOB}
+      - --region=${_REGION}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}
+      # Model backbone = Anthropic-direct: the key is injected as an env var from
+      # Secret Manager (same mechanism as the DB password). To move to Vertex
+      # later, drop ANTHROPIC_API_KEY and set SUITE_LLM_PROVIDER=vertex.
+      - --set-secrets=SQL_APP_PASSWORD=db-app-password:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest
+      - --set-env-vars=SUITE_LLM_PROVIDER=anthropic,SUITE_BACKEND=gcp
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}

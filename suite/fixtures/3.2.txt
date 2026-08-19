@@ -1,0 +1,441 @@
+## OUTPUT 1 — content_calendar JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "cycle_month": "2026-08",
+  "cycle_weeks": 4,
+  "timezone_primary": "America/Mexico_City",
+  "markets": ["Mexico", "Colombia", "Dominican Republic", "Puerto Rico"],
+  "cadence_rules": [
+    {
+      "platform": "instagram",
+      "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "best_window_local": "12:00-14:00, 19:00-21:00",
+      "max_per_day": 2,
+      "min_spacing_hours": 4,
+      "lead_time_days": 2,
+      "source": "default"
+    },
+    {
+      "platform": "meta_ads",
+      "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "best_window_local": "09:00 (launch)",
+      "max_per_day": null,
+      "min_spacing_hours": null,
+      "lead_time_days": 3,
+      "source": "default"
+    },
+    {
+      "platform": "landing_page",
+      "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+      "best_window_local": "09:00-10:00",
+      "max_per_day": 1,
+      "min_spacing_hours": null,
+      "lead_time_days": 5,
+      "source": "default"
+    },
+    {
+      "platform": "whatsapp",
+      "allowed_days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+      "best_window_local": "10:00-12:00, 17:00-19:00",
+      "max_per_day": 1,
+      "min_spacing_hours": 24,
+      "lead_time_days": 1,
+      "source": "default"
+    },
+    {
+      "platform": "email",
+      "allowed_days": ["Tue", "Wed", "Thu"],
+      "best_window_local": "09:00-11:00",
+      "max_per_day": 1,
+      "min_spacing_hours": 48,
+      "lead_time_days": 2,
+      "source": "default"
+    },
+    {
+      "platform": "linkedin",
+      "allowed_days": ["Tue", "Wed", "Thu"],
+      "best_window_local": "08:00-10:00, 12:00-13:00",
+      "max_per_day": 1,
+      "min_spacing_hours": 24,
+      "lead_time_days": 3,
+      "source": "default"
+    },
+    {
+      "platform": "blog",
+      "allowed_days": ["Tue", "Wed", "Thu"],
+      "best_window_local": "09:00-11:00",
+      "max_per_day": 1,
+      "min_spacing_hours": 48,
+      "lead_time_days": 4,
+      "source": "default"
+    },
+    {
+      "platform": "youtube",
+      "allowed_days": ["Wed", "Thu", "Fri", "Sat", "Sun"],
+      "best_window_local": "15:00-17:00",
+      "max_per_day": 1,
+      "min_spacing_hours": 48,
+      "lead_time_days": 5,
+      "source": "default"
+    }
+  ],
+  "slots": [
+    {
+      "slot_id": "slot-edu-convocatoria-w1-1",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 1,
+      "channel": "instagram",
+      "format": "reel",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-04",
+      "publish_time_local": "13:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-02",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Conoce mas",
+      "content_ref": {
+        "topic": "Como una escuela privada llena su convocatoria de agosto sin bajar la colegiatura",
+        "format": "reel",
+        "funnel_stage": "awareness",
+        "messaging_pillar": "ROI medible",
+        "target_segment_id": "seg-director-admisiones",
+        "trend_ref": "trend-regreso-clases-ago"
+      },
+      "notes_for_creator": "Open with the enrollment-gap pain point; no pricing claims."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w1-2",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 1,
+      "channel": "instagram",
+      "format": "carousel",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-06",
+      "publish_time_local": "20:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-04",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Descarga la guia de admisiones",
+      "content_ref": {
+        "topic": "3 senales de que tu proceso de admisiones esta perdiendo prospectos",
+        "format": "carousel",
+        "funnel_stage": "consideration",
+        "messaging_pillar": "Operacion sin friccion",
+        "target_segment_id": "seg-marketing-escuela",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Link to the lead-magnet landing page in week 1."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w2-1",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 2,
+      "channel": "landing_page",
+      "format": "landing_page",
+      "slot_type": "publish",
+      "publish_date": "2026-08-11",
+      "publish_time_local": "09:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-06",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Descarga la guia",
+      "content_ref": {
+        "topic": "Guia: el embudo de admisiones de una escuela privada, paso a paso",
+        "format": "landing_page",
+        "funnel_stage": "consideration",
+        "messaging_pillar": "Operacion sin friccion",
+        "target_segment_id": "seg-marketing-escuela",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Single email-gated download; feed leads to the WhatsApp nurture. Must be live before the week-2 paid creative and the week-3 conversion push."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w2-2",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 2,
+      "channel": "meta_ads",
+      "format": "ad_creative",
+      "slot_type": "paid_flight",
+      "publish_date": "2026-08-12",
+      "publish_time_local": "09:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-09",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Agenda una llamada",
+      "content_ref": {
+        "topic": "Caso: como medimos el costo por prospecto inscrito mes a mes",
+        "format": "ad_creative",
+        "funnel_stage": "consideration",
+        "messaging_pillar": "ROI medible",
+        "target_segment_id": "seg-director-admisiones",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Use a ROI proof point, not a discount; respect pricing-claims constraint. Flight launches after the landing page is live (2026-08-11)."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w3-1",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 3,
+      "channel": "whatsapp",
+      "format": "whatsapp_broadcast",
+      "slot_type": "send",
+      "publish_date": "2026-08-18",
+      "publish_time_local": "11:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-17",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Solicita tu lugar",
+      "content_ref": {
+        "topic": "Recordatorio: cierre de convocatoria de agosto, ultimos lugares",
+        "format": "whatsapp_broadcast",
+        "funnel_stage": "conversion",
+        "messaging_pillar": "Operacion sin friccion",
+        "target_segment_id": "seg-marketing-escuela",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Personalize by program; honor opt-in and data-privacy constraint. Sends to the list captured by the week-2 lead magnet."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w3-2",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 3,
+      "channel": "email",
+      "format": "email_single",
+      "slot_type": "send",
+      "publish_date": "2026-08-20",
+      "publish_time_local": "10:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-18",
+      "status": "scheduled",
+      "priority": "high",
+      "cta": "Inscribete hoy",
+      "content_ref": {
+        "topic": "Inscribete antes del cierre: lo que incluye el acompanamiento de admisiones",
+        "format": "email_single",
+        "funnel_stage": "conversion",
+        "messaging_pillar": "ROI medible",
+        "target_segment_id": "seg-director-admisiones",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Clear single CTA; link to the application form. Lands after the WhatsApp reminder for a two-touch conversion push."
+    },
+    {
+      "slot_id": "slot-edu-convocatoria-w4-1",
+      "campaign_id": "cmp-edu-convocatoria-ago",
+      "campaign_name": "Convocatoria Agosto — Educacion Privada",
+      "week": 4,
+      "channel": "instagram",
+      "format": "static_post",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-25",
+      "publish_time_local": "13:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-23",
+      "status": "scheduled",
+      "priority": "medium",
+      "cta": "Refiere a un colega",
+      "content_ref": {
+        "topic": "Refiere a otra escuela y gana un diagnostico de admisiones gratis",
+        "format": "static_post",
+        "funnel_stage": "retention",
+        "messaging_pillar": "ROI medible",
+        "target_segment_id": "seg-director-admisiones",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Frame around peer trust among school administrators."
+    },
+    {
+      "slot_id": "slot-autoridad-genai-w1-1",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "campaign_name": "Autoridad GenAI para PyMEs Educativas",
+      "week": 1,
+      "channel": "linkedin",
+      "format": "article",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-05",
+      "publish_time_local": "08:30",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-02",
+      "status": "scheduled",
+      "priority": "medium",
+      "cta": "Sigue a Acme Co.",
+      "content_ref": {
+        "topic": "Que puede y que no puede hacer la IA generativa en el marketing de una escuela",
+        "format": "article",
+        "funnel_stage": "awareness",
+        "messaging_pillar": "Autoridad GenAI",
+        "target_segment_id": "seg-director-general",
+        "trend_ref": "trend-ia-generativa-pyme"
+      },
+      "notes_for_creator": "Educational tone; avoid overpromising AI capabilities (brand-safety constraint)."
+    },
+    {
+      "slot_id": "slot-autoridad-genai-w2-1",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "campaign_name": "Autoridad GenAI para PyMEs Educativas",
+      "week": 2,
+      "channel": "blog",
+      "format": "blog_post",
+      "slot_type": "publish",
+      "publish_date": "2026-08-12",
+      "publish_time_local": "10:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-08",
+      "status": "scheduled",
+      "priority": "medium",
+      "cta": "Lee el articulo completo",
+      "content_ref": {
+        "topic": "Como un solo responsable de marketing puede operar 6 campanas con agentes de IA",
+        "format": "blog_post",
+        "funnel_stage": "consideration",
+        "messaging_pillar": "Autoridad GenAI",
+        "target_segment_id": "seg-director-general",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Show the workflow, not the internal cost structure."
+    },
+    {
+      "slot_id": "slot-autoridad-genai-w3-1",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "campaign_name": "Autoridad GenAI para PyMEs Educativas",
+      "week": 3,
+      "channel": "youtube",
+      "format": "short_video",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-19",
+      "publish_time_local": "16:00",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-14",
+      "status": "scheduled",
+      "priority": "medium",
+      "cta": "Agenda una llamada",
+      "content_ref": {
+        "topic": "Demo en video: del brief a la campana publicada en una semana",
+        "format": "short_video",
+        "funnel_stage": "consideration",
+        "messaging_pillar": "Autoridad GenAI",
+        "target_segment_id": "seg-director-general",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Keep under 90s; end with the demo-booking CTA. Longest lead time in the cycle (5 days)."
+    },
+    {
+      "slot_id": "slot-autoridad-genai-w4-1",
+      "campaign_id": "cmp-autoridad-genai-pyme",
+      "campaign_name": "Autoridad GenAI para PyMEs Educativas",
+      "week": 4,
+      "channel": "linkedin",
+      "format": "ad_creative",
+      "slot_type": "organic_post",
+      "publish_date": "2026-08-26",
+      "publish_time_local": "08:30",
+      "timezone": "America/Mexico_City",
+      "production_due_date": "2026-08-23",
+      "status": "scheduled",
+      "priority": "medium",
+      "cta": "Solicita tu diagnostico",
+      "content_ref": {
+        "topic": "Solicita un diagnostico de marketing con IA para tu institucion",
+        "format": "ad_creative",
+        "funnel_stage": "conversion",
+        "messaging_pillar": "Autoridad GenAI",
+        "target_segment_id": "seg-director-general",
+        "trend_ref": null
+      },
+      "notes_for_creator": "Diagnostic is the entry offer; no margin/COGS references. Plan tagged this as ad_creative on LinkedIn but the registry funds no LinkedIn paid line, so it is scheduled as an organic post — flag for the reviewer."
+    }
+  ],
+  "summary": {
+    "total_slots": 11,
+    "slots_by_platform": {
+      "instagram": 3,
+      "landing_page": 1,
+      "meta_ads": 1,
+      "whatsapp": 1,
+      "email": 1,
+      "linkedin": 2,
+      "blog": 1,
+      "youtube": 1
+    },
+    "slots_by_week": {"1": 3, "2": 3, "3": 3, "4": 2},
+    "slots_by_day_of_week": {
+      "Mon": 0,
+      "Tue": 4,
+      "Wed": 5,
+      "Thu": 2,
+      "Fri": 0,
+      "Sat": 0,
+      "Sun": 0
+    },
+    "paid_flights": 1,
+    "first_publish_date": "2026-08-04",
+    "last_publish_date": "2026-08-26",
+    "earliest_production_due_date": "2026-08-02"
+  },
+  "scheduling_notes": "All 11 content_plan items scheduled into 11 slots (conservation holds; total_slots == plan total_items). Primary timezone America/Mexico_City (markets[0] = Mexico); CO/DR/PR audiences are served by the same MX-time slots this cycle. Default LATAM SMB cadence rules applied (no platform_rules override injected). Dependency ordering: the week-2 landing page (publish 2026-08-11, due 2026-08-06) goes live BEFORE the Meta paid creative (flight launch 2026-08-12) and the week-3 WhatsApp/email conversion push, so all driving items point at a live page. WhatsApp (08-18) precedes the email (08-20) by 48h for a two-touch conversion week, honoring email min spacing. Instagram: 2 posts in week 1 placed on different days (08-04, 08-06), within max 2/day and 4h spacing. The week-4 LinkedIn item was tagged 'ad_creative' in the plan but the campaign_registry funds no LinkedIn paid line; scheduled as an organic LinkedIn post and flagged for the reviewer rather than implying unbudgeted spend. Longest lead time is the YouTube demo video (5 days; due 2026-08-14). Earliest production due date overall is 2026-08-02 (the week-1 Instagram reel and the LinkedIn article). No August blackout windows present in client_profile; all slots fall inside their campaign timing windows and outside quiet hours (07:00-21:30)."
+}
+```
+
+## OUTPUT 2 — Scheduling Brief
+
+SCHEDULING BRIEF — Acme Co. BU · Cycle 2026-08 · America/Mexico_City
+
+The approved August content_plan (11 items across two campaigns) is now a dated 4-week calendar. All times are in Mexico City local time, the primary market; Colombia, Dominican Republic and Puerto Rico audiences are served by the same MX-time slots this cycle (a per-market split is a future refinement once we have market-level engagement data). No client-specific platform_rules were injected, so the built-in LATAM SMB cadence defaults were applied and recorded in cadence_rules.
+
+Distribution. The cycle spreads evenly — 3 slots in each of weeks 1–3 and 2 in week 4 — and clusters on Tue/Wed/Thu, the strongest days for a B2B private-education buyer (admissions directors, marketing leads, general directors). Campaign A "Convocatoria Agosto" (the demand/conversion engine) owns 7 slots; Campaign B "Autoridad GenAI" (the slower authority play) owns 4, matching their relative intensity in the plan.
+
+Cadence and spacing. Instagram carries the most volume (3 posts) and is the only platform with two items in a single week (week 1): they are placed on different days (Tue 08-04 at 13:00 and Thu 08-06 at 20:00), well inside the max 2/day and 4h-spacing limits, and use the two different best windows (midday and evening). LinkedIn (1/day, Tue–Thu) takes the week-1 article (Wed 08-05, 08:30) and the week-4 conversion creative (Wed 08-26, 08:30). Email, blog, and YouTube are all 1/day low-frequency platforms and sit comfortably one per week.
+
+Best-time windows used (local). Instagram: 13:00 (midday) and 20:00 (evening). LinkedIn: 08:30 (morning professional window). Blog/email: 09:00–10:00. WhatsApp: 11:00 (late-morning window). YouTube: 16:00 (afternoon). Meta paid flight: 09:00 launch. None fall in quiet hours.
+
+Dependency ordering (the hinge of the month). The week-2 lead-magnet landing page is the dependency root: it publishes 2026-08-11 (production due 2026-08-06, the 5-day lead time). The Meta paid creative that drives cold traffic to it launches the next day (08-12), and the entire week-3 conversion push — WhatsApp reminder (08-18) then email (08-20) — only fires after the page is live and the list has begun filling. Production must therefore treat 08-06 (landing page) as the first hard deadline, ahead of even earlier-publishing social posts.
+
+Production lead times for Layer 4. The earliest production_due_date in the cycle is 2026-08-02 (the week-1 Instagram reel at 2-day lead and the LinkedIn article at 3-day lead). The longest single lead time is the YouTube demo video (5 days, due 08-14). All other assets have 1–4 day lead times. Every slot's due date precedes its publish date by its channel lead time; none is infeasible within the cycle.
+
+One flag for the operator. The plan tagged the week-4 LinkedIn item as format "ad_creative", but campaign_registry funds no LinkedIn paid line for this cycle. Rather than imply unbudgeted ad spend, it is scheduled as an organic LinkedIn post (slot_type organic_post) and called out here and in OUTPUT 3 for a decision: keep it organic, or have 2.2/5.1 allocate a LinkedIn paid budget.
+
+Confidentiality preserved: no internal cost, margin, or bonus figures appear in any slot, topic, CTA, or note; all client-facing topics/CTAs are carried through from the plan unchanged in ES-MX.
+
+## OUTPUT 3 — Calendar Review Gate Summary
+
+=== AGENT 3.2 — CALENDAR REVIEW GATE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Timezone: America/Mexico_City
+Gate status: PENDING REVIEW
+
+--- CALENDAR TOTALS ---
+Total slots: 11 (equals content_plan total_items = 11 — conservation holds)
+By platform: instagram=3 · linkedin=2 · meta_ads=1 · landing_page=1 · whatsapp=1 · email=1 · blog=1 · youtube=1
+By week: W1=3 · W2=3 · W3=3 · W4=2
+By day-of-week: Tue=4 · Wed=5 · Thu=2 (Mon/Fri/Sat/Sun=0)
+Paid flights: 1 (Meta, week 2)
+First publish: 2026-08-04 · Last publish: 2026-08-26
+
+--- CADENCE & SPACING CHECK ---
+Pass. No platform exceeds its max/day (Instagram peaks at 2 posts in week 1, on different days). All min-spacing limits respected (Instagram 4h via separate days; email 48h; WhatsApp/LinkedIn 24h). Only allowed days used; Tue–Thu favored for high-value items. No day-clumping.
+
+--- BLACKOUT / WINDOW CHECK ---
+Pass. No August blackout windows in client_profile. Every slot falls inside its campaign timing window and outside quiet hours (07:00–21:30). No date shifts were required. One coherence flag (not a blackout issue): the week-4 LinkedIn item was tagged ad_creative but has no funded LinkedIn paid line — scheduled organic, see below.
+
+--- PRODUCTION LEAD TIMES (for Layer 4) ---
+Earliest production due date: 2026-08-02 (week-1 Instagram reel + LinkedIn article). Hard hinge deadline: 2026-08-06 (lead-magnet landing page — must ship before the paid flight and conversion push). Longest lead time: YouTube demo video, 5 days (due 2026-08-14). No infeasible lead times.
+
+--- RECOMMENDED ACTION ---
+RETURN — approve as-is for scheduling EXCEPT confirm one item: the week-4 LinkedIn "Solicita un diagnostico" item is tagged ad_creative but the registry funds no LinkedIn paid budget. Decide (a) keep it as the scheduled organic LinkedIn post, or (b) route to 2.2/5.1 to fund a LinkedIn paid line. On that decision, APPROVE and release the calendar to Layer 4 production (first deadline 2026-08-06) and Layer 5 publishing.

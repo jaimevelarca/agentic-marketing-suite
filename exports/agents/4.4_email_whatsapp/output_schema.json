@@ -1,0 +1,444 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/message_flows/v1",
+  "version": "1.0.0",
+  "title": "message_flows",
+  "description": "Memory block written by Agent 4.4 (Email / WhatsApp). The complete, ready-to-deploy lifecycle/nurture sequences — email drips (Resend) and WhatsApp flows (Twilio WhatsApp Business API) — produced from the approved audience_segments and content_calendar. Each flow is a series of timed, channel-specific messages with ES-MX (or client primary language) client-facing copy, trigger/enrollment logic, exit conditions, and the funnel stage it serves. Read by Layer 5 (5.3 Lead Capture + Nurture executes the flows) and Layer 6 (6.1 Performance Analytics attributes opens/clicks/replies). Human gate: required on first deployment of each flow (first-deploy tier) — defaults to pending_review. | Depends on: audience_segments (1.2), content_calendar (L3), client_profile (DEL-17). | First authored: 2026-05-29.",
+  "type": "object",
+  "definitions": {
+    "message": {
+      "type": "object",
+      "required": [
+        "message_id",
+        "channel",
+        "step",
+        "delay",
+        "body"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "message_id": {
+          "type": "string",
+          "pattern": "^msg-[a-z0-9-]+$",
+          "description": "Stable id, unique within the flow. Format: msg-{slug}."
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "whatsapp"
+          ],
+          "description": "Delivery channel. email = Resend; whatsapp = Twilio WhatsApp Business API."
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based ordinal position of this message within its flow."
+        },
+        "delay": {
+          "type": "object",
+          "required": [
+            "amount",
+            "unit",
+            "from"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "amount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Wait before sending this message. 0 = send immediately on the reference event."
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "minutes",
+                "hours",
+                "days"
+              ]
+            },
+            "from": {
+              "type": "string",
+              "enum": [
+                "enrollment",
+                "previous_message",
+                "previous_open",
+                "previous_reply"
+              ],
+              "description": "Reference event the delay is measured from."
+            },
+            "send_window": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Optional local send window in client primary timezone, e.g. '09:00-20:00 America/Mexico_City'. WhatsApp messages must respect local quiet hours."
+            }
+          }
+        },
+        "subject": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Email subject line in ES-MX (or client primary language). Required for email; null for WhatsApp."
+        },
+        "preheader": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Email preview text in ES-MX. Optional; email only."
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Client-facing message copy in ES-MX (or client primary language). Personalization tokens use {{first_name}} / {{company}} style. WhatsApp bodies stay short and may reference an approved template name."
+        },
+        "whatsapp_template": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Required when channel=whatsapp and the message is sent outside the 24h customer-service window: a pre-approved WhatsApp template reference (Twilio/Meta). Null for free-form replies inside the session window.",
+          "additionalProperties": true,
+          "properties": {
+            "template_name": {
+              "type": "string"
+            },
+            "language_code": {
+              "type": "string"
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "MARKETING",
+                "UTILITY",
+                "AUTHENTICATION"
+              ]
+            },
+            "approval_status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "submitted",
+                "approved",
+                "rejected",
+                "not_required"
+              ]
+            }
+          }
+        },
+        "cta": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Primary call to action for this message.",
+          "additionalProperties": true,
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "Button/link text in ES-MX."
+            },
+            "url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "destination": {
+              "type": "string",
+              "enum": [
+                "landing_page",
+                "whatsapp_chat",
+                "calendar",
+                "reply",
+                "unsubscribe",
+                "external"
+              ]
+            }
+          }
+        },
+        "personalization_tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Merge tokens used in subject/body, e.g. ['{{first_name}}','{{institution}}']."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "One short EN sentence (operator-facing) tying this message to its segment/funnel objective."
+        }
+      }
+    },
+    "flow": {
+      "type": "object",
+      "required": [
+        "flow_id",
+        "name",
+        "channel",
+        "funnel_stage",
+        "trigger",
+        "exit_conditions",
+        "messages"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "flow_id": {
+          "type": "string",
+          "pattern": "^flow-[a-z0-9-]+$",
+          "description": "Stable flow id. Format: flow-{slug}."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Operator-facing flow name."
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "whatsapp",
+            "multichannel"
+          ],
+          "description": "Dominant channel. 'multichannel' = the flow mixes email and WhatsApp steps."
+        },
+        "funnel_stage": {
+          "type": "string",
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention"
+          ]
+        },
+        "target_segment_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "audience_segments segment_id this flow nurtures; null if it spans all segments."
+        },
+        "objective": {
+          "type": "string",
+          "description": "What this flow is meant to achieve (EN, operator-facing)."
+        },
+        "trigger": {
+          "type": "object",
+          "required": [
+            "event"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "event": {
+              "type": "string",
+              "enum": [
+                "lead_created",
+                "form_submitted",
+                "lead_magnet_downloaded",
+                "demo_requested",
+                "trial_started",
+                "no_activity",
+                "purchase_completed",
+                "manual_enrollment",
+                "tag_added"
+              ],
+              "description": "Enrollment event that starts the flow."
+            },
+            "filter": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Optional enrollment condition, e.g. 'segment in [seg-...-01]'."
+            },
+            "source": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Where the trigger fires from, e.g. 'lead_register (5.3)' / 'HubSpot workflow'."
+            }
+          }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions that remove a contact from the flow, e.g. 'replied', 'booked_demo', 'unsubscribed', 'goal_met'."
+        },
+        "goal": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The conversion event that marks the flow successful (used by Layer 6 attribution)."
+        },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/message"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "flows",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this message-flow set belongs to. Lowercase-hyphenated. Example: acme-co."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this message_flows block was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Human gate status. Agent 4.4 is first-deploy gated: a flow that has never been deployed defaults to pending_review; already-approved flows being regenerated may carry 'approved'. Must be 'approved' before Layer 5 (5.3) executes the flow."
+    },
+    "lifecycle_stage": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "pre-launch",
+        "early",
+        "growth",
+        "established",
+        null
+      ],
+      "description": "Carried from client_profile; affects messaging maturity and volume assumptions."
+    },
+    "cycle_month": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this flow set was authored for, YYYY-MM. Null when evergreen."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Target markets these flows serve, ordered by priority (MX/CO/DR/PR)."
+    },
+    "primary_language": {
+      "type": "string",
+      "description": "Language of the client-facing copy. Default 'es-MX'."
+    },
+    "providers": {
+      "type": "object",
+      "description": "Delivery providers per ADR-04.",
+      "additionalProperties": true,
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email provider. Default 'resend'."
+        },
+        "whatsapp": {
+          "type": "string",
+          "description": "WhatsApp provider. Default 'twilio_whatsapp_business_api'."
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "description": "Deliverability + consent guardrails the operator must confirm before first deploy.",
+      "additionalProperties": true,
+      "properties": {
+        "email_unsubscribe_present": {
+          "type": "boolean",
+          "description": "Every email flow includes a working unsubscribe link."
+        },
+        "whatsapp_opt_in_required": {
+          "type": "boolean",
+          "description": "WhatsApp marketing requires prior opt-in; true unless contact opted in."
+        },
+        "quiet_hours_respected": {
+          "type": "boolean",
+          "description": "No sends outside local quiet hours / send windows."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "flows": {
+      "type": "array",
+      "description": "Lifecycle/nurture flows. May be empty only when gate_status is 'blocked'.",
+      "items": {
+        "$ref": "#/definitions/flow"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_flows",
+        "total_messages"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_flows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_messages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "messages_by_channel": {
+          "type": "object",
+          "description": "Count of messages per channel, e.g. {\"email\": 5, \"whatsapp\": 3}."
+        },
+        "flows_by_funnel_stage": {
+          "type": "object",
+          "description": "Count of flows per funnel stage."
+        },
+        "first_deploy_flow_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "flow_ids that have never been deployed and therefore drive the first-deploy human gate."
+        }
+      }
+    },
+    "planning_notes": {
+      "type": "string",
+      "description": "EN — assumptions, gaps, coherence flags, blocked reasons, deliverability cautions."
+    }
+  }
+}

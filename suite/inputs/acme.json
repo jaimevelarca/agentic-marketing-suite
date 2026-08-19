@@ -1,0 +1,57 @@
+{
+  "client_id": "acme",
+  "quick_start_form": {
+    "company_name": "the AI Marketing Suite vendor",
+    "website_url": "https://www.acme.com.mx/",
+    "industry": "Management & organizational-transformation consulting (B2B professional services)",
+    "offer_description": "Consultoría de transformación organizacional con resultados garantizados contractualmente. Tres líneas: Estrategia (planeación de crecimiento a 5 años), Operaciones y Procesos (eficiencia), y Transformación Digital. ROI promedio 5:1.",
+    "target_markets": ["Mexico", "Colombia", "Chile", "Peru", "Puerto Rico", "Bolivia", "Paraguay", "USA"],
+    "primary_market": "Mexico",
+    "target_customer": "Mid-market and enterprise organizations (multi-industry) seeking profitability improvement and organizational transformation; decision-makers are C-level / owners.",
+    "marketing_objective": null,
+    "monthly_budget": null,
+    "sales_cycle": null,
+    "languages": ["es-MX", "en"],
+    "notes": "Marketing objective / KPIs / budget intentionally left null — pending the partners' SMART-objective session (S1-T1..T3). Agent should defer these (Tier D) rather than assume."
+  },
+  "scraper_output": {
+    "scrape_status": "success",
+    "meta_description": "the AI Marketing Suite vendor — Transformamos su organización e incrementamos su rentabilidad. Resultados garantizados contractualmente.",
+    "about_text_excerpt": "Más de 10 años de experiencia incrementando la rentabilidad de organizaciones a través de Proyectos de Transformación. Resultados contractualmente garantizados, con un ROI promedio de 5:1.",
+    "services_extracted": [
+      "Estrategia — planeación de crecimiento a 5 años",
+      "Operaciones y Procesos — mejoras de eficiencia",
+      "Transformación Digital — implementación de tecnología"
+    ],
+    "value_propositions": [
+      "Transformamos su organización e incrementamos su rentabilidad",
+      "Resultados garantizados contractualmente",
+      "ROI promedio 5:1"
+    ],
+    "primary_cta": "Agendar reunión sin compromiso",
+    "locations_detected": ["Mexico", "USA", "Chile", "Colombia", "Bolivia", "Peru", "Puerto Rico", "Paraguay"],
+    "visual_identity": {
+      "top_5_hex": [],
+      "heading_font": null,
+      "body_font": null,
+      "logo": {"url": null}
+    },
+    "brand_voice": {
+      "detected_language": "es",
+      "vocabulary_register": "professional/corporate",
+      "proposed_voice_tokens": ["profesional", "orientado a resultados", "confiable", "estratégico"],
+      "sample_sentences": [
+        "Transformamos su organización e incrementamos su rentabilidad.",
+        "Resultados garantizados contractualmente.",
+        "Más de 10 años incrementando la rentabilidad de organizaciones."
+      ]
+    },
+    "company_context": {
+      "social_links_found": {
+        "instagram": "https://www.instagram.com/acme_co",
+        "linkedin": "https://www.linkedin.com/company/acme-co"
+      }
+    }
+  },
+  "operator_notes": "First LIVE smoke test of Agent 1.1 (Business Diagnostics) on real data. Client = Acme Co. itself (dogfood pilot, S1-D1). Visual identity fields (hex/fonts/logo) were not auto-scraped — expect a human-gate flag requesting the logo/brand package (S1-T7). GA4 verification is an open operator task (S1-T5). Marketing objective/KPIs/budget pending partners (S1-T1..T3)."
+}

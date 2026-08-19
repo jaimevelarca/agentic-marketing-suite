@@ -1,0 +1,208 @@
+## OUTPUT 1 — copy_assets JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "cycle_month": "2026-08",
+  "markets": ["Mexico", "Colombia", "Dominican Republic", "Puerto Rico"],
+  "source_plan": "content_plan:cmp-edu-convocatoria-ago+cmp-autoridad-genai-pyme:2026-08",
+  "assets": [
+    {
+      "asset_id": "cpy-acme-co-01",
+      "content_item_ref": "cmp-edu-convocatoria-ago/W1/como-llena-convocatoria-agosto",
+      "channel": "instagram",
+      "format": "reel",
+      "funnel_stage": "awareness",
+      "target_segment_id": "seg-director-admisiones",
+      "messaging_pillar": "ROI medible",
+      "language": "es-MX",
+      "hook": "Tu convocatoria de agosto se llena o se vacia en las primeras dos semanas.",
+      "primary_caption": "Cada agosto las escuelas privadas pelean por los mismos prospectos. Las que ganan no bajan la colegiatura: ordenan su proceso de admisiones y miden de donde viene cada inscrito. En este reel te mostramos las tres palancas que mueven la aguja sin tocar el precio.",
+      "char_count": 322,
+      "cta": "Conoce mas",
+      "variants": [
+        {
+          "text": "Llenar tu convocatoria no es cuestion de suerte: es cuestion de proceso.",
+          "angle": "Pain-led hook (process vs luck) vs the seasonal-urgency hook in primary."
+        },
+        {
+          "text": "3 palancas para llenar admisiones en agosto sin bajar la colegiatura.",
+          "angle": "Listicle/number hook to test curiosity-driven openings."
+        }
+      ],
+      "hashtags": ["#EducacionPrivada", "#Admisiones", "#MarketingEducativo", "#GestionEscolar"],
+      "image_prompts": [
+        {
+          "model_target": "flux-2-pro",
+          "prompt": "Vertical 9:16 photoreal hero shot for an Instagram Reel cover: a confident school admissions director in her 40s reviewing an enrollment dashboard on a tablet in a bright, modern private-school office, soft natural window light, shallow depth of field, teal and dark-green brand color accents in the environment, clean professional editorial style, optimistic and focused mood.",
+          "negative_prompt": "no text, no logos, no competitor branding, no watermark, no distorted hands or faces, no clutter, no low-resolution artifacts",
+          "in_image_text": null,
+          "aspect_ratio": "9:16",
+          "alt_text": "Directora de admisiones revisando un tablero de inscripciones en una tablet en una oficina escolar."
+        }
+      ],
+      "risk_tier": "low",
+      "risk_reason": "Routine awareness copy; no pricing/ROI numbers, no competitor mention, no sensitive topic.",
+      "rationale": "Opens on the admissions director's seasonal pain (the enrollment window) and ties to the ROI-medible pillar without claiming a number.",
+      "notes": "ES-MX; works across MX/CO/DR/PR with neutral vocabulary. No discount language per pricing-claims constraint."
+    },
+    {
+      "asset_id": "cpy-acme-co-02",
+      "content_item_ref": "cmp-edu-convocatoria-ago/W1/3-senales-proceso-pierde-prospectos",
+      "channel": "instagram",
+      "format": "carousel",
+      "funnel_stage": "consideration",
+      "target_segment_id": "seg-marketing-escuela",
+      "messaging_pillar": "Operacion sin friccion",
+      "language": "es-MX",
+      "hook": "Si tu proceso de admisiones tiene fugas, las veras en estas tres senales.",
+      "primary_caption": "Muchos equipos de marketing escolar generan prospectos suficientes, pero los pierden entre el formulario y la llamada. Desliza para ver las tres senales mas comunes de fuga en el embudo de admisiones y como cerrarlas antes del cierre de convocatoria.",
+      "char_count": 286,
+      "cta": "Descarga la guia de admisiones",
+      "variants": [
+        {
+          "text": "No te faltan prospectos: se te escapan en el embudo.",
+          "angle": "Reframe hook (volume vs leakage) to test against the diagnostic-signals hook."
+        }
+      ],
+      "hashtags": ["#Admisiones", "#MarketingEducativo", "#EmbudoDeVentas", "#EducacionPrivada"],
+      "image_prompts": [
+        {
+          "model_target": "ideogram-3.0",
+          "prompt": "Square 1:1 carousel cover with clean legible in-image text, minimalist editorial infographic style, dark green and teal brand palette on an off-white background, a simple funnel diagram with three highlighted leak points, professional and modern, generous whitespace.",
+          "negative_prompt": "no competitor logos, no watermark, no photorealistic faces, no cluttered layout, no rainbow colors",
+          "in_image_text": "3 fugas en tu embudo",
+          "aspect_ratio": "1:1",
+          "alt_text": "Portada de carrusel con un embudo de admisiones que marca tres puntos de fuga."
+        }
+      ],
+      "risk_tier": "medium",
+      "risk_reason": "Lead-magnet CTA into the funnel and a process-quality claim; warrants a human glance before publish.",
+      "rationale": "Consideration carousel surfaces the funnel-leak problem the Suite solves, for the school-marketing segment.",
+      "notes": "ES-MX; carousel cover uses ideogram for the in-image text. Links to the week-2 landing page."
+    },
+    {
+      "asset_id": "cpy-acme-co-03",
+      "content_item_ref": "cmp-edu-convocatoria-ago/W2/caso-costo-por-prospecto-inscrito",
+      "channel": "meta_ads",
+      "format": "ad_creative",
+      "funnel_stage": "consideration",
+      "target_segment_id": "seg-director-admisiones",
+      "messaging_pillar": "ROI medible",
+      "language": "es-MX",
+      "hook": "Cuanto te cuesta cada prospecto que termina inscrito?",
+      "primary_caption": "La mayoria de las escuelas no lo sabe. Nosotros lo medimos mes a mes, por canal, para que inviertas donde si convierte. Agenda una llamada y te mostramos como se ve ese tablero para una institucion como la tuya.",
+      "char_count": 232,
+      "cta": "Agenda una llamada",
+      "variants": [
+        {
+          "text": "Mide el costo por prospecto inscrito, no solo el costo por clic.",
+          "angle": "Metric-contrast hook (CPL vs vanity clicks) for the ROI-literate buyer."
+        }
+      ],
+      "hashtags": [],
+      "image_prompts": [
+        {
+          "model_target": "flux-2-pro",
+          "prompt": "Square 1:1 paid-ad creative, photoreal close-up of a clean analytics dashboard on a laptop screen showing a cost-per-enrolled-lead chart, modern office bokeh background, teal and dark-green brand accents, crisp professional B2B SaaS aesthetic, trustworthy and data-driven mood.",
+          "negative_prompt": "no fabricated specific numbers on screen, no competitor logos, no watermark, no clutter, no misleading metrics",
+          "in_image_text": null,
+          "aspect_ratio": "1:1",
+          "alt_text": "Tablero de analitica en una laptop mostrando el costo por prospecto inscrito."
+        }
+      ],
+      "risk_tier": "high",
+      "risk_reason": "Paid creative that frames an ROI/measurement claim (cost-per-enrolled-lead); ROI claims require human review and no fabricated figures.",
+      "rationale": "Paid consideration creative drives demo bookings on the ROI-medible angle for the admissions-director segment.",
+      "notes": "ES-MX; no specific numbers stated (none in inputs). Negative prompt forbids fabricated on-screen figures. Respects pricing-claims constraint (no price/discount)."
+    },
+    {
+      "asset_id": "cpy-acme-co-04",
+      "content_item_ref": "cmp-edu-convocatoria-ago/W3/recordatorio-cierre-convocatoria",
+      "channel": "whatsapp",
+      "format": "whatsapp_broadcast",
+      "funnel_stage": "conversion",
+      "target_segment_id": "seg-marketing-escuela",
+      "messaging_pillar": "Operacion sin friccion",
+      "language": "es-MX",
+      "hook": "Quedan pocos lugares para la convocatoria de agosto.",
+      "primary_caption": "Hola, te escribimos porque mostraste interes en nuestro proceso de admisiones. El cierre de convocatoria de agosto se acerca y aun tienes lugar para agendar tu diagnostico. Quieres que te apartemos un espacio esta semana?",
+      "char_count": 233,
+      "cta": "Solicita tu lugar",
+      "variants": [],
+      "hashtags": [],
+      "image_prompts": [],
+      "risk_tier": "medium",
+      "risk_reason": "WhatsApp outbound to a warm list — opt-in and data-privacy constraint apply; needs a reviewer confirm on consent.",
+      "rationale": "Conversion nudge to the list captured by the week-2 lead magnet, ahead of the deadline.",
+      "notes": "ES-MX; text-only broadcast so image_prompts is empty. Honor opt-in and data_privacy constraint; personalize by program at send time."
+    }
+  ],
+  "summary": {
+    "total_assets": 4,
+    "assets_by_channel": {
+      "instagram": 2,
+      "meta_ads": 1,
+      "whatsapp": 1
+    },
+    "assets_by_funnel_stage": {
+      "awareness": 1,
+      "consideration": 2,
+      "conversion": 1
+    },
+    "assets_by_risk_tier": {
+      "low": 1,
+      "medium": 2,
+      "high": 1
+    },
+    "total_image_prompts": 3,
+    "assets_needing_review": 3
+  },
+  "production_notes": "Four assets produced from the August content plan (campaigns cmp-edu-convocatoria-ago and the lead-up of cmp-autoridad-genai-pyme), all ES-MX with neutral vocabulary usable across MX/CO/DR/PR. Image prompts split between flux-2-pro (photoreal heroes, no in-image text) and ideogram-3.0 (the carousel cover, which needs legible Spanish text). One high-risk asset (the Meta ROI creative) because it frames a cost-per-enrolled-lead measurement angle; two medium (the consideration carousel lead-magnet and the WhatsApp conversion broadcast under opt-in/data-privacy); one low (the awareness reel). No pricing/discount claims and no internal cost/margin figures anywhere (pricing-claims + confidentiality constraints). No competitor mentions, no political/religious or brand-safety violations. Rollup gate_status is pending_review because medium- and high-risk assets are present."
+}
+```
+
+## OUTPUT 2 — Production Brief
+
+PRODUCTION BRIEF — Acme Co. BU · Cycle 2026-08
+
+This batch turns the August editorial plan into four ready-to-review assets plus their image-gen prompts. The funnel mix is 1 awareness / 2 consideration / 1 conversion, deliberately consideration-weighted because the pilot is still building its first warm list before pushing conversion spend.
+
+Copy and segments. The awareness reel (asset 01) and the Meta creative (asset 03) speak to the admissions-director segment on the "ROI medible" pillar — one soft (seasonal pain, no numbers), one sharper (cost-per-enrolled-lead framing). The consideration carousel (asset 02) and the WhatsApp broadcast (asset 04) speak to the school-marketing segment on "Operacion sin friccion" — the carousel surfaces the funnel-leak problem and drives the lead magnet; the broadcast converts that captured list ahead of the deadline. Every hook leads with the buyer's pain or payoff, never the brand name, and leans into the competitive white-space (measurement + frictionless operation) rather than feature lists.
+
+A/B variants. Assets 01, 02 and 03 ship with alternative hooks so Layer 6 can test: process-vs-luck and listicle openings on the reel, a volume-vs-leakage reframe on the carousel, and a CPL-vs-clicks metric contrast on the ad. The WhatsApp broadcast ships without variants (single personalized send).
+
+Image prompts for Agent 4.2. Three prompts total. Two go to flux-2-pro (photoreal hero shots — the admissions-director reel cover and the dashboard ad creative — both with no in-image text and negative prompts that forbid fabricated on-screen numbers and competitor logos). One goes to ideogram-3.0: the carousel cover, which needs the legible Spanish line "3 fugas en tu embudo" rendered in-image. The WhatsApp broadcast is text-only, so it carries no image prompt. All prompts carry an aspect ratio matched to the channel (9:16 reel, 1:1 feed/ad) and ES-MX alt text for accessibility.
+
+Constraint calls. No prices, discounts, or colegiatura cuts anywhere (pricing-claims). No internal cost/margin figures (confidentiality). No specific performance numbers were invented — the ROI creative frames the measurement angle without quoting a figure that isn't in the data. The WhatsApp broadcast is flagged for opt-in/data-privacy confirmation.
+
+Assets needing human review: 02 (medium — lead-magnet CTA + process claim), 03 (high — ROI/measurement framing on paid), 04 (medium — outbound WhatsApp under opt-in/data-privacy). Asset 01 (awareness reel) is low-risk and could be spot-checked.
+
+## OUTPUT 3 — Risk Gate Summary
+
+=== AGENT 4.1 — RISK GATE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-08
+Gate status: PENDING REVIEW
+
+--- ASSET TOTALS ---
+Total assets: 4
+By channel: instagram=2 · meta_ads=1 · whatsapp=1
+By funnel stage: awareness=1 · consideration=2 · conversion=1
+By risk tier: low=1 · medium=2 · high=1
+Image prompts: 3 (flux-2-pro=2 · ideogram-3.0=1)
+Assets needing review: 3
+
+--- ASSETS REQUIRING HUMAN REVIEW ---
+- cpy-acme-co-03 (HIGH) — Meta paid creative framing a cost-per-enrolled-lead/ROI measurement angle; confirm no claim overreach and no fabricated figures.
+- cpy-acme-co-02 (MEDIUM) — consideration carousel with a lead-magnet CTA and a funnel-quality claim.
+- cpy-acme-co-04 (MEDIUM) — outbound WhatsApp broadcast; confirm recipients are opted in (data-privacy constraint).
+
+--- CONSTRAINT / CONFIDENTIALITY CHECK ---
+Pass. No pricing/discount claims (pricing-claims). No internal COGS/margin/cost-to-serve figures anywhere (confidentiality). No competitor mentions, no political/religious or brand-safety violations. No invented statistics. ES-MX copy, neutral for MX/CO/DR/PR.
+
+--- RECOMMENDED ACTION ---
+REVIEW — approve assets 02, 03, 04 (medium/high) before release to Layer 5; asset 01 (low) may be spot-checked and auto-released. On approval, hand the image prompts to Agent 4.2 (Visual Creative) and the copy to Agent 5.2 (Social Publisher) / 5.1 (Campaign Launcher) per channel.

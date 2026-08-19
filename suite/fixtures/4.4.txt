@@ -1,0 +1,227 @@
+## OUTPUT 1 — message_flows JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "lifecycle_stage": "pre-launch",
+  "cycle_month": "2026-06",
+  "markets": ["Mexico", "Colombia", "Dominican Republic", "Puerto Rico"],
+  "primary_language": "es-MX",
+  "providers": {
+    "email": "resend",
+    "whatsapp": "twilio_whatsapp_business_api"
+  },
+  "compliance": {
+    "email_unsubscribe_present": true,
+    "whatsapp_opt_in_required": true,
+    "quiet_hours_respected": true,
+    "notes": "WhatsApp marketing templates require prior opt-in and Meta approval before first send. All sends scheduled inside 09:00-20:00 local time per market. No blackout dates declared in client_profile."
+  },
+  "flows": [
+    {
+      "flow_id": "flow-welcome-diagnostic-edu",
+      "name": "Welcome + ROI Diagnostic Nurture (Directores de colegio)",
+      "channel": "multichannel",
+      "funnel_stage": "consideration",
+      "target_segment_id": "seg-acme-co-01",
+      "objective": "Nurture private-school directors who downloaded the marketing-ROI diagnostic into booking a 20-minute consultation.",
+      "trigger": {
+        "event": "lead_magnet_downloaded",
+        "filter": "segment in [seg-acme-co-01]",
+        "source": "lead_register (5.3)"
+      },
+      "exit_conditions": ["booked_consultation", "replied", "unsubscribed", "goal_met"],
+      "goal": "consultation_booked",
+      "messages": [
+        {
+          "message_id": "msg-welcome-deliver",
+          "channel": "email",
+          "step": 1,
+          "delay": {"amount": 0, "unit": "minutes", "from": "enrollment", "send_window": "09:00-20:00 America/Mexico_City"},
+          "subject": "Tu diagnóstico de marketing está listo, {{first_name}}",
+          "preheader": "Dónde se está fugando tu inversión de captación — y cómo recuperarla.",
+          "body": "Hola {{first_name}},\n\nAquí tienes el diagnóstico de marketing que descargaste para {{institution}}. Adentro encontrarás tres puntos donde la mayoría de los colegios privados pierden inscripciones cada ciclo — y qué hacer en cada uno.\n\nLéelo en 5 minutos. Si quieres, te muestro cómo se vería aplicado a tu institución, con números.\n\nUn saludo,\nEquipo Acme Co.",
+          "whatsapp_template": null,
+          "cta": {"label": "Abrir mi diagnóstico", "url": "https://www.acme.com.mx/diagnostico", "destination": "landing_page"},
+          "personalization_tokens": ["{{first_name}}", "{{institution}}"],
+          "rationale": "Delivers the lead magnet immediately and reframes it around the segment's primary pain (enrollment leakage) to earn the next open."
+        },
+        {
+          "message_id": "msg-welcome-proof",
+          "channel": "email",
+          "step": 2,
+          "delay": {"amount": 2, "unit": "days", "from": "enrollment", "send_window": "09:00-20:00 America/Mexico_City"},
+          "subject": "Cómo un colegio bajó su costo por prospecto 38%",
+          "preheader": "El mismo enfoque, traducido a tu temporada de inscripciones.",
+          "body": "Hola {{first_name}},\n\nUn colegio del tamaño de {{institution}} venía pagando de más por cada prospecto. En un ciclo, con seguimiento automatizado y mensajes mejor segmentados, bajó su costo por prospecto 38% sin subir el presupuesto.\n\nNo es magia — es medir, ajustar y no soltar al prospecto. Si te interesa, te explico el método en 20 minutos.\n\nEquipo Acme Co.",
+          "whatsapp_template": null,
+          "cta": {"label": "Agendar 20 minutos", "url": "https://www.acme.com.mx/agenda", "destination": "calendar"},
+          "personalization_tokens": ["{{first_name}}", "{{institution}}"],
+          "rationale": "Addresses the 'will this work for a school like mine' objection with a concrete, ROI-grounded proof point and a low-commitment CTA."
+        },
+        {
+          "message_id": "msg-welcome-wa-nudge",
+          "channel": "whatsapp",
+          "step": 3,
+          "delay": {"amount": 2, "unit": "days", "from": "previous_message", "send_window": "10:00-19:00 America/Mexico_City"},
+          "subject": null,
+          "preheader": null,
+          "body": "Hola {{first_name}}, soy del equipo de Acme Co.. Vi que descargaste el diagnóstico para {{institution}}. ¿Te late que te muestre en 20 min cómo aplicarlo antes del próximo ciclo de inscripciones? Responde *SÍ* y te paso un par de horarios.",
+          "whatsapp_template": {
+            "template_name": "acme_nurture_consult_invite_v1",
+            "language_code": "es_MX",
+            "category": "MARKETING",
+            "approval_status": "pending"
+          },
+          "cta": {"label": "Responder SÍ", "url": null, "destination": "reply"},
+          "personalization_tokens": ["{{first_name}}", "{{institution}}"],
+          "rationale": "Switches to WhatsApp for a higher-response conversational nudge; uses an approved marketing template because it is sent outside the 24h session window."
+        },
+        {
+          "message_id": "msg-welcome-last-call",
+          "channel": "email",
+          "step": 4,
+          "delay": {"amount": 4, "unit": "days", "from": "previous_message", "send_window": "09:00-20:00 America/Mexico_City"},
+          "subject": "¿Cerramos esto antes del ciclo, {{first_name}}?",
+          "preheader": "Última nota — y cómo darte de baja si no es momento.",
+          "body": "Hola {{first_name}},\n\nNo quiero saturarte. Si este no es el momento para revisar el marketing de {{institution}}, lo entiendo perfecto.\n\nSi sí lo es, el mejor paso es una llamada corta antes de que arranque la temporada de inscripciones — ahí es donde se gana o se pierde el ciclo.\n\nSi prefieres dejar de recibir estos correos, puedes darte de baja abajo.\n\nEquipo Acme Co.",
+          "whatsapp_template": null,
+          "cta": {"label": "Darme de baja", "url": "https://www.acme.com.mx/baja", "destination": "unsubscribe"},
+          "personalization_tokens": ["{{first_name}}", "{{institution}}"],
+          "rationale": "Closing email of the email track — respectful last call plus the mandatory unsubscribe path, keeping list health and brand trust."
+        }
+      ]
+    },
+    {
+      "flow_id": "flow-demo-confirm-followup",
+      "name": "Consultation Confirm + Follow-up",
+      "channel": "multichannel",
+      "funnel_stage": "conversion",
+      "target_segment_id": "seg-acme-co-01",
+      "objective": "Maximize show rate for booked consultations and convert a no-show into a rebooking.",
+      "trigger": {
+        "event": "demo_requested",
+        "filter": null,
+        "source": "HubSpot workflow (meeting booked)"
+      },
+      "exit_conditions": ["attended_consultation", "purchased", "unsubscribed"],
+      "goal": "consultation_attended",
+      "messages": [
+        {
+          "message_id": "msg-demo-confirm",
+          "channel": "whatsapp",
+          "step": 1,
+          "delay": {"amount": 0, "unit": "minutes", "from": "enrollment", "send_window": null},
+          "subject": null,
+          "preheader": null,
+          "body": "¡Listo, {{first_name}}! Tu consultoría con Acme Co. quedó para el {{meeting_date}} a las {{meeting_time}}. Te llega el enlace por correo. Si necesitas mover el horario, responde aquí y lo ajustamos.",
+          "whatsapp_template": {
+            "template_name": "acme_meeting_confirmation_v1",
+            "language_code": "es_MX",
+            "category": "UTILITY",
+            "approval_status": "approved"
+          },
+          "cta": {"label": "Confirmar / reagendar", "url": null, "destination": "reply"},
+          "personalization_tokens": ["{{first_name}}", "{{meeting_date}}", "{{meeting_time}}"],
+          "rationale": "Immediate confirmation reduces no-shows; UTILITY template is appropriate for a transactional booking confirmation."
+        },
+        {
+          "message_id": "msg-demo-reminder",
+          "channel": "whatsapp",
+          "step": 2,
+          "delay": {"amount": 24, "unit": "hours", "from": "enrollment", "send_window": "09:00-20:00 America/Mexico_City"},
+          "subject": null,
+          "preheader": null,
+          "body": "Hola {{first_name}}, recordatorio de tu consultoría de mañana ({{meeting_date}}, {{meeting_time}}). Llega con una pregunta concreta sobre tu captación y la resolvemos en vivo. ¿Confirmas asistencia?",
+          "whatsapp_template": {
+            "template_name": "acme_meeting_reminder_v1",
+            "language_code": "es_MX",
+            "category": "UTILITY",
+            "approval_status": "approved"
+          },
+          "cta": {"label": "Confirmo", "url": null, "destination": "reply"},
+          "personalization_tokens": ["{{first_name}}", "{{meeting_date}}", "{{meeting_time}}"],
+          "rationale": "24h reminder is the single highest-impact lever on show rate; keeps it conversational and useful."
+        },
+        {
+          "message_id": "msg-demo-noshow-followup",
+          "channel": "email",
+          "step": 3,
+          "delay": {"amount": 1, "unit": "days", "from": "previous_message", "send_window": "09:00-20:00 America/Mexico_City"},
+          "subject": "Te esperábamos, {{first_name}} — ¿reagendamos?",
+          "preheader": "Sigue disponible el análisis de tu captación.",
+          "body": "Hola {{first_name}},\n\nNo coincidimos en la consultoría — no pasa nada, la agenda en temporada de inscripciones es así.\n\nDejé apartado el análisis de captación de {{institution}}. Si me das un nuevo horario, lo retomamos donde quedó.\n\nY si prefieres que dejemos de insistir, puedes darte de baja abajo.\n\nEquipo Acme Co.",
+          "whatsapp_template": null,
+          "cta": {"label": "Reagendar", "url": "https://www.acme.com.mx/agenda", "destination": "calendar"},
+          "personalization_tokens": ["{{first_name}}", "{{institution}}"],
+          "rationale": "Recovers no-shows with a no-guilt rebooking offer and includes the unsubscribe path required on the email channel."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_flows": 2,
+    "total_messages": 7,
+    "messages_by_channel": {
+      "email": 4,
+      "whatsapp": 3
+    },
+    "flows_by_funnel_stage": {
+      "consideration": 1,
+      "conversion": 1
+    },
+    "first_deploy_flow_ids": [
+      "flow-welcome-diagnostic-edu",
+      "flow-demo-confirm-followup"
+    ]
+  },
+  "planning_notes": "Both flows target the priority-1 segment (private-school directors). Welcome nurture aligns to the June calendar's email_sequence + whatsapp_broadcast items for the enrollment-ROI pillar; demo flow aligns to the conversion pillar. WhatsApp marketing template (acme_nurture_consult_invite_v1) is still pending Meta approval — operator must submit and approve before the welcome flow's step 3 can fire; UTILITY confirmation/reminder templates are already approved. Both flows are first-deploy, so the whole block is pending_review. Re-engagement flow deferred: no cold-lead population exists yet for a pre-launch BU."
+}
+```
+
+## OUTPUT 2 — Flow Brief
+
+FLOW BRIEF — Agent 4.4 (Email / WhatsApp) — acme-co — cycle 2026-06
+
+Built 2 multichannel flows, both targeting the priority-1 segment seg-acme-co-01 (private-school directors; primary pain = enrollment leakage / paying too much per prospect).
+
+1) flow-welcome-diagnostic-edu — Consideration. Trigger: lead_magnet_downloaded (ROI diagnostic). Goal: consultation_booked.
+   - Channel mix: 3 emails + 1 WhatsApp nudge. Email delivers the magnet and a proof point; WhatsApp (template) drives a higher-response conversational ask at day ~4; final email is a respectful last-call with unsubscribe.
+   - Cadence: day 0, day 2, day 4 (WA), day 8 (email). One touch every 2-4 days, humane.
+   - Copy choices: ROI-grounded, no hype; pre-empts the "works for a school like mine?" objection with a concrete cost-per-prospect proof.
+
+2) flow-demo-confirm-followup — Conversion. Trigger: demo_requested (HubSpot meeting booked). Goal: consultation_attended.
+   - Channel mix: 2 WhatsApp (UTILITY confirm + reminder, already approved) + 1 email no-show recovery.
+   - Cadence: immediate confirm, 24h reminder (top show-rate lever), +1 day email rebooking on no-show.
+
+Channel rationale: WhatsApp for time-sensitive, high-intent, conversational touches (confirmations, reminders, the consult nudge); email for value delivery and longer nurture that needs links. All client-facing copy is ES-MX, neutral enough for MX/CO/DR/PR. Personalization tokens: {{first_name}}, {{institution}}, {{meeting_date}}, {{meeting_time}}.
+
+Reviewer note: the welcome flow's WhatsApp step uses a MARKETING template (acme_nurture_consult_invite_v1) that is still pending Meta approval — it cannot fire until approved. The two UTILITY templates are approved.
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 4.4 — FIRST-DEPLOY GATE SUMMARY ===
+Client: Acme Co. BU (acme-co)
+Date: 2026-05-29
+Cycle: 2026-06
+Gate status: PENDING REVIEW
+
+--- FLOWS REQUIRING FIRST-DEPLOY SIGN-OFF ---
+- flow-welcome-diagnostic-edu (multichannel, consideration) — NEW
+- flow-demo-confirm-followup (multichannel, conversion) — NEW
+
+--- COMPLIANCE CHECKLIST ---
+- Email unsubscribe present: YES (closing/recovery emails include the baja link).
+- WhatsApp opt-in required: YES — confirm each contact opted in before enabling WhatsApp steps.
+- Quiet hours respected: YES — all sends inside 09:00-20:00 local; WhatsApp narrowed to 10:00-19:00 where applicable.
+- WhatsApp templates: 1 MARKETING template PENDING Meta approval (blocks welcome step 3 until approved); 2 UTILITY templates approved.
+
+--- BLOCKERS BEFORE GO-LIVE ---
+- Submit + get Meta approval for acme_nurture_consult_invite_v1 (welcome WhatsApp nudge).
+- Confirm WhatsApp opt-in coverage for the enrolled audience.
+
+--- RECOMMENDED ACTION ---
+REVIEW — approve copy + cadence, then clear the two go-live blockers (template approval, opt-in) before Layer 5 activates the flows.

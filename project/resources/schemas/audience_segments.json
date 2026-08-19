@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/audience_segments/v1",
+  "version": "1.0.0",
+  "title": "audience_segments",
+  "description": "Canonical memory schema for Agent 1.2 (Audience Intelligence) output. The OUTPUT-1 payload is an OBJECT wrapping the ranked segment array so base.py object-routing (write_memory_block) works. Each segment uses the DEL-09 confidence-metadata pattern on its tagged leaf fields. Read by Layers 2, 3, 4, 6. | Depends on: DEL-11 (system prompt), DEL-09 (confidence_metadata), client_profile (DEL-17). | First authored: 2026-05-29",
+  "type": "object",
+  "definitions": {
+    "confidence_metadata": {
+      "description": "DEL-09 Data Confidence Tagger — required on every tagged leaf field written to memory.",
+      "type": "object",
+      "required": [
+        "data_source",
+        "confidence_score",
+        "tier",
+        "verification_status",
+        "first_set_date"
+      ],
+      "properties": {
+        "data_source": {
+          "type": "string",
+          "enum": ["client", "enriched", "estimated", "benchmark"],
+          "description": "Origin of the value. 'client' = from CRM/survey/analytics the client provided. 'enriched' = AI-augmented from public/social data. 'estimated' = AI-inferred from indirect signals. 'benchmark' = industry demographic table."
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "0.0-1.0. Tier A 0.80-0.95 | Tier B 0.60-0.79 | Tier C 0.40-0.59 | Tier D 0.20-0.39."
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D"],
+          "description": "Substitution tier at time of writing."
+        },
+        "source_detail": {
+          "type": "string",
+          "description": "Human-readable note on how this value was derived. Required when tier is C or D."
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": ["verified", "enriched", "ai-proposed", "estimated"]
+        },
+        "first_set_date": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date this field was first written. YYYY-MM-DD."
+        },
+        "last_verified_date": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "ISO 8601 date of last human confirmation. Null until confirmed."
+        },
+        "will_be_replaced_by": {
+          "type": "string",
+          "description": "Optional. Real-data source that will upgrade this inferred field (e.g. 'GA4 audience + lead data after 30 days')."
+        }
+      }
+    },
+    "tagged_string": {
+      "type": "object",
+      "required": ["value", "metadata"],
+      "properties": {
+        "value": { "type": "string" },
+        "metadata": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    },
+    "tagged_string_array": {
+      "type": "object",
+      "required": ["value", "metadata"],
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metadata": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    },
+    "tagged_int": {
+      "type": "object",
+      "required": ["value", "metadata"],
+      "properties": {
+        "value": { "type": ["integer", "number"] },
+        "metadata": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    },
+    "tagged_channels": {
+      "type": "object",
+      "required": ["value", "metadata"],
+      "properties": {
+        "value": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["channel", "priority"],
+            "properties": {
+              "channel": { "type": "string" },
+              "rationale": { "type": "string" },
+              "priority": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "metadata": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "required": [
+        "segment_id",
+        "client_id",
+        "priority_rank",
+        "confidence_tier",
+        "name",
+        "description",
+        "buying_dynamics",
+        "channel_and_format",
+        "commercial_value",
+        "embedding_text"
+      ],
+      "properties": {
+        "segment_id": {
+          "type": "string",
+          "pattern": "^seg-[a-z0-9-]+-(0[1-9]|[1-9][0-9])$",
+          "description": "Format: seg-{client_id}-{NN}. Example: seg-acme-co-01."
+        },
+        "client_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "priority_rank": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "1 = strongest commercial recommendation, not necessarily largest segment."
+        },
+        "confidence_tier": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D"],
+          "description": "Segment-level tier: the lowest tier among the core fields (size, primary_pain, preferred_channels)."
+        },
+        "name": { "$ref": "#/definitions/tagged_string" },
+        "description": { "$ref": "#/definitions/tagged_string" },
+        "demographics": {
+          "type": "object",
+          "properties": {
+            "age_range": { "$ref": "#/definitions/tagged_string" },
+            "gender_skew": { "$ref": "#/definitions/tagged_string" },
+            "income_level": { "$ref": "#/definitions/tagged_string" },
+            "education_level": { "$ref": "#/definitions/tagged_string" },
+            "geography_primary": { "$ref": "#/definitions/tagged_string" }
+          }
+        },
+        "size": {
+          "type": "object",
+          "properties": {
+            "estimated_addressable": { "$ref": "#/definitions/tagged_int" },
+            "estimated_reachable_pct": { "$ref": "#/definitions/tagged_int" }
+          }
+        },
+        "buying_dynamics": {
+          "type": "object",
+          "required": ["primary_pain", "triggers", "objections", "decision_timeline"],
+          "properties": {
+            "primary_pain": { "$ref": "#/definitions/tagged_string" },
+            "secondary_pain": { "$ref": "#/definitions/tagged_string" },
+            "triggers": { "$ref": "#/definitions/tagged_string_array" },
+            "objections": { "$ref": "#/definitions/tagged_string_array" },
+            "decision_maker": { "$ref": "#/definitions/tagged_string" },
+            "decision_timeline": { "$ref": "#/definitions/tagged_string" }
+          }
+        },
+        "channel_and_format": {
+          "type": "object",
+          "required": ["preferred_channels", "format_preference"],
+          "properties": {
+            "preferred_channels": { "$ref": "#/definitions/tagged_channels" },
+            "format_preference": { "$ref": "#/definitions/tagged_string_array" },
+            "best_content_themes": { "$ref": "#/definitions/tagged_string_array" },
+            "messaging_angle": { "$ref": "#/definitions/tagged_string" }
+          }
+        },
+        "commercial_value": {
+          "type": "object",
+          "required": ["ltv_signal", "conversion_likelihood", "priority_score"],
+          "properties": {
+            "ltv_signal": {
+              "type": "object",
+              "required": ["value", "metadata"],
+              "properties": {
+                "value": { "type": "string", "enum": ["high", "medium", "low"] },
+                "metadata": { "$ref": "#/definitions/confidence_metadata" }
+              }
+            },
+            "conversion_likelihood": {
+              "type": "object",
+              "required": ["value", "metadata"],
+              "properties": {
+                "value": { "type": "string", "enum": ["high", "medium", "low"] },
+                "metadata": { "$ref": "#/definitions/confidence_metadata" }
+              }
+            },
+            "priority_score": {
+              "type": "object",
+              "required": ["value"],
+              "properties": {
+                "value": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+                "rationale": { "type": "string" }
+              }
+            }
+          }
+        },
+        "validation_plan": {
+          "type": "string",
+          "description": "What data will confirm/refute this segment. Required in spirit for Tier C/D segments."
+        },
+        "embedding_text": {
+          "type": "string",
+          "minLength": 40,
+          "description": "Dense, semantically rich paragraph for vector embedding + downstream semantic retrieval. Mandatory."
+        }
+      }
+    }
+  },
+  "required": ["client_id", "created_at", "gate_status", "segments"],
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this segment set belongs to. Lowercase-hyphenated. Example: acme-co."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this audience_segments block was produced."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": ["pending_review", "approved", "returned", "blocked", "auto_approved"],
+      "default": "pending_review",
+      "description": "Human gate status. Agent 1.2 is review-gated, so it defaults to pending_review until the operator ranks + approves the segments."
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "enum": ["pre-launch", "early", "growth", "established"],
+      "description": "Carried from client_profile; affects how much segment data is inferred vs. observed."
+    },
+    "based_on_profile_gate": {
+      "type": ["string", "null"],
+      "description": "The gate_status of the client_profile this segmentation was built on. Should be 'approved' in production (orchestrator precondition)."
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 5,
+      "description": "3-5 segments ordered from highest to lowest commercial priority (index 0 = priority_rank 1).",
+      "items": { "$ref": "#/definitions/segment" }
+    }
+  }
+}

@@ -1,0 +1,200 @@
+## OUTPUT 1 — performance_history JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-09-01T08:00:00Z",
+  "gate_status": "auto_approved",
+  "escalated": true,
+  "cycle_label": "2026-Q3 launch cycle",
+  "window": {
+    "starts_on": "2026-08-01",
+    "ends_on": "2026-08-31",
+    "cadence": "monthly",
+    "days": 31
+  },
+  "metrics": {
+    "spend_usd": 480.00,
+    "revenue_usd": 3398.00,
+    "impressions": 214500,
+    "reach": 161200,
+    "clicks": 3010,
+    "ctr_pct": 1.4,
+    "leads": 41,
+    "customers": 2,
+    "conversion_rate_pct": 4.9,
+    "cpl_usd": 11.71,
+    "cac_usd": 240.00,
+    "roas": 7.08
+  },
+  "by_channel": [
+    {
+      "channel": "meta_ads",
+      "spend_usd": 300.00,
+      "leads": 28,
+      "cpl_usd": 10.71,
+      "roas": 5.66,
+      "ctr_pct": 1.6
+    },
+    {
+      "channel": "google_ads",
+      "spend_usd": 180.00,
+      "leads": 13,
+      "cpl_usd": 13.85,
+      "roas": 9.44,
+      "ctr_pct": 1.1
+    }
+  ],
+  "kpi_reconciliation": [
+    {
+      "metric": "leads",
+      "unit": "count",
+      "target_value": 60,
+      "threshold_floor": 45,
+      "actual_value": 41,
+      "variance_pct": -31.7,
+      "direction": "higher_is_better",
+      "status": "breach",
+      "metadata": {
+        "data_source": "measured",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "source_detail": "Counted from lead_register entries dated within the August window."
+      }
+    },
+    {
+      "metric": "cpl_usd",
+      "unit": "usd",
+      "target_value": 10.0,
+      "threshold_floor": 14.0,
+      "actual_value": 11.71,
+      "variance_pct": 17.1,
+      "direction": "lower_is_better",
+      "status": "at_risk",
+      "metadata": {
+        "data_source": "measured",
+        "confidence_score": 0.9,
+        "tier": "A",
+        "source_detail": "spend_usd / leads = 480.00 / 41."
+      }
+    },
+    {
+      "metric": "roas",
+      "unit": "ratio",
+      "target_value": 4.0,
+      "threshold_floor": 3.0,
+      "actual_value": 7.08,
+      "variance_pct": 77.0,
+      "direction": "higher_is_better",
+      "status": "ahead",
+      "metadata": {
+        "data_source": "measured",
+        "confidence_score": 0.85,
+        "tier": "A",
+        "source_detail": "revenue_usd / spend_usd = 3398.00 / 480.00; two pilot closes at Tier 2 ($1,699/mo) booked in-window."
+      }
+    },
+    {
+      "metric": "conversion_rate_pct",
+      "unit": "pct",
+      "target_value": 5.0,
+      "threshold_floor": null,
+      "actual_value": 4.9,
+      "variance_pct": -2.0,
+      "direction": "higher_is_better",
+      "status": "on_track",
+      "metadata": {
+        "data_source": "measured",
+        "confidence_score": 0.8,
+        "tier": "B",
+        "source_detail": "customers / leads = 2 / 41; small-n, treat as directional."
+      }
+    },
+    {
+      "metric": "reach",
+      "unit": "count",
+      "target_value": 150000,
+      "threshold_floor": null,
+      "actual_value": 161200,
+      "variance_pct": 7.5,
+      "direction": "higher_is_better",
+      "status": "on_track",
+      "metadata": {
+        "data_source": "measured",
+        "confidence_score": 0.75,
+        "tier": "B",
+        "source_detail": "Paid reach (ad_campaign_log) + organic reach (publish_log), de-duplicated only at the channel level."
+      }
+    }
+  ],
+  "alerts": [
+    {
+      "type": "kpi_breach",
+      "severity": "critical",
+      "metric": "leads",
+      "message": "Leads breached: contracted 60/mo (floor 45), got 41 — 31.7% under target and below the floor. The volume gap is concentrated in Meta (28 leads on $300) where the back-to-school convocatoria creative is fatiguing; Google search held its share. Next-cycle strategy should refresh the Meta creative and re-test audiences before raising spend."
+    },
+    {
+      "type": "kpi_at_risk",
+      "severity": "warning",
+      "metric": "cpl_usd",
+      "message": "CPL at risk: contracted $10.00 (floor $14.00), running $11.71 — 17.1% over target but still inside the floor. Driven by the same Meta creative fatigue; will breach the floor if lead volume keeps falling at flat spend."
+    }
+  ],
+  "upstream_provenance": {
+    "ad_campaign_log": true,
+    "publish_log": true,
+    "lead_register": true,
+    "active_strategy": true,
+    "kpi_contracts_present": true
+  },
+  "summary": {
+    "headline": "August window: ROAS well ahead, but leads breached target (41 vs 60) and CPL is creeping over — Meta creative fatigue is the driver.",
+    "kpis_total": 5,
+    "kpis_on_track": 2,
+    "kpis_ahead": 1,
+    "kpis_at_risk": 1,
+    "kpis_breached": 1,
+    "kpis_no_data": 0,
+    "recommended_action": "ALERT"
+  },
+  "notes": "Full window: all four upstream blocks present and within the August reconciliation cadence (active_strategy.kpi_contracts.review_cadence = monthly). Revenue reflects two Tier-2 pilot closes booked in-window; ROAS therefore beats target despite the lead shortfall, so the real risk is top-of-funnel volume, not efficiency. conversion_rate and reach are small-n / partly organic and tagged B-tier. Agent 6.1 does not reallocate budget — the Meta refresh / spend decision is for Agent 6.3 and the operator. USD throughout; no internal economics included."
+}
+```
+
+## OUTPUT 2 — Performance Brief
+
+PERFORMANCE BRIEF — Acme Co. BU · Window 2026-08-01 → 2026-08-31 (monthly)
+
+Verdict: AT RISK with one hard breach. The August launch window paid back strongly on efficiency — ROAS landed at 7.08x against a contracted 4.0x, and conversion held at the 5% line — but the top of the funnel missed: we captured 41 leads against a contracted 60 (floor 45), a 31.7% shortfall that crosses the floor and is the headline of the cycle.
+
+Funnel snapshot (USD): spend $480.00 · 214,500 impressions · 161,200 reach · 3,010 clicks (CTR 1.4%) · 41 leads (CPL $11.71) · 2 customers (CAC $240.00, conversion 4.9%) · revenue $3,398.00 (ROAS 7.08x). The two closes were Tier-2 pilots, which is why revenue and ROAS look healthy on a small spend — the economics of a won deal are strong; the problem is we are simply not feeding enough leads into the top.
+
+KPI reconciliation vs the binding contract: leads BREACH (60 target / 45 floor → 41 actual); CPL AT RISK ($10.00 target / $14.00 floor → $11.71, 17.1% over but inside the floor); ROAS AHEAD (4.0x → 7.08x); conversion ON TRACK (5.0% → 4.9%); reach ON TRACK (150k → 161.2k).
+
+What is driving the breach: the channel split makes it clear. Meta carried $300 of the $480 but delivered 28 leads at a rising $10.71 CPL — the back-to-school "convocatoria de agosto" creative is fatiguing. Google search ($180) held its 13 leads at a higher but stable $13.85 CPL. So the volume gap is a Meta creative problem, not a budget or a Google problem, and CPL will tip over its floor if Meta volume keeps sliding at flat spend.
+
+Forward note for strategy (Layer 2 / 6.3): the next cycle should refresh the Meta creative and re-test audiences before any spend increase — raising spend on a fatiguing creative would breach CPL without fixing leads. Efficiency (ROAS, conversion) is not the constraint and should not be touched. This agent flags only; it does not move budget.
+
+## OUTPUT 3 — Ops / Alert Summary
+
+=== AGENT 6.1 — PERFORMANCE ALERT SUMMARY ===
+Client: Acme Co. BU
+Window: 2026-08-01 → 2026-08-31 (monthly)
+Gate posture: AUTO-APPROVED (auto + alert)
+Escalated: YES
+
+--- KPI SCOREBOARD ---
+leads — target 60 (floor 45) vs actual 41 — BREACH
+cpl_usd — target $10.00 (floor $14.00) vs actual $11.71 — AT RISK
+roas — target 4.0x vs actual 7.08x — AHEAD
+conversion_rate_pct — target 5.0% vs actual 4.9% — ON TRACK
+reach — target 150,000 vs actual 161,200 — ON TRACK
+
+--- ALERTS ---
+CRITICAL: leads breached — 41 vs 60 (floor 45), 31.7% under; Meta creative fatigue is the driver.
+WARNING: cpl_usd at risk — $11.71 vs $10.00 target (inside the $14.00 floor); same root cause.
+
+--- RECOMMENDED ACTION ---
+ALERT — the leads KPI breached its floor. Inspect the Meta "convocatoria de agosto" campaign first (28 leads on $300, CPL rising): the shortfall is creative fatigue, not budget. Refresh the Meta creative / re-test audiences before raising spend; ROAS and conversion are ahead and need no action. Agent 6.1 does NOT reallocate budget — that decision is for Agent 6.3 and the operator.

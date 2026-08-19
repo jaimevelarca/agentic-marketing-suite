@@ -1,0 +1,469 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/competitive_map/v1",
+  "version": "0.1.0",
+  "title": "competitive_map",
+  "description": "Canonical memory schema for Agent 1.3 (Competitive Intelligence) output. Validates the competitive_map block before it is committed to Cloud SQL + pgvector. Reused confidence-metadata pattern from DEL-09/DEL-17. Read by Layers 2, 3, 4. Last updated: 2026-05-29",
+  "type": "object",
+  "definitions": {
+    "confidence_metadata": {
+      "description": "DEL-09 Data Confidence Tagger — required on every leaf field written to memory.",
+      "type": "object",
+      "required": [
+        "data_source",
+        "confidence_score",
+        "tier",
+        "verification_status",
+        "first_set_date"
+      ],
+      "properties": {
+        "data_source": {
+          "type": "string",
+          "enum": [
+            "client",
+            "enriched",
+            "estimated",
+            "benchmark"
+          ],
+          "description": "Origin of the value. 'client' = provided directly (competitor list, positioning notes). 'enriched' = AI-augmented from public data (scraper, ad library). 'estimated' = AI-inferred. 'benchmark' = LATAM industry table default."
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "0.0-1.0. client-verified >=0.85 | enriched 0.60-0.80 | estimated 0.40-0.59 | benchmark 0.20-0.39"
+        },
+        "tier": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "source_detail": {
+          "type": "string",
+          "description": "Human-readable note on how the value was derived. Required in spirit when tier is C or D."
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "enriched",
+            "ai-proposed",
+            "estimated"
+          ]
+        },
+        "first_set_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "last_verified_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "will_be_replaced_by": {
+          "type": "string"
+        }
+      }
+    },
+    "competitor": {
+      "description": "One identified competitor with its positioning, observed content angles, and a per-competitor confidence tag.",
+      "type": "object",
+      "required": [
+        "competitor_id",
+        "name",
+        "competitor_type",
+        "positioning",
+        "metadata"
+      ],
+      "properties": {
+        "competitor_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "lowercase-hyphenated stable id, e.g. 'comp-leadsales'"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "social_profiles": {
+          "type": "object",
+          "properties": {
+            "instagram": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "facebook": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "linkedin": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tiktok": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "youtube": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "competitor_type": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "indirect",
+            "aspirational",
+            "substitute"
+          ],
+          "description": "direct = same offer/segment/market | indirect = adjacent offer | aspirational = larger benchmark brand | substitute = different solution to the same problem"
+        },
+        "markets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Which of MX/CO/DR/PR this competitor is active in."
+        },
+        "positioning": {
+          "type": "string",
+          "minLength": 5,
+          "description": "One-sentence read of how this competitor positions itself."
+        },
+        "estimated_price_tier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "budget",
+            "mid",
+            "premium",
+            null
+          ]
+        },
+        "content_angles_used": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Recurring messaging/content angles observed on their channels."
+        },
+        "primary_channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "threat_level": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "content_gap": {
+      "description": "A content/message space the competitive set under-serves and the client could own.",
+      "type": "object",
+      "required": [
+        "gap",
+        "opportunity",
+        "metadata"
+      ],
+      "properties": {
+        "gap": {
+          "type": "string",
+          "minLength": 5,
+          "description": "What the competitive set is NOT doing well or at all."
+        },
+        "opportunity": {
+          "type": "string",
+          "minLength": 5,
+          "description": "How the client can exploit the gap (the actionable angle for Layers 3/4)."
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "swot": {
+      "description": "Client SWOT framed relative to the identified competitive set (not absolute).",
+      "type": "object",
+      "required": [
+        "strengths",
+        "weaknesses",
+        "opportunities",
+        "threats",
+        "metadata"
+      ],
+      "properties": {
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "threats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "benchmark_metric": {
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "competitors",
+    "content_gaps",
+    "swot"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this competitive map belongs to. lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this competitive_map was first created."
+    },
+    "last_updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approved_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human reviewer who approved this map at the review-only gate. Null until first gate passes."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Review-only gate. Defaults to pending_review; the reviewer confirms competitor identification (correct competitors, no partners misidentified) before Layers 2-4 consume it."
+    },
+    "analysis_scope": {
+      "description": "What the agent was asked to map and over which markets.",
+      "type": "object",
+      "required": [
+        "markets",
+        "metadata"
+      ],
+      "properties": {
+        "markets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Ranked LATAM markets in scope (subset of MX/CO/DR/PR)."
+        },
+        "industry": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "competitors": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/definitions/competitor"
+      },
+      "description": "3-5 (up to 8) identified competitors. Each carries its own confidence tag."
+    },
+    "positioning_landscape": {
+      "description": "Where the client sits relative to competitors on the two axes that matter for this market.",
+      "type": "object",
+      "required": [
+        "axes",
+        "metadata"
+      ],
+      "properties": {
+        "axes": {
+          "type": "object",
+          "required": [
+            "x_axis",
+            "y_axis"
+          ],
+          "properties": {
+            "x_axis": {
+              "type": "string",
+              "description": "e.g. 'price (budget -> premium)'"
+            },
+            "y_axis": {
+              "type": "string",
+              "description": "e.g. 'breadth of offer (point tool -> full suite)'"
+            }
+          }
+        },
+        "client_position": {
+          "type": "string",
+          "description": "Narrative of where the client lands and the white space it can own."
+        },
+        "white_space": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "content_gaps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/content_gap"
+      },
+      "description": "Under-served content/message spaces the client can own. Feeds Layer 3 planning + Layer 4 copy."
+    },
+    "swot": {
+      "$ref": "#/definitions/swot"
+    },
+    "benchmarks": {
+      "description": "Competitive/industry KPI benchmarks for the client's vertical + LATAM market. Tier D when from industry tables; tag every value.",
+      "type": "object",
+      "properties": {
+        "avg_cpl_usd": {
+          "$ref": "#/definitions/benchmark_metric"
+        },
+        "avg_conversion_rate_pct": {
+          "$ref": "#/definitions/benchmark_metric"
+        },
+        "avg_roas": {
+          "$ref": "#/definitions/benchmark_metric"
+        },
+        "avg_engagement_rate_pct": {
+          "$ref": "#/definitions/benchmark_metric"
+        },
+        "avg_posting_cadence_per_week": {
+          "$ref": "#/definitions/benchmark_metric"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    }
+  }
+}

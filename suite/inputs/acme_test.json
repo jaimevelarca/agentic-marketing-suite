@@ -1,0 +1,58 @@
+{
+  "client_id": "acme-test",
+  "_validation_note": "SYNTHETIC validation input — identical to acme.json but with a placeholder marketing_objective/budget/sales_cycle filled in so the FULL pipeline runs past the Layer-2 binding gate during live-validation. These three values are NOT real Acme Co. decisions (those are pending the partners' S1-T1..T3 session) and must never reach the real pilot record. client_id is deliberately 'acme-test' to keep this run isolated from the real 'acme' profile.",
+  "quick_start_form": {
+    "company_name": "the AI Marketing Suite vendor",
+    "website_url": "https://www.acme.com.mx/",
+    "industry": "Management & organizational-transformation consulting (B2B professional services)",
+    "offer_description": "Consultoría de transformación organizacional con resultados garantizados contractualmente. Tres líneas: Estrategia (planeación de crecimiento a 5 años), Operaciones y Procesos (eficiencia), y Transformación Digital. ROI promedio 5:1.",
+    "target_markets": ["Mexico", "Colombia", "Chile", "Peru", "Puerto Rico", "Bolivia", "Paraguay", "USA"],
+    "primary_market": "Mexico",
+    "target_customer": "Mid-market and enterprise organizations (multi-industry) seeking profitability improvement and organizational transformation; decision-makers are C-level / owners.",
+    "marketing_objective": "[SYNTHETIC] Generar 15 reuniones de diagnóstico calificadas por mes con directivos C-level de empresas medianas (100+ empleados) en México, en un plazo de 90 días, con un costo por reunión calificada menor a USD 180.",
+    "monthly_budget": {"min": 3000, "max": 5000},
+    "sales_cycle": "8-16 semanas de primer contacto a contrato firmado",
+    "languages": ["es-MX", "en"],
+    "notes": "[VALIDATION RUN] marketing_objective/monthly_budget/sales_cycle are SYNTHETIC placeholders to exercise the full pipeline end-to-end. Real values pending partners (S1-T1..T3)."
+  },
+  "scraper_output": {
+    "scrape_status": "success",
+    "meta_description": "the AI Marketing Suite vendor — Transformamos su organización e incrementamos su rentabilidad. Resultados garantizados contractualmente.",
+    "about_text_excerpt": "Más de 10 años de experiencia incrementando la rentabilidad de organizaciones a través de Proyectos de Transformación. Resultados contractualmente garantizados, con un ROI promedio de 5:1.",
+    "services_extracted": [
+      "Estrategia — planeación de crecimiento a 5 años",
+      "Operaciones y Procesos — mejoras de eficiencia",
+      "Transformación Digital — implementación de tecnología"
+    ],
+    "value_propositions": [
+      "Transformamos su organización e incrementamos su rentabilidad",
+      "Resultados garantizados contractualmente",
+      "ROI promedio 5:1"
+    ],
+    "primary_cta": "Agendar reunión sin compromiso",
+    "locations_detected": ["Mexico", "USA", "Chile", "Colombia", "Bolivia", "Peru", "Puerto Rico", "Paraguay"],
+    "visual_identity": {
+      "top_5_hex": [],
+      "heading_font": null,
+      "body_font": null,
+      "logo": {"url": null}
+    },
+    "brand_voice": {
+      "detected_language": "es",
+      "vocabulary_register": "professional/corporate",
+      "proposed_voice_tokens": ["profesional", "orientado a resultados", "confiable", "estratégico"],
+      "sample_sentences": [
+        "Transformamos su organización e incrementamos su rentabilidad.",
+        "Resultados garantizados contractualmente.",
+        "Más de 10 años incrementando la rentabilidad de organizaciones."
+      ]
+    },
+    "company_context": {
+      "social_links_found": {
+        "instagram": "https://www.instagram.com/acme_co",
+        "linkedin": "https://www.linkedin.com/company/acme-co"
+      }
+    }
+  },
+  "operator_notes": "[VALIDATION RUN] Full 19-agent live-validation pass on synthetic-but-realistic data. Purpose: confirm every agent's real model output validates against its schema before GCP deploy."
+}

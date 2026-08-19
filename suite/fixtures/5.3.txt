@@ -1,0 +1,201 @@
+## OUTPUT 1 — lead_register JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "auto_approved",
+  "lifecycle_stage": "pre-launch",
+  "batch_window": "2026-06-01T09:00Z/PT15M",
+  "markets": ["Mexico", "Colombia"],
+  "crm": {
+    "platform": "hubspot",
+    "sync_cadence_minutes": 15
+  },
+  "leads": [
+    {
+      "lead_id": "lead-mariana-rivas-colegio-altamira",
+      "source": "landing_page",
+      "market": "Mexico",
+      "contact": {
+        "name": "Mariana Rivas",
+        "email": "mariana.rivas@colegioaltamira.mx",
+        "phone": "+525512345678",
+        "company": "Colegio Altamira",
+        "whatsapp_opt_in": true
+      },
+      "segment_id": "seg-acme-co-01",
+      "score": 88,
+      "score_breakdown": {
+        "intent": 38,
+        "segment_fit": 23,
+        "firmographic_fit": 13,
+        "contactability": 9,
+        "recency": 5
+      },
+      "temperature": "hot",
+      "routing": "human_followup",
+      "enrolled_flow_id": null,
+      "crm_action": "create",
+      "crm_status": "synced",
+      "crm_object_id": "hs-contact-700101",
+      "rationale": "Director of a private school explicitly requested a demo + pricing; matches priority-1 high-LTV segment with full contactability — straight to a human, not a drip."
+    },
+    {
+      "lead_id": "lead-jorge-mendez-instituto-bilingue",
+      "source": "meta_lead_form",
+      "market": "Mexico",
+      "contact": {
+        "name": "Jorge Méndez",
+        "email": "jmendez@institutobilingue.edu.mx",
+        "phone": "+528133456789",
+        "company": "Instituto Bilingüe del Norte",
+        "whatsapp_opt_in": true
+      },
+      "segment_id": "seg-acme-co-01",
+      "score": 58,
+      "score_breakdown": {
+        "intent": 22,
+        "segment_fit": 16,
+        "firmographic_fit": 10,
+        "contactability": 8,
+        "recency": 2
+      },
+      "temperature": "warm",
+      "routing": "nurture",
+      "enrolled_flow_id": "flow-welcome-diagnostic-edu",
+      "crm_action": "create",
+      "crm_status": "synced",
+      "crm_object_id": "hs-contact-700102",
+      "rationale": "Downloaded the ROI diagnostic and fits the priority-1 segment but made no explicit ask — enrolled in the consideration welcome nurture to earn the consultation."
+    },
+    {
+      "lead_id": "lead-paula-castano-fundacion-saber",
+      "source": "meta_lead_form",
+      "market": "Colombia",
+      "contact": {
+        "name": "Paula Castaño",
+        "email": "paula.castano@fundacionsaber.co",
+        "phone": "+573001234567",
+        "company": "Fundación Saber",
+        "whatsapp_opt_in": false
+      },
+      "segment_id": "seg-acme-co-02",
+      "score": 33,
+      "score_breakdown": {
+        "intent": 10,
+        "segment_fit": 12,
+        "firmographic_fit": 8,
+        "contactability": 3,
+        "recency": 0
+      },
+      "temperature": "cold",
+      "routing": "nurture",
+      "enrolled_flow_id": "flow-welcome-diagnostic-edu",
+      "crm_action": "create",
+      "crm_status": "synced",
+      "crm_object_id": "hs-contact-700103",
+      "rationale": "Low-intent older form fill, secondary segment, email-only and no WhatsApp opt-in — enrolled in the lightest available nurture flow rather than discarded."
+    },
+    {
+      "lead_id": "lead-test-qa-submission",
+      "source": "landing_page",
+      "market": null,
+      "contact": {
+        "name": "QA Test",
+        "email": "test@test.com",
+        "phone": null,
+        "company": null,
+        "whatsapp_opt_in": false
+      },
+      "segment_id": null,
+      "score": 0,
+      "score_breakdown": {
+        "intent": 0,
+        "segment_fit": 0,
+        "firmographic_fit": 0,
+        "contactability": 0,
+        "recency": 0
+      },
+      "temperature": "disqualified",
+      "routing": "disqualified",
+      "enrolled_flow_id": null,
+      "crm_action": "skip",
+      "crm_status": "skipped",
+      "crm_object_id": null,
+      "rationale": "Obvious test submission (test@test.com, no company/phone) — disqualified, not synced as a real contact, no human flag."
+    }
+  ],
+  "hot_leads_for_human": [
+    {
+      "lead_id": "lead-mariana-rivas-colegio-altamira",
+      "name": "Mariana Rivas",
+      "company": "Colegio Altamira",
+      "score": 88,
+      "reason": "Explicit demo + pricing request from a priority-1 private-school director — call within the hour."
+    }
+  ],
+  "summary": {
+    "total_leads": 4,
+    "by_temperature": {
+      "hot": 1,
+      "warm": 1,
+      "cold": 1,
+      "disqualified": 1
+    },
+    "by_routing": {
+      "human_followup": 1,
+      "nurture": 2,
+      "disqualified": 1
+    },
+    "by_market": {
+      "Mexico": 2,
+      "Colombia": 1
+    },
+    "enrolled_count": 2,
+    "hot_count": 1,
+    "crm_failed_count": 0
+  },
+  "routing_notes": "Batch of 4 inbound leads for the June launch window. One hot lead (explicit demo+pricing request) routed to human follow-up; two leads (1 warm, 1 cold) enrolled into the approved consideration flow flow-welcome-diagnostic-edu; one clear test submission disqualified and skipped from CRM. The cold lead has no WhatsApp opt-in, so its flow will run email-only steps until opt-in is captured. No CRM sync failures. by_market counts the 3 real contacts (the disqualified test lead has no market). Gate is auto_approved: the routine scoring/sync/enrollment ran autonomously; the single hot lead is flagged for the operator, which does not block the automation."
+}
+```
+
+## OUTPUT 2 — Lead Routing Brief
+
+LEAD ROUTING BRIEF — Agent 5.3 (Lead Capture + Nurture) — acme-co — window 2026-06-01 09:00Z (15m)
+
+Processed 4 inbound leads: 2 from Meta lead forms, 2 from the landing page. Markets: Mexico (2 real) + Colombia (1 real); one test submission with no market.
+
+Temperature / routing split:
+- HOT (1) → human follow-up: Mariana Rivas, Colegio Altamira (score 88) — explicit demo + pricing request, priority-1 segment. Not drip-enrolled by design; a human takes it.
+- WARM (1) → nurture: Jorge Méndez, Instituto Bilingüe del Norte (score 58) — ROI-diagnostic download, priority-1 segment → enrolled in flow-welcome-diagnostic-edu (consideration).
+- COLD (1) → nurture: Paula Castaño, Fundación Saber (score 33) — low-intent, secondary segment, email-only → enrolled in flow-welcome-diagnostic-edu (lightest available approved flow); WhatsApp steps held until opt-in.
+- DISQUALIFIED (1): test@test.com — obvious QA/test submission, skipped from CRM.
+
+Segments: the priority-1 private-school-director segment (seg-...-01) dominated (2 of 3 real leads). All 3 real leads synced to HubSpot (create); the test lead was skipped. 2 leads enrolled into automated nurture; 1 flagged for a human.
+
+Hot lead needing human follow-up NOW: Mariana Rivas (Colegio Altamira) — wants a demo and pricing; call within the hour while intent is high.
+
+## OUTPUT 3 — Conditional Gate Summary
+
+=== AGENT 5.3 — CONDITIONAL GATE SUMMARY ===
+Client: Acme Co. BU (acme-co)
+Date: 2026-05-29
+Batch size: 4 inbound leads (window 2026-06-01T09:00Z/PT15M)
+Gate status: AUTO-APPROVED
+
+--- HOT LEADS FOR HUMAN FOLLOW-UP ---
+- Mariana Rivas — Colegio Altamira (score 88): explicit demo + pricing request, priority-1 segment. Call within the hour.
+
+--- AUTOMATED ROUTING ---
+- Warm enrolled: 1 → flow-welcome-diagnostic-edu (Jorge Méndez, Instituto Bilingüe del Norte).
+- Cold enrolled: 1 → flow-welcome-diagnostic-edu, email-only until WhatsApp opt-in (Paula Castaño, Fundación Saber).
+- HubSpot: 3 contacts created + synced, 1 test submission skipped. No sync failures.
+
+--- EXCEPTIONS ---
+- 1 disqualified test submission (test@test.com) — skipped from CRM, no human flag.
+- Cold lead has no WhatsApp opt-in: its flow runs email-only steps for now.
+
+--- RECOMMENDED ACTION ---
+AUTO-PROCESSED — no gate blocks the automation. Operator action: call Mariana Rivas (Colegio Altamira) now while her demo/pricing request is hot. Everything else has been scored, synced, and enrolled autonomously.

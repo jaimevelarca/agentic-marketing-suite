@@ -1,0 +1,19 @@
+{
+  "id": "4.1",
+  "name": "Copy + Prompt Engine",
+  "layer": "L4",
+  "slug": "copy_prompt_engine",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "copy_assets",
+  "schema_name": "copy_assets",
+  "reads": [
+    "content_calendar",
+    "audience_segments",
+    "competitive_map",
+    "client_profile"
+  ],
+  "gate": "risk-tiered",
+  "human_gated": true
+}

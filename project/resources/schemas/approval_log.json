@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/approval_log/v1",
+  "version": "1.0.0",
+  "title": "approval_log",
+  "description": "Memory block written by Agent 3.3 (Approval Workflow). The review-queue routing ledger for a content cycle: one entry per upstream content item, recording how it is routed through the single human reviewer's queue (route, priority, reviewer role, review-by deadline, status) plus alerts and a footing summary. Reads: content_calendar (3.2, primary) with content_plan (3.1) as fallback, optional client_profile constraints. Read by Layer 6 reporting and the Firestore review-queue UI. Human gate: queue manager (autonomous — gate_status is always auto_approved).",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "entries",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "priority": {
+      "type": "string",
+      "enum": [
+        "urgent",
+        "high",
+        "normal",
+        "low"
+      ]
+    },
+    "approval_entry": {
+      "type": "object",
+      "required": [
+        "item_id",
+        "route",
+        "priority",
+        "review_required",
+        "status"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Id of the upstream content item being routed (from content_calendar or content_plan)."
+        },
+        "campaign_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Campaign this item belongs to, if known."
+        },
+        "channel": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Distribution channel of the item (instagram, meta_ads, email, whatsapp, blog, landing_page, ...)."
+        },
+        "format": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Content format (reel, carousel, ad_creative, landing_page, email_single, ...)."
+        },
+        "funnel_stage": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention",
+            null
+          ]
+        },
+        "topic": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Client-facing topic/angle echoed verbatim from the upstream item (ES-MX). Not rewritten by this agent."
+        },
+        "scheduled_for": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Scheduled publish timestamp/date of the item, if the calendar provided one."
+        },
+        "review_required": {
+          "type": "boolean",
+          "description": "Whether a human must clear this item before it ships."
+        },
+        "route": {
+          "type": "string",
+          "enum": [
+            "human_review",
+            "auto_publish",
+            "escalate",
+            "hold"
+          ],
+          "description": "The lane this item is routed into."
+        },
+        "priority": {
+          "$ref": "#/definitions/priority"
+        },
+        "reviewer_role": {
+          "type": "string",
+          "enum": [
+            "operator",
+            "partner",
+            "none"
+          ],
+          "description": "Who clears it: operator (single reviewer, default), partner (approval-chain commercial sign-off), or none (auto_publish)."
+        },
+        "review_by": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Deadline by which the item must be cleared to publish on schedule. Null when no scheduled date is known."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "auto_approved",
+            "blocked",
+            "approved",
+            "returned"
+          ],
+          "description": "Initial lifecycle state set by this agent: queued (human_review/escalate), auto_approved (auto_publish), blocked (hold). Operator advances queued -> approved/returned later."
+        },
+        "overdue": {
+          "type": "boolean",
+          "description": "True when review_by is at or before the run timestamp and the item is still queued/blocked."
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Constraint/risk tags that influenced routing (e.g. pricing_claims, data_privacy, dependency_hold, autonomous_organic)."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "One short sentence (EN) explaining which rule routed this item and why."
+        },
+        "matched_rule": {
+          "type": "string",
+          "description": "Label of the routing rule that matched (e.g. 'RULE 4 — autonomous organic')."
+        }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "required": [
+        "type",
+        "message"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "overdue",
+            "queue_overload",
+            "missing_input",
+            "dependency_hold"
+          ]
+        },
+        "item_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "description": "EN operator-facing alert text."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this approval_log (routing run) was generated. Also the reference 'now' for overdue detection."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "auto_approved",
+      "description": "Gate posture of this agent's OWN output. Always 'auto_approved' — Agent 3.3 is an autonomous queue manager. Per-item gating lives in entries[].route / entries[].status, not here."
+    },
+    "cycle_month": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this ledger covers, YYYY-MM. Null if not derivable from the upstream block."
+    },
+    "source_block": {
+      "type": "string",
+      "enum": [
+        "content_calendar",
+        "content_plan",
+        "none"
+      ],
+      "description": "Which upstream block the entries were routed from. 'none' when nothing was available to route."
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/approval_entry"
+      },
+      "description": "One routing decision per upstream content item. May be empty only when nothing was available to route (source_block = 'none')."
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/alert"
+      },
+      "description": "Overdue / queue-overload / missing-input / dependency-hold alerts surfaced to the operator."
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_items",
+        "auto_published",
+        "human_review",
+        "escalated",
+        "on_hold"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "auto_published": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "human_review": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "escalated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "on_hold": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overdue": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_priority": {
+          "type": "object",
+          "properties": {
+            "urgent": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "normal": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "EN — assumptions, fallback used (calendar vs plan), overload/empty-cycle reasons."
+    }
+  }
+}

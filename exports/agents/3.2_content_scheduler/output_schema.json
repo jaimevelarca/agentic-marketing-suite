@@ -1,0 +1,383 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/content_calendar/v1",
+  "version": "1.0.0",
+  "title": "content_calendar",
+  "description": "Memory block written by Agent 3.2 (Content Scheduler). The dated, timed, platform-assigned publishing calendar derived from an approved content_plan. Each plan item becomes exactly one calendar slot with a concrete publish date/time (local market timezone), a production due date (publish minus channel lead time), and the resolved per-platform cadence rules that were applied. Read by Layer 4 (production due dates), Layer 5 (when/where to publish), and Layer 6 (slot-level attribution). Reads: content_plan, campaign_registry; optional platform_rules, client_profile. Human gate: calendar review.",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "cycle_month",
+    "timezone_primary",
+    "markets",
+    "slots",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "day_of_week": {
+      "type": "string",
+      "enum": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "instagram",
+        "facebook",
+        "tiktok",
+        "linkedin",
+        "youtube",
+        "email",
+        "whatsapp",
+        "blog",
+        "landing_page",
+        "google_ads",
+        "meta_ads",
+        "tiktok_ads"
+      ]
+    },
+    "cadence_rule": {
+      "type": "object",
+      "required": [
+        "platform",
+        "best_window_local",
+        "lead_time_days"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "platform": {
+          "$ref": "#/definitions/channel"
+        },
+        "allowed_days": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/day_of_week"
+          }
+        },
+        "best_window_local": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Preferred local-time window(s) for this platform, e.g. '12:00-14:00, 19:00-21:00'."
+        },
+        "max_per_day": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "Max posts/day for this platform; null for always-on paid flights."
+        },
+        "min_spacing_hours": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Minimum hours between two posts on this platform; null when n/a."
+        },
+        "lead_time_days": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Days before publish that Layer 4 needs the asset ready."
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "default",
+            "platform_rules",
+            "client_profile"
+          ],
+          "description": "Where this resolved rule came from. 'default' = built-in LATAM SMB defaults; 'platform_rules' = client/agency override."
+        }
+      }
+    },
+    "content_ref": {
+      "type": "object",
+      "required": [
+        "topic",
+        "format",
+        "funnel_stage",
+        "messaging_pillar"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "topic": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Editorial angle carried through unchanged from content_plan (client-facing, ES-MX)."
+        },
+        "format": {
+          "type": "string"
+        },
+        "funnel_stage": {
+          "type": "string",
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention"
+          ]
+        },
+        "messaging_pillar": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Approved messaging pillar carried from the plan item."
+        },
+        "target_segment_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Audience segment id carried from the plan item."
+        },
+        "trend_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Trend id/label carried from the plan item; null when evergreen."
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "required": [
+        "slot_id",
+        "campaign_id",
+        "channel",
+        "format",
+        "slot_type",
+        "publish_date",
+        "publish_time_local",
+        "timezone",
+        "production_due_date",
+        "status",
+        "week",
+        "content_ref"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "slot_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable slot id, e.g. slot-<campaign>-w1-1."
+        },
+        "campaign_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "campaign_name": {
+          "type": "string"
+        },
+        "week": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "channel": {
+          "$ref": "#/definitions/channel"
+        },
+        "format": {
+          "type": "string"
+        },
+        "slot_type": {
+          "type": "string",
+          "enum": [
+            "organic_post",
+            "paid_flight",
+            "send",
+            "publish"
+          ],
+          "description": "organic_post = social feed post; paid_flight = always-on ad launch slot; send = email/whatsapp send; publish = blog/landing_page go-live."
+        },
+        "publish_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Concrete publish date (YYYY-MM-DD) inside the item's week range and the campaign window, on an allowed day, not in a blackout."
+        },
+        "publish_time_local": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+          "description": "Local publish time (HH:MM, 24h) in timezone, inside the platform window and outside quiet hours (07:00-21:30)."
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "description": "IANA timezone the publish_time_local is expressed in, e.g. America/Mexico_City."
+        },
+        "production_due_date": {
+          "type": "string",
+          "format": "date",
+          "description": "publish_date minus the channel lead time; the asset deadline for Layer 4."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "blocked",
+            "shifted"
+          ],
+          "default": "scheduled",
+          "description": "scheduled = placed cleanly; shifted = moved off the ideal date to satisfy a constraint (explained in scheduling_notes); blocked = could not be placed."
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "cta": {
+          "type": "string",
+          "description": "Call-to-action carried through unchanged from the plan (client-facing, ES-MX)."
+        },
+        "content_ref": {
+          "$ref": "#/definitions/content_ref"
+        },
+        "notes_for_creator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional guidance carried through from the plan item (EN)."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this content_calendar was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Calendar review gate status. Must be 'approved' before Layer 4 produces or Layer 5 publishes. 'blocked' = upstream content_plan missing/unapproved or an impossible window/blackout conflict."
+    },
+    "blocking_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Populated only when gate_status == 'blocked'."
+    },
+    "cycle_month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this calendar covers, YYYY-MM (carried from content_plan)."
+    },
+    "cycle_weeks": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6,
+      "description": "Number of weeks in the cycle (default 4)."
+    },
+    "timezone_primary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary IANA timezone used for all publish_time_local values, derived from markets[0] / client_profile.locations."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Target markets for this cycle, ordered by priority (carried from content_plan)."
+    },
+    "cadence_rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/cadence_rule"
+      },
+      "description": "The resolved per-platform cadence/timing rules actually applied (defaults overridden by platform_rules where present)."
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/slot"
+      },
+      "description": "Dated, timed, platform-assigned content slots. One per content_plan item. May be empty ONLY when gate_status == 'blocked'."
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_slots"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_slots": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Must equal the source content_plan summary.total_items."
+        },
+        "slots_by_platform": {
+          "type": "object"
+        },
+        "slots_by_week": {
+          "type": "object"
+        },
+        "slots_by_day_of_week": {
+          "type": "object"
+        },
+        "paid_flights": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "first_publish_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "last_publish_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "earliest_production_due_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      }
+    },
+    "scheduling_notes": {
+      "type": "string",
+      "description": "EN - cadence rules applied, dependency ordering, date shifts, unplaceable items, lead-time flags, blocked reasons."
+    }
+  }
+}

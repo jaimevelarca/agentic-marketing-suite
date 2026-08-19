@@ -1,0 +1,17 @@
+{
+  "id": "5.3",
+  "name": "Lead Capture + Nurture",
+  "layer": "L5",
+  "slug": "lead_capture_nurture",
+  "model": "claude-haiku-4-5@20251001",
+  "model_tier": "routing",
+  "max_tokens": 16000,
+  "memory_block": "lead_register",
+  "schema_name": "lead_register",
+  "reads": [
+    "audience_segments",
+    "message_flows"
+  ],
+  "gate": "conditional",
+  "human_gated": true
+}

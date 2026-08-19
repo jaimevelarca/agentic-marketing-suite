@@ -1,0 +1,19 @@
+{
+  "id": "5.1",
+  "name": "Campaign Launcher",
+  "layer": "L5",
+  "slug": "campaign_launcher",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "ad_campaign_log",
+  "schema_name": "ad_campaign_log",
+  "reads": [
+    "campaign_registry",
+    "copy_assets",
+    "page_assets",
+    "active_strategy"
+  ],
+  "gate": "financial-auth",
+  "human_gated": true
+}

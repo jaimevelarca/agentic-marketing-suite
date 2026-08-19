@@ -1,0 +1,14 @@
+**/__pycache__/
+**/*.pyc
+.venv/
+venv/
+.git/
+.DS_Store
+tests/
+docs/
+pm/
+operations/
+content/
+brand/
+agents/
+# keep: suite/, pyproject.toml, README.md, project/resources/schemas, the DEL-17 schema

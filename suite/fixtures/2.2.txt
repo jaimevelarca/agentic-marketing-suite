@@ -1,0 +1,155 @@
+## OUTPUT 1 — campaign_registry JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "gate_status": "pending_review",
+  "blocking_reason": null,
+  "cycle_label": "2026-Q3",
+  "cycle": {
+    "period": "quarterly",
+    "start_date": "2026-07-01",
+    "end_date": "2026-09-30",
+    "blackouts": []
+  },
+  "strategy_ref": {
+    "strategy_id": "strat-acme-co-2026q3",
+    "objective": "Sign 5 paying pilot clients in private education (Mexico) through one full marketing cycle within 90 days of commercial launch.",
+    "total_budget_usd": 600,
+    "channel_priority": ["meta_ads", "google_ads", "organic_social"],
+    "kpi_contracts": [
+      { "metric": "leads", "target": 60, "unit": "leads/quarter" },
+      { "metric": "cpl", "target": 22, "unit": "usd" },
+      { "metric": "reach", "target": 45000, "unit": "impressions/quarter" }
+    ]
+  },
+  "campaigns": [
+    {
+      "campaign_id": "camp-2026q3-01",
+      "name": "Marketing con IA para Escuelas — Conoce la Suite",
+      "theme": "Dar a conocer cómo una preparatoria o universidad privada puede operar marketing de nivel agencia con IA, a precio de PyME.",
+      "objective": "Build top-of-funnel awareness of the Digital Marketing AI Suite among private-education decision-makers in Mexico, seeding the lead-gen campaign.",
+      "funnel_stage": "awareness",
+      "priority": "high",
+      "primary_segment_ids": ["seg-edu-directores-mkt"],
+      "secondary_segment_ids": ["seg-edu-fundadores"],
+      "messaging_pillars": [
+        "Marketing de nivel agencia, operado por agentes de IA, al alcance de tu institución.",
+        "Un solo responsable humano mantiene la calidad — tú ves resultados, no complejidad.",
+        "Cada acción se mide en ROI: más prospectos inscritos, no solo más publicaciones."
+      ],
+      "timing": {
+        "start_date": "2026-07-01",
+        "end_date": "2026-08-10"
+      },
+      "paid": true,
+      "budget_usd": 240,
+      "budget_pct": 40.0,
+      "channel_budget": [
+        { "channel": "meta_ads", "budget_usd": 150 },
+        { "channel": "google_ads", "budget_usd": 60 },
+        { "channel": "organic_social", "budget_usd": 30 }
+      ],
+      "success_metrics": [
+        { "metric": "reach", "target": 30000, "unit": "impressions/quarter" },
+        { "metric": "leads", "target": 18, "unit": "leads/quarter" }
+      ],
+      "notes": "Awareness precedes and feeds the conversion campaign; weighted to Meta for low-cost reach in MX."
+    },
+    {
+      "campaign_id": "camp-2026q3-02",
+      "name": "Agenda tu Diagnóstico Gratuito de Marketing con IA",
+      "theme": "Convertir el interés en reuniones de diagnóstico con instituciones educativas listas para un piloto pagado.",
+      "objective": "Generate qualified pilot leads (booked diagnostic calls) from private-education prospects in Mexico, targeting the 5-client objective.",
+      "funnel_stage": "conversion",
+      "priority": "high",
+      "primary_segment_ids": ["seg-edu-directores-mkt"],
+      "secondary_segment_ids": [],
+      "messaging_pillars": [
+        "Agenda un diagnóstico gratuito y descubre cuántos prospectos estás dejando ir.",
+        "Te mostramos, con tus propios números, el ROI proyectado del primer ciclo.",
+        "Plazas de piloto limitadas para el trimestre — reserva la de tu institución."
+      ],
+      "timing": {
+        "start_date": "2026-08-11",
+        "end_date": "2026-09-30"
+      },
+      "paid": true,
+      "budget_usd": 360,
+      "budget_pct": 60.0,
+      "channel_budget": [
+        { "channel": "meta_ads", "budget_usd": 180 },
+        { "channel": "google_ads", "budget_usd": 150 },
+        { "channel": "organic_social", "budget_usd": 30 }
+      ],
+      "success_metrics": [
+        { "metric": "leads", "target": 42, "unit": "leads/quarter" },
+        { "metric": "cpl", "target": 22, "unit": "usd" },
+        { "metric": "reach", "target": 15000, "unit": "impressions/quarter" }
+      ],
+      "notes": "Carries the bulk of paid spend and the CPL contract; Google Ads weighted up to capture high-intent search ('agencia marketing educativo')."
+    }
+  ],
+  "budget_summary": {
+    "total_budget_usd": 600,
+    "total_allocated_usd": 600,
+    "unallocated_usd": 0,
+    "currency": "USD"
+  },
+  "assumptions": [
+    "Assumed the approved 2026-Q3 strategy allocates $600/quarter of marketing media spend, separate from the $100/mo GCP infra cap (I-02). Confirm with the strategy block once the partner budget session (S1-T3) lands.",
+    "Used placeholder segment ids seg-edu-directores-mkt / seg-edu-fundadores pending the real Agent 1.2 audience_segments block; confirm ids on integration.",
+    "No quarter blackout dates supplied; assumed none. Confirm any institutional exam-period blackouts (May/November fall outside this cycle)."
+  ],
+  "coherence_flags": [
+    "Budget coherence: $600/quarter at a $22 CPL implies ~27 paid leads; the 60-lead quarter KPI assumes ~33 additional leads from organic + diagnostic-call conversion. If the partner budget session sets a lower figure, the lead target must be revisited with the strategy (Agent 2.1)."
+  ]
+}
+```
+
+## OUTPUT 2 — Campaign Brief
+
+**Cycle 2026-Q3 — campaign architecture for the Acme Co. BU pilot.**
+
+The approved strategy commits to one objective: sign 5 paying pilot clients in private education (Mexico) within a 90-day cycle. With a lean $600/quarter allocatable media budget, the plan deliberately runs **two sequenced campaigns rather than many** — fewer, well-funded efforts beat starved fragments, and the single-operator review model rewards a tight plan.
+
+**Sequencing logic (awareness → conversion).** Campaign 1, *"Marketing con IA para Escuelas — Conoce la Suite"*, runs first (Jul 1 – Aug 10) to build recognition of the Suite among private-education decision-makers before we ask for a meeting. It is weighted toward Meta for low-cost reach in MX and carries the reach KPI plus a modest lead floor. Campaign 2, *"Agenda tu Diagnóstico Gratuito de Marketing con IA"*, runs Aug 11 – Sep 30 and carries the bulk of paid spend and the binding CPL contract; Google Ads is weighted up to capture high-intent search. The two do not spend simultaneously, so the small budget is never split thin.
+
+**How it ladders to the objective.** Five signed pilots require a healthy top of funnel; the 60-lead quarter KPI is split 18 (awareness) / 42 (conversion), with the conversion campaign owning CPL. Messaging pillars are grounded in the client USP — agency-grade, ROI-tracked marketing run by AI at SMB prices, kept high-quality by one human — and in the directores-de-marketing segment's pain points. All client-facing lines are ES-MX, formal register, per the brand voice tokens.
+
+**Trade-offs flagged.** At $600/quarter and a $22 CPL, paid spend alone yields roughly 27 leads; the 60-lead target leans on organic reach and diagnostic-call conversion. That gap is recorded as a coherence flag for the reviewer — it is not silently absorbed.
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 2.2 — HUMAN GATE SUMMARY ===
+Client: Acme Co. BU
+Cycle: 2026-Q3
+Date: 2026-05-29
+Gate status: PENDING REVIEW
+
+--- CAMPAIGN PLAN AT A GLANCE ---
+1. Marketing con IA para Escuelas — Conoce la Suite · awareness · high · Jul 1–Aug 10 · $240 · primary KPI: reach (30k)
+2. Agenda tu Diagnóstico Gratuito de Marketing con IA · conversion · high · Aug 11–Sep 30 · $360 · primary KPI: leads (42) @ CPL $22
+
+--- BUDGET RECONCILIATION ---
+Strategy total: $600/quarter · Allocated: $600 · Unallocated: $0
+Pass: budgets foot exactly to the strategy total.
+
+--- KPI COVERAGE ---
+leads → owned by both campaigns (18 + 42 = 60, matches contract).
+cpl ($22) → owned by Campaign 2 (conversion).
+reach (45,000) → owned by both campaigns (30,000 + 15,000 = 45,000, matches contract).
+No uncovered KPIs.
+
+--- ASSUMPTIONS THE REVIEWER MUST CONFIRM ---
+- $600/quarter media budget read (separate from the $100/mo infra cap) — pending partner budget session S1-T3.
+- Placeholder segment ids — confirm against the real Agent 1.2 audience_segments block.
+- No quarter blackout dates assumed — confirm institutional exam-period blackouts.
+
+--- COHERENCE FLAGS ---
+⚠️ $600/quarter at $22 CPL covers ~27 paid leads; the 60-lead target relies on organic + diagnostic-call conversion. If the budget session sets a lower figure, revisit the lead target with Agent 2.1.
+
+--- RECOMMENDED ACTION ---
+↩️ RETURN — confirm the $600/quarter media budget and the real audience segment ids, then re-run; the budget gap on the lead target needs a partner decision before this releases to Layer 3.

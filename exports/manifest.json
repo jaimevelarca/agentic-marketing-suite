@@ -1,0 +1,163 @@
+{
+  "suite": "Digital Marketing AI Suite",
+  "agent_count": 19,
+  "model_tiers": {
+    "primary": "claude-sonnet-4-6",
+    "routing": "claude-haiku-4-5@20251001",
+    "deep": "claude-opus-4-7"
+  },
+  "agents": [
+    {
+      "id": "1.1",
+      "name": "Business Diagnostics",
+      "layer": "L1",
+      "model_tier": "primary",
+      "memory_block": "client_profile",
+      "gate": "review"
+    },
+    {
+      "id": "1.2",
+      "name": "Audience Intelligence",
+      "layer": "L1",
+      "model_tier": "primary",
+      "memory_block": "audience_segments",
+      "gate": "review"
+    },
+    {
+      "id": "1.3",
+      "name": "Competitive Intelligence",
+      "layer": "L1",
+      "model_tier": "primary",
+      "memory_block": "competitive_map",
+      "gate": "review-only"
+    },
+    {
+      "id": "1.4",
+      "name": "Trend Radar",
+      "layer": "L1",
+      "model_tier": "routing",
+      "memory_block": "trend_signals",
+      "gate": "autonomous"
+    },
+    {
+      "id": "2.1",
+      "name": "Strategy Orchestrator",
+      "layer": "L2",
+      "model_tier": "deep",
+      "memory_block": "active_strategy",
+      "gate": "binding"
+    },
+    {
+      "id": "2.2",
+      "name": "Campaign Planner",
+      "layer": "L2",
+      "model_tier": "primary",
+      "memory_block": "campaign_registry",
+      "gate": "review"
+    },
+    {
+      "id": "3.1",
+      "name": "Monthly Marketing Deck",
+      "layer": "L3",
+      "model_tier": "primary",
+      "memory_block": "content_plan",
+      "gate": "review"
+    },
+    {
+      "id": "3.2",
+      "name": "Content Scheduler",
+      "layer": "L3",
+      "model_tier": "primary",
+      "memory_block": "content_calendar",
+      "gate": "review"
+    },
+    {
+      "id": "3.3",
+      "name": "Approval Workflow",
+      "layer": "L3",
+      "model_tier": "routing",
+      "memory_block": "approval_log",
+      "gate": "queue-mgr"
+    },
+    {
+      "id": "4.1",
+      "name": "Copy + Prompt Engine",
+      "layer": "L4",
+      "model_tier": "primary",
+      "memory_block": "copy_assets",
+      "gate": "risk-tiered"
+    },
+    {
+      "id": "4.2",
+      "name": "Visual Creative",
+      "layer": "L4",
+      "model_tier": "primary",
+      "memory_block": "visual_assets",
+      "gate": "batch-review"
+    },
+    {
+      "id": "4.3",
+      "name": "Web + Landing Pages",
+      "layer": "L4",
+      "model_tier": "primary",
+      "memory_block": "page_assets",
+      "gate": "full-review"
+    },
+    {
+      "id": "4.4",
+      "name": "Email / WhatsApp",
+      "layer": "L4",
+      "model_tier": "primary",
+      "memory_block": "message_flows",
+      "gate": "first-deploy"
+    },
+    {
+      "id": "5.1",
+      "name": "Campaign Launcher",
+      "layer": "L5",
+      "model_tier": "primary",
+      "memory_block": "ad_campaign_log",
+      "gate": "financial-auth"
+    },
+    {
+      "id": "5.2",
+      "name": "Social Publisher",
+      "layer": "L5",
+      "model_tier": "routing",
+      "memory_block": "publish_log",
+      "gate": "autonomous"
+    },
+    {
+      "id": "5.3",
+      "name": "Lead Capture + Nurture",
+      "layer": "L5",
+      "model_tier": "routing",
+      "memory_block": "lead_register",
+      "gate": "conditional"
+    },
+    {
+      "id": "6.1",
+      "name": "Performance Analytics",
+      "layer": "L6",
+      "model_tier": "primary",
+      "memory_block": "performance_history",
+      "gate": "auto+alert"
+    },
+    {
+      "id": "6.2",
+      "name": "Client Reporting",
+      "layer": "L6",
+      "model_tier": "primary",
+      "memory_block": "client_health_score",
+      "gate": "pre-client"
+    },
+    {
+      "id": "6.3",
+      "name": "Optimization Engine",
+      "layer": "L6",
+      "model_tier": "primary",
+      "memory_block": "content_learnings",
+      "gate": "bounded-auto"
+    }
+  ]
+}

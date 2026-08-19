@@ -1,0 +1,346 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/visual_assets/v1",
+  "version": "1.0.0",
+  "title": "visual_assets",
+  "description": "Memory block written by Agent 4.2 (Visual Creative, Layer 4 — Production). A batch of generation SPECS (image/video prompts + asset metadata, NOT rendered pixels) for the fal.ai engines Flux 2 Pro / Ideogram 3.0 / Kling 2.5 / Runway Gen-4.5 (ADR-04). Reads: content_calendar (or content_plan), copy_assets, client_profile. Human gate: batch review. Read downstream by Layer 5 (5.2 Social Publisher) to match a rendered file to its scheduled slot.",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "cycle_month",
+    "markets",
+    "assets",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "carousel_slide": {
+      "type": "object",
+      "required": [
+        "slide",
+        "engine",
+        "prompt"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "slide": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based slide index."
+        },
+        "engine": {
+          "type": "string",
+          "enum": [
+            "flux-2-pro",
+            "ideogram-3.0",
+            "kling-2.5",
+            "runway-gen-4.5"
+          ]
+        },
+        "role": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "cover | content | cta | etc."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 10,
+          "description": "English generation prompt for this slide."
+        },
+        "in_image_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Exact ES-MX text rendered in this slide, verbatim from approved copy; null if image-only."
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": [
+        "asset_id",
+        "asset_type",
+        "engine",
+        "format",
+        "channel",
+        "aspect_ratio",
+        "prompt",
+        "status"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique id within this batch, e.g. 'va-001'."
+        },
+        "content_item_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Id (or topic key) of the content_calendar item this asset realizes."
+        },
+        "asset_type": {
+          "type": "string",
+          "enum": [
+            "image",
+            "carousel",
+            "video"
+          ]
+        },
+        "engine": {
+          "type": "string",
+          "enum": [
+            "flux-2-pro",
+            "ideogram-3.0",
+            "kling-2.5",
+            "runway-gen-4.5"
+          ],
+          "description": "fal.ai generation engine (ADR-04). For carousels this is the dominant/cover engine; per-slide engines live in slides[]."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "reel",
+            "story",
+            "short_video",
+            "long_video",
+            "carousel",
+            "static_post",
+            "ad_creative",
+            "infographic",
+            "hero_image",
+            "og_image",
+            "thumbnail"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "instagram",
+            "facebook",
+            "tiktok",
+            "linkedin",
+            "youtube",
+            "email",
+            "whatsapp",
+            "blog",
+            "landing_page",
+            "google_ads",
+            "meta_ads",
+            "tiktok_ads"
+          ]
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "enum": [
+            "9:16",
+            "1:1",
+            "4:5",
+            "16:9",
+            "1.91:1"
+          ]
+        },
+        "funnel_stage": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention",
+            null
+          ]
+        },
+        "messaging_pillar": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_segment_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 10,
+          "description": "English generation prompt tuned to the engine. For carousels, a one-line cover/overall directive; per-slide prompts live in slides[]."
+        },
+        "negative_prompt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "English negatives to suppress failure modes + brand-safety negatives."
+        },
+        "in_image_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Exact ES-MX text to render inside the asset, verbatim from approved copy; null if no baked text."
+        },
+        "slides": {
+          "type": "array",
+          "description": "Per-slide specs; required (non-empty) when asset_type == 'carousel'.",
+          "items": {
+            "$ref": "#/definitions/carousel_slide"
+          }
+        },
+        "duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Clip length for video assets; null for stills/carousels."
+        },
+        "source_still_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reference to an approved still this video animates (image-to-video); null otherwise."
+        },
+        "alt_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Accessibility alt text in ES-MX."
+        },
+        "safe_zone_notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Where platform UI overlaps the creative (caption bar, story stickers)."
+        },
+        "brand_color_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "description": "Brand hex colors pinned for this asset (from client_profile.visual_identity)."
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "EN — one sentence tying the asset to its item/objective/segment."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "planned",
+            "needs_revision"
+          ],
+          "description": "'planned' = ready to render; 'needs_revision' = blocked on a constraint conflict (see revision_reason)."
+        },
+        "revision_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Why the asset cannot be produced cleanly; null unless status == 'needs_revision'."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this visual_assets batch was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Batch-review gate status. Must be 'approved' (by a human) before Layer 5 publishes the rendered assets. Agent 4.2 emits only 'pending_review' or 'blocked'."
+    },
+    "cycle_month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this batch serves, YYYY-MM."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Target markets for this cycle, ordered by priority."
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/asset"
+      },
+      "description": "Generation specs for this batch. May be empty only when gate_status is 'blocked'."
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_assets"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_assets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_engine": {
+          "type": "object"
+        },
+        "by_asset_type": {
+          "type": "object"
+        },
+        "by_channel": {
+          "type": "object"
+        },
+        "video_asset_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of video assets — the costliest fal.ai line; surfaced for the reviewer."
+        },
+        "needs_revision_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "production_notes": {
+      "type": "string",
+      "description": "EN — engine-mix rationale, skipped items, constraint flags, blocked reasons, fal.ai cost note."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "4.4",
+  "name": "Email / WhatsApp",
+  "layer": "L4",
+  "slug": "email_whatsapp",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "message_flows",
+  "schema_name": "message_flows",
+  "reads": [
+    "audience_segments",
+    "content_calendar"
+  ],
+  "gate": "first-deploy",
+  "human_gated": true
+}

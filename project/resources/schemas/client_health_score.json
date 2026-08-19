@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/client_health_score/v1",
+  "version": "1.0.0",
+  "title": "client_health_score",
+  "description": "Memory block written by Agent 6.2 (Client Reporting). The internal, machine-readable companion to the monthly client-facing narrative ROI report: a composite client_health_score (0-100) plus its component sub-scores, the period's headline ROI/KPI results reconciled against the active kpi_contracts, retention/churn signals, and the account-management recommendation. The client-facing report itself (ES-MX, per the brand formatting guide) is OUTPUT 2; this block is the internal account-management record (no COGS / margins / performance-bonus figures ever appear here or in the report). Read by internal account management for renewal / upsell / churn-risk triage. Human gate: required before the report is delivered to the client (pre-client tier) -> defaults to pending_review. | Reads upstream: performance_history (6.1), active_strategy (2.1), client_profile (1.1). | First authored: 2026-05-29.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "reporting_period",
+    "health_score",
+    "roi_summary",
+    "kpi_scorecard",
+    "recommendation"
+  ],
+  "definitions": {
+    "kpi_line": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "kpi",
+        "target",
+        "actual",
+        "status"
+      ],
+      "properties": {
+        "kpi": {
+          "type": "string",
+          "minLength": 1,
+          "description": "KPI name as it appears in the kpi_contracts (e.g. 'leads_per_month', 'cpl_usd', 'roas', 'conversion_rate_pct', 'reach_per_month')."
+        },
+        "unit": {
+          "type": ["string", "null"],
+          "description": "Unit of the KPI: 'count', 'usd', 'ratio', 'pct'. Null if dimensionless."
+        },
+        "target": {
+          "type": ["number", "null"],
+          "description": "Contracted target for the period from kpi_contracts. Null if no target was set (learning mode)."
+        },
+        "actual": {
+          "type": ["number", "null"],
+          "description": "Measured actual for the period from performance_history. Null if not yet measurable."
+        },
+        "attainment_pct": {
+          "type": ["number", "null"],
+          "description": "actual vs target as a percentage (100 = on target). For inverse KPIs like cpl_usd, lower-is-better is reflected in 'status', not the raw ratio."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["on_track", "ahead", "behind", "at_risk", "no_target", "no_data"],
+          "description": "Reconciliation verdict for this KPI against its contract."
+        },
+        "lower_is_better": {
+          "type": "boolean",
+          "description": "True for cost KPIs (e.g. cpl_usd, cpa_usd) where actual below target is good."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated. Example: acme-co"
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0",
+      "description": "Schema version. Increment on breaking changes."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this report/health-score record was generated."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": ["pending_review", "approved", "returned", "blocked", "auto_approved"],
+      "default": "pending_review",
+      "description": "Human gate status. pre-client tier: the report must be 'approved' by the operator before it is delivered to the client. Defaults to pending_review."
+    },
+    "report_language": {
+      "type": "string",
+      "description": "Language of the client-facing narrative report (OUTPUT 2). Default 'es-MX' for LATAM clients.",
+      "default": "es-MX"
+    },
+    "reporting_period": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["label", "start_date", "end_date"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human label for the period, ES-MX where client-facing (e.g. 'Abril 2026')."
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "First day of the reporting period (YYYY-MM-DD)."
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Last day of the reporting period (YYYY-MM-DD)."
+        },
+        "market": {
+          "type": ["string", "null"],
+          "description": "Primary market this report covers (Mexico | Colombia | Dominican Republic | Puerto Rico), or null for all-markets."
+        }
+      }
+    },
+    "health_score": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["composite", "band", "components"],
+      "properties": {
+        "composite": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall client-health score 0-100. Internal account-management signal; NOT shown verbatim to the client."
+        },
+        "band": {
+          "type": "string",
+          "enum": ["healthy", "watch", "at_risk", "critical"],
+          "description": "Banded interpretation of the composite score."
+        },
+        "trend": {
+          "type": ["string", "null"],
+          "enum": ["improving", "stable", "declining", null],
+          "description": "Direction vs the prior period's composite. Null if no prior period."
+        },
+        "previous_composite": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Prior period composite for trend context. Null on first report."
+        },
+        "components": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["kpi_attainment", "engagement", "retention_signal"],
+          "description": "Weighted sub-scores (each 0-100) that roll into the composite.",
+          "properties": {
+            "kpi_attainment": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "How well KPI contracts were met this period."
+            },
+            "engagement": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Content/channel engagement vs plan (reach, CTR, opens, replies)."
+            },
+            "retention_signal": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Composite of renewal proximity, sentiment, and usage/responsiveness signals."
+            }
+          }
+        }
+      }
+    },
+    "roi_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["narrative", "marketing_spend_usd", "attributed_revenue_usd"],
+      "description": "Headline ROI for the period. All figures are CLIENT marketing economics (their ad spend, their attributed revenue) -- never Acme Co. COGS, margins, cost-to-serve, or performance-bonus figures.",
+      "properties": {
+        "narrative": {
+          "type": "string",
+          "minLength": 10,
+          "description": "One- to two-sentence ES-MX plain-language ROI statement for the client (e.g. 'Por cada peso invertido en pauta generamos X en ingresos atribuidos')."
+        },
+        "marketing_spend_usd": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Client's total marketing/ad spend in the period (USD). Null if no paid media ran."
+        },
+        "attributed_revenue_usd": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Revenue attributed to marketing in the period (USD). Null in pre-launch / no-conversion-data mode."
+        },
+        "roas": {
+          "type": ["number", "null"],
+          "description": "Return on ad spend (attributed_revenue_usd / marketing_spend_usd). Null if spend is 0 or revenue not attributable."
+        },
+        "leads": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Leads captured in the period."
+        },
+        "cpl_usd": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Cost per lead in the period (USD)."
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["measured", "partial", "estimated", "learning_mode"],
+          "description": "Honesty flag on the ROI figures. 'learning_mode' = pre-launch / insufficient data; the report must say so plainly instead of inventing numbers."
+        }
+      }
+    },
+    "kpi_scorecard": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/kpi_line"},
+      "description": "Per-KPI reconciliation of active_strategy/kpi_contracts targets against performance_history actuals for the period. May be empty in learning mode (no contracted KPIs yet)."
+    },
+    "highlights": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "2-4 ES-MX client-facing wins for the period (what worked)."
+    },
+    "lowlights": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "1-3 ES-MX client-facing honest under-performances (what missed and why)."
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["action", "owner"],
+        "properties": {
+          "action": {"type": "string", "minLength": 1, "description": "ES-MX client-facing recommended action for next period."},
+          "owner": {"type": "string", "enum": ["suite", "client", "operator"], "description": "Who executes it."},
+          "expected_impact": {"type": ["string", "null"], "description": "Plain-language expected ROI impact."}
+        }
+      },
+      "description": "Forward-looking recommendations tying each action to the next cycle's objective (ROI focus)."
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "renewal_date": {"type": ["string", "null"], "format": "date", "description": "Contract renewal date (YYYY-MM-DD), or null if unknown."},
+        "churn_risk": {"type": "string", "enum": ["low", "medium", "high"], "description": "Internal churn-risk read for account management."},
+        "upsell_opportunity": {"type": ["string", "null"], "description": "Internal note on tier-upgrade / scope-expansion opportunity. NOT client-facing."}
+      },
+      "description": "Internal account-management signals. Never surfaced in the client report."
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["action", "rationale"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["approve_and_send", "revise", "hold", "escalate"],
+          "description": "Recommended operator action at the pre-client gate. 'approve_and_send' only when figures are reconciled and confidentiality-clean."
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 5,
+          "description": "EN one-line justification for the operator."
+        }
+      },
+      "description": "The pre-client-delivery gate recommendation. gate_status must be consistent with this (approve_and_send pairs with an operator-approved send; default pending_review)."
+    }
+  }
+}

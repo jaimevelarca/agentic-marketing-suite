@@ -1,0 +1,1150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/client_profile/v1",
+  "version": "0.3.1",
+  "title": "client_profile",
+  "description": "DEL-17 | Canonical memory schema for Agent 1.1 output. Every field that Agent 1.1 writes to memory must validate against this schema before being committed. | Depends on: DEL-09 (confidence_metadata pattern) | Last updated: 2026-03-30",
+  "type": "object",
+  "definitions": {
+    "confidence_metadata": {
+      "description": "DEL-09 Data Confidence Tagger — required on every leaf field written to memory.",
+      "type": "object",
+      "required": [
+        "data_source",
+        "confidence_score",
+        "tier",
+        "verification_status",
+        "first_set_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "data_source": {
+          "type": "string",
+          "enum": [
+            "client",
+            "enriched",
+            "estimated",
+            "benchmark"
+          ],
+          "description": "Origin of the value. 'client' = provided directly. 'enriched' = AI-augmented from public data. 'estimated' = AI-inferred. 'benchmark' = industry table default."
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "0.0–1.0. See DEL-09 mapping: client-verified ≥0.90 | enriched 0.60–0.89 | estimated 0.40–0.59 | benchmark 0.20–0.39 | rough estimate 0.10–0.19"
+        },
+        "tier": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "description": "Substitution tier at time of writing."
+        },
+        "source_detail": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Human-readable note on how this value was derived. Required when tier is C or D; may be null for clean Tier-A client-provided values."
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "enriched",
+            "ai-proposed",
+            "estimated"
+          ],
+          "description": "Current verification state."
+        },
+        "first_set_date": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date this field was first written. YYYY-MM-DD."
+        },
+        "last_verified_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "ISO 8601 date of last human confirmation. Null until confirmed."
+        },
+        "will_be_replaced_by": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional. Describes the real-data source that will upgrade this field (e.g. 'Layer 6 actual traffic data after 30 days'). Null for verified Tier-A fields with no pending upgrade."
+        }
+      }
+    },
+    "tagged_string": {
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "tagged_string_nullable": {
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "tagged_number": {
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "tagged_string_array": {
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "budget_value": {
+      "description": "Budget can be a single number (exact) or a range object. Never null.",
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "object",
+          "required": [
+            "min",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      ]
+    },
+    "constraint_category": {
+      "description": "One constraint checklist category (DEL-04). 'none' is a valid and explicit answer.",
+      "type": "object",
+      "required": [
+        "response",
+        "metadata"
+      ],
+      "properties": {
+        "response": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Free text or 'none'. Never empty."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "product_line": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "description",
+        "primary_focus"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "usp": {
+          "type": "string"
+        },
+        "target_segment_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "goals": {
+          "type": "string"
+        },
+        "primary_focus": {
+          "type": "boolean",
+          "description": "True for the product line that is the current marketing cycle's focus. Exactly one product_line should be true."
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "lifecycle_stage",
+    "name",
+    "industry",
+    "size",
+    "website_url",
+    "offers",
+    "usp",
+    "goals",
+    "budget",
+    "brand_voice_tokens",
+    "constraints"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Unique identifier for this client. Format: lowercase-hyphenated. Example: acme-co",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version. Increment on breaking changes.",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this client_profile was first created."
+    },
+    "last_updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime of last write to any field."
+    },
+    "approved_by": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Name or ID of human reviewer who approved this profile at last human gate. Null until first gate passes."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked"
+      ],
+      "default": "pending_review",
+      "description": "Current human gate status. Must be 'approved' before Layer 2 can read this profile."
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "enum": [
+        "pre-launch",
+        "early",
+        "growth",
+        "established"
+      ],
+      "description": "Client lifecycle stage. Affects substitution rules and benchmark thresholds. pre-launch = product not yet in market | early = 0–6 months | growth = 6–24 months | established = 24+ months."
+    },
+    "name": {
+      "description": "Company legal and/or trade name.",
+      "type": "object",
+      "required": [
+        "legal",
+        "metadata"
+      ],
+      "properties": {
+        "legal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trade": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "industry": {
+      "description": "Primary industry vertical. Used to select benchmark tables in DEL-07.",
+      "type": "object",
+      "required": [
+        "primary",
+        "metadata"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "enum": [
+            "private_education",
+            "ecommerce",
+            "financial_services",
+            "health",
+            "real_estate",
+            "hospitality",
+            "technology_consulting",
+            "other"
+          ],
+          "description": "Must match a vertical defined in DEL-07 Industry Benchmark Engine."
+        },
+        "secondary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "naics_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "size": {
+      "description": "Company headcount range.",
+      "type": "object",
+      "required": [
+        "range",
+        "metadata"
+      ],
+      "properties": {
+        "range": {
+          "type": "string",
+          "enum": [
+            "1-10",
+            "11-50",
+            "51-200",
+            "201-500",
+            "500+"
+          ]
+        },
+        "exact": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "revenue_range": {
+      "description": "Annual revenue range in USD. Optional — many SMBs won't share.",
+      "type": "object",
+      "required": [
+        "value",
+        "metadata"
+      ],
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "min_usd",
+                "max_usd"
+              ],
+              "properties": {
+                "min_usd": {
+                  "type": "number"
+                },
+                "max_usd": {
+                  "type": "number"
+                }
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "website_url": {
+      "description": "Primary website URL. At least one URL is required.",
+      "type": "object",
+      "required": [
+        "primary",
+        "metadata"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "format": "uri"
+        },
+        "additional": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "social_profiles": {
+      "description": "Social media presence by platform.",
+      "type": "object",
+      "properties": {
+        "instagram": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        },
+        "facebook": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        },
+        "linkedin": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        },
+        "tiktok": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        },
+        "youtube": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        },
+        "twitter_x": {
+          "$ref": "#/definitions/tagged_string_nullable"
+        }
+      }
+    },
+    "locations": {
+      "description": "Geographic presence — offices, operations, service areas.",
+      "type": "object",
+      "required": [
+        "countries",
+        "metadata"
+      ],
+      "properties": {
+        "countries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "cities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "target_markets": {
+      "description": "Markets where the client wants to grow, ordered by priority.",
+      "type": "object",
+      "required": [
+        "ranked",
+        "metadata"
+      ],
+      "properties": {
+        "ranked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Index 0 = highest priority market."
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "offers": {
+      "description": "What the client sells — services, products, programs.",
+      "type": "object",
+      "required": [
+        "description",
+        "metadata"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "description": "2–3 sentence marketing-ready description of the primary offer."
+        },
+        "product_lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/product_line"
+          },
+          "description": "Optional. Use when client has multiple distinct product lines requiring separate treatment."
+        },
+        "price_range": {
+          "type": "object",
+          "properties": {
+            "low_usd": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "high_usd": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "model": {
+              "type": "string",
+              "enum": [
+                "hourly",
+                "monthly_retainer",
+                "project",
+                "subscription",
+                "transactional",
+                "mixed"
+              ]
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "usp": {
+      "description": "Unique Selling Proposition — one sentence, marketing-ready.",
+      "type": "object",
+      "required": [
+        "statement",
+        "metadata"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 300
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "sales_cycle": {
+      "description": "Typical time from first contact to closed sale.",
+      "type": "object",
+      "required": [
+        "weeks_min",
+        "weeks_max",
+        "metadata"
+      ],
+      "properties": {
+        "weeks_min": {
+          "type": "number",
+          "minimum": 0
+        },
+        "weeks_max": {
+          "type": "number",
+          "minimum": 0
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "goals": {
+      "description": "Business objectives for the current marketing cycle. This block has NO Tier D substitution — system blocks without at least Tier C data.",
+      "type": "object",
+      "required": [
+        "primary_objective",
+        "success_metric",
+        "metadata"
+      ],
+      "properties": {
+        "primary_objective": {
+          "type": "string",
+          "minLength": 20,
+          "description": "SMART 90-day objective. Must be non-empty. The ONLY field in the entire schema that blocks the system if absent."
+        },
+        "success_metric": {
+          "type": "string",
+          "minLength": 5,
+          "description": "Primary KPI — what number confirms success?"
+        },
+        "kpi_targets": {
+          "type": "object",
+          "properties": {
+            "leads_per_month": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "cpl_usd": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "conversion_rate_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "roas_target": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "reach_per_month": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "budget": {
+      "description": "Marketing investment. Required — can be a range if exact not known. Never null.",
+      "type": "object",
+      "required": [
+        "monthly",
+        "metadata"
+      ],
+      "properties": {
+        "monthly": {
+          "description": "Monthly marketing budget in USD. Can be a number or a range. Never null.",
+          "$ref": "#/definitions/budget_value"
+        },
+        "annual": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/budget_value"
+            }
+          ]
+        },
+        "channel_breakdown": {
+          "type": "object",
+          "description": "Optional. Budget allocation by channel in USD/month.",
+          "properties": {
+            "meta_ads": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "google_ads": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "content_production": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "email": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "other": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "visual_identity": {
+      "description": "Brand visual standards.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "guidelines_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri",
+          "description": "URL or file path to brand guidelines document."
+        },
+        "logo_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "URL or file path to primary logo file."
+        },
+        "primary_colors_hex": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "description": "Top 2–5 brand colors as hex codes."
+        },
+        "fonts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Font family names."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "brand_voice_tokens": {
+      "description": "3–7 adjective tokens defining brand communication style. Required. Examples: ['professional', 'direct', 'data-driven']",
+      "type": "object",
+      "required": [
+        "tokens",
+        "metadata"
+      ],
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 3,
+          "maxItems": 7
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Languages used in brand communications. Example: ['es', 'en']"
+        },
+        "tone_selected": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "formal",
+            "conversational",
+            "bold",
+            null
+          ],
+          "description": "If derived from DEL-03 tone selection exercise, record selected tone here."
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. 3–10 example copy snippets that exemplify the brand voice."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "constraints": {
+      "description": "Hard limits on marketing content and operations. All 10 categories must have a response — 'none' is valid and explicit. Never omit a category.",
+      "type": "object",
+      "required": [
+        "competitor_mentions",
+        "pricing_claims",
+        "legal_regulatory",
+        "political_religious",
+        "brand_safety_topics",
+        "blackout_dates",
+        "approval_chain",
+        "geographic_restrictions",
+        "tone_boundaries",
+        "data_privacy"
+      ],
+      "properties": {
+        "competitor_mentions": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "pricing_claims": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "legal_regulatory": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "political_religious": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "brand_safety_topics": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "blackout_dates": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "approval_chain": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "geographic_restrictions": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "tone_boundaries": {
+          "$ref": "#/definitions/constraint_category"
+        },
+        "data_privacy": {
+          "$ref": "#/definitions/constraint_category"
+        }
+      }
+    },
+    "funnel": {
+      "description": "Conversion data by funnel stage. Frequently Tier D for pre-launch clients — benchmark values used and flagged.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "monthly_visitors": {
+          "$ref": "#/definitions/tagged_number"
+        },
+        "visitor_to_lead_cvr": {
+          "type": "object",
+          "required": [
+            "value",
+            "metadata"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "metadata": {
+              "$ref": "#/definitions/confidence_metadata"
+            }
+          }
+        },
+        "lead_to_customer_cvr": {
+          "type": "object",
+          "required": [
+            "value",
+            "metadata"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "metadata": {
+              "$ref": "#/definitions/confidence_metadata"
+            }
+          }
+        },
+        "monthly_leads": {
+          "$ref": "#/definitions/tagged_number"
+        },
+        "monthly_customers": {
+          "$ref": "#/definitions/tagged_number"
+        },
+        "avg_ticket_usd": {
+          "$ref": "#/definitions/tagged_number"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "analytics": {
+      "description": "Web analytics tracking status.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "ga4_installed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ga4_access_granted": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "semrush_available": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "email_platform": {
+      "description": "Email marketing platform and status.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "platform": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "mailchimp",
+            "hubspot",
+            "sendgrid",
+            "activecampaign",
+            "brevo",
+            "klaviyo",
+            "other",
+            null
+          ]
+        },
+        "list_size": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "campaign_history": {
+      "description": "Past campaign performance summary. Tier D for pre-launch — system enters learning mode.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "has_history": {
+          "type": "boolean"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "meta",
+              "google",
+              "tiktok",
+              "email",
+              "other"
+            ]
+          }
+        },
+        "avg_monthly_spend_usd": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_cpl_usd": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "avg_roas": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "seasonality": {
+      "description": "Business calendar peaks, deadlines, and blackout periods.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "peak_months": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        "key_dates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "date",
+              "label"
+            ],
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "deadline",
+                  "event",
+                  "blackout",
+                  "peak_start",
+                  "peak_end"
+                ]
+              }
+            }
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "crm_data": {
+      "description": "CRM or customer list status.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "has_crm": {
+          "type": "boolean"
+        },
+        "platform": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "record_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "export_provided": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "content_library": {
+      "description": "Existing content assets.",
+      "type": "object",
+      "required": [
+        "metadata"
+      ],
+      "properties": {
+        "has_content": {
+          "type": "boolean"
+        },
+        "post_count": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "best_performing_provided": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    }
+  }
+}

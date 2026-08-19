@@ -1,0 +1,457 @@
+## OUTPUT 1 — competitive_map JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "last_updated_at": "2026-05-29T00:00:00Z",
+  "approved_by": null,
+  "gate_status": "pending_review",
+  "analysis_scope": {
+    "markets": [
+      "Mexico",
+      "Colombia",
+      "Dominican Republic",
+      "Puerto Rico"
+    ],
+    "industry": "marketing_technology_for_smb",
+    "metadata": {
+      "data_source": "enriched",
+      "confidence_score": 0.78,
+      "tier": "B",
+      "verification_status": "enriched",
+      "first_set_date": "2026-05-29",
+      "last_verified_date": null,
+      "source_detail": "Scope derived from client_profile.industry (technology_consulting / private_education GTM) and ranked target_markets MX>CO>DR>PR."
+    }
+  },
+  "competitors": [
+    {
+      "competitor_id": "comp-traditional-agency",
+      "name": "Local full-service digital agency (segment archetype)",
+      "website_url": null,
+      "social_profiles": {
+        "instagram": null,
+        "facebook": null,
+        "linkedin": null,
+        "tiktok": null,
+        "youtube": null
+      },
+      "competitor_type": "direct",
+      "markets": [
+        "Mexico",
+        "Colombia"
+      ],
+      "positioning": "Human-led, retainer-based digital marketing agency selling senior strategists and bespoke service to SMBs.",
+      "estimated_price_tier": "premium",
+      "content_angles_used": [
+        "case studies with named clients",
+        "thought-leadership from named strategists",
+        "award and certification badges"
+      ],
+      "primary_channels": [
+        "LinkedIn",
+        "referral",
+        "Instagram"
+      ],
+      "strengths": [
+        "trust from human relationships",
+        "deep local market knowledge",
+        "can handle bespoke creative"
+      ],
+      "weaknesses": [
+        "high cost-to-serve limits price floor",
+        "slow turnaround",
+        "no transparent ROI instrumentation"
+      ],
+      "threat_level": "high",
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.52,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Archetype of the dominant alternative for private-education SMBs in MX/CO; client did not name a specific agency. FLAG for reviewer to replace with named local agencies once known."
+      }
+    },
+    {
+      "competitor_id": "comp-hubspot",
+      "name": "HubSpot Marketing Hub",
+      "website_url": "https://www.hubspot.com/products/marketing",
+      "social_profiles": {
+        "instagram": null,
+        "facebook": "https://www.facebook.com/hubspot",
+        "linkedin": "https://www.linkedin.com/company/hubspot",
+        "tiktok": null,
+        "youtube": "https://www.youtube.com/user/HubSpot"
+      },
+      "competitor_type": "indirect",
+      "markets": [
+        "Mexico",
+        "Colombia",
+        "Dominican Republic",
+        "Puerto Rico"
+      ],
+      "positioning": "All-in-one self-serve marketing/CRM platform; the SMB buys software and runs marketing themselves.",
+      "estimated_price_tier": "mid",
+      "content_angles_used": [
+        "inbound-marketing education",
+        "free tools and academy certifications",
+        "template libraries"
+      ],
+      "primary_channels": [
+        "SEO/content",
+        "YouTube",
+        "LinkedIn",
+        "email"
+      ],
+      "strengths": [
+        "category-defining brand",
+        "huge free education funnel",
+        "deep integrations"
+      ],
+      "weaknesses": [
+        "tool, not done-for-you outcome — SMB still needs an operator",
+        "English-first; LATAM SMB onboarding gap"
+      ],
+      "threat_level": "medium",
+      "metadata": {
+        "data_source": "enriched",
+        "confidence_score": 0.74,
+        "tier": "B",
+        "verification_status": "enriched",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Public site/social scrape; an indirect substitute (software the client does FOR the SMB)."
+      }
+    },
+    {
+      "competitor_id": "comp-fiverr-freelancers",
+      "name": "Freelance / marketplace marketers (Fiverr, Workana)",
+      "website_url": "https://www.workana.com",
+      "social_profiles": {
+        "instagram": null,
+        "facebook": null,
+        "linkedin": null,
+        "tiktok": null,
+        "youtube": null
+      },
+      "competitor_type": "substitute",
+      "markets": [
+        "Mexico",
+        "Colombia",
+        "Dominican Republic",
+        "Puerto Rico"
+      ],
+      "positioning": "Cheap, piecemeal marketing labor bought task-by-task on a marketplace.",
+      "estimated_price_tier": "budget",
+      "content_angles_used": [
+        "price-led offers",
+        "fast-delivery promises"
+      ],
+      "primary_channels": [
+        "marketplace SEO",
+        "Instagram"
+      ],
+      "strengths": [
+        "lowest nominal price",
+        "no commitment"
+      ],
+      "weaknesses": [
+        "no strategy or continuity",
+        "inconsistent quality",
+        "zero ROI tracking"
+      ],
+      "threat_level": "medium",
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.5,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "The 'cheap substitute' alternative SMBs weigh against a managed suite; inferred, not client-named."
+      }
+    },
+    {
+      "competitor_id": "comp-inhouse-hire",
+      "name": "In-house marketing hire / do-it-yourself",
+      "website_url": null,
+      "social_profiles": {
+        "instagram": null,
+        "facebook": null,
+        "linkedin": null,
+        "tiktok": null,
+        "youtube": null
+      },
+      "competitor_type": "substitute",
+      "markets": [
+        "Mexico",
+        "Colombia",
+        "Dominican Republic",
+        "Puerto Rico"
+      ],
+      "positioning": "SMB hires one generalist marketer or has the owner run marketing internally.",
+      "estimated_price_tier": "mid",
+      "content_angles_used": [],
+      "primary_channels": [],
+      "strengths": [
+        "full control and context",
+        "no vendor dependency"
+      ],
+      "weaknesses": [
+        "single generalist can't cover the full lifecycle",
+        "no automation leverage",
+        "expensive once loaded cost is counted"
+      ],
+      "threat_level": "high",
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.55,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "The most common real alternative for an 11-50 person SMB; status-quo substitute."
+      }
+    }
+  ],
+  "positioning_landscape": {
+    "axes": {
+      "x_axis": "price / cost-to-serve (budget -> premium)",
+      "y_axis": "delivery model (DIY software <-> done-for-you with human oversight)"
+    },
+    "client_position": "Acme Co. sits in the white space: done-for-you outcomes (like a premium agency) at near-software prices, made possible by AI agents with one human reviewer per 6-10 clients. Agencies own premium+done-for-you; HubSpot owns mid+DIY; freelancers/in-house own budget+fragmented.",
+    "white_space": [
+      "agency-grade outcomes at SMB subscription prices",
+      "transparent, ROI-instrumented reporting that agencies don't offer and software can't deliver alone",
+      "Spanish-first LATAM SMB onboarding"
+    ],
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.5,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-29",
+      "last_verified_date": null,
+      "source_detail": "Synthesis across the competitor set and client_profile.usp; pending partner sign-off on the USP (S1-T8)."
+    }
+  },
+  "content_gaps": [
+    {
+      "gap": "Competitors talk about activity (posts, ads, deliverables); none lead with measured ROI per peso for SMBs.",
+      "opportunity": "Own the 'ROI por peso, medible cada mes' angle — publish a recurring transparent results format that agencies won't show and software can't auto-produce.",
+      "priority": "high",
+      "channels": [
+        "LinkedIn",
+        "Instagram",
+        "email"
+      ],
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.53,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "No competitor in the scraped set leads with per-client ROI reporting."
+      }
+    },
+    {
+      "gap": "Private-education marketing content in MX is generic and not segmented by the admissions funnel stage.",
+      "opportunity": "Produce stage-specific content for private-education clients (awareness -> open-house -> enrollment deadline) that the client can resell as a vertical playbook.",
+      "priority": "high",
+      "channels": [
+        "Instagram",
+        "WhatsApp",
+        "landing pages"
+      ],
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.48,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Anchor vertical is private education (MX first); gap inferred from generic competitor content."
+      }
+    },
+    {
+      "gap": "Software players (HubSpot) educate but leave the SMB to execute; agencies execute but don't teach.",
+      "opportunity": "Bridge with 'AI does the work, you keep the visibility' content showing the human-reviewed workflow — neither pure-tool nor black-box agency.",
+      "priority": "medium",
+      "channels": [
+        "LinkedIn",
+        "YouTube"
+      ],
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.46,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Positioning bridge between the two indirect competitor classes."
+      }
+    }
+  ],
+  "swot": {
+    "strengths": [
+      "single-operator economics enable agency-grade output at SMB prices",
+      "ROI instrumentation built in from day 1",
+      "Spanish-first, four-market LATAM focus"
+    ],
+    "weaknesses": [
+      "pre-launch: no case studies or named-client proof yet",
+      "single-vendor GCP dependency",
+      "brand unknown vs. HubSpot / established agencies"
+    ],
+    "opportunities": [
+      "LATAM SMBs priced out of agencies and overwhelmed by DIY software",
+      "private-education vertical underserved by segmented marketing",
+      "AI-marketing category still being defined in the region"
+    ],
+    "threats": [
+      "incumbents (HubSpot, agencies) adding AI features",
+      "low switching cost from cheap freelancer substitutes",
+      "trust barrier for AI-run marketing among conservative SMB owners"
+    ],
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.5,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-29",
+      "last_verified_date": null,
+      "source_detail": "Relative SWOT synthesized from client_profile + competitor set; pending partner review."
+    }
+  },
+  "benchmarks": {
+    "avg_cpl_usd": {
+      "value": 22.0,
+      "unit": "USD per lead",
+      "source": "LATAM B2B SMB SaaS benchmark (DEL-07 archetype)",
+      "metadata": {
+        "data_source": "benchmark",
+        "confidence_score": 0.3,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Industry table; no client pipeline data yet.",
+        "will_be_replaced_by": "Layer 6 actual performance data after 30 days of live operation"
+      }
+    },
+    "avg_conversion_rate_pct": {
+      "value": 8.0,
+      "unit": "percent lead-to-customer",
+      "source": "LATAM B2B SMB SaaS benchmark (DEL-07 archetype)",
+      "metadata": {
+        "data_source": "benchmark",
+        "confidence_score": 0.3,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "will_be_replaced_by": "Layer 6 actual performance data after 30 days of live operation"
+      }
+    },
+    "avg_roas": {
+      "value": 3.5,
+      "unit": "revenue / ad spend",
+      "source": "LATAM B2B SMB SaaS benchmark (DEL-07 archetype)",
+      "metadata": {
+        "data_source": "benchmark",
+        "confidence_score": 0.3,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "will_be_replaced_by": "Layer 6 actual performance data after 30 days of live operation"
+      }
+    },
+    "avg_engagement_rate_pct": {
+      "value": 2.0,
+      "unit": "percent on social",
+      "source": "LATAM SMB social benchmark",
+      "metadata": {
+        "data_source": "benchmark",
+        "confidence_score": 0.28,
+        "tier": "D",
+        "verification_status": "estimated",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null
+      }
+    },
+    "avg_posting_cadence_per_week": {
+      "value": 4.0,
+      "unit": "posts per week",
+      "source": "Observed competitor cadence (scrape estimate)",
+      "metadata": {
+        "data_source": "estimated",
+        "confidence_score": 0.42,
+        "tier": "C",
+        "verification_status": "ai-proposed",
+        "first_set_date": "2026-05-29",
+        "last_verified_date": null,
+        "source_detail": "Estimated from competitor channel observation; not a measured average."
+      }
+    }
+  }
+}
+```
+
+## OUTPUT 2 — Competitive Brief
+
+=== COMPETITIVE BRIEF — Acme Co. ===
+Markets in scope: Mexico · Colombia · Dominican Republic · Puerto Rico
+Competitive set: 4 competitors (0 client-named, 1 discovered, 3 AI-inferred)
+
+THE FIELD
+The real fight for an SMB marketing budget in LATAM is not against a single named rival — it is against four archetypes: the premium local agency (human, expensive, no ROI transparency), the self-serve software platform (HubSpot — capable but leaves the SMB to execute), the cheap marketplace freelancer, and the status-quo in-house hire / do-it-yourself. Acme Co. competes with all four at once because it offers the agency's outcome at the software's price.
+
+WHERE WE WIN / WHERE WE'RE EXPOSED
+- Win: agency-grade, done-for-you output at SMB subscription prices, with ROI measured every month — a combination none of the four can match.
+- Exposed: pre-launch with no named-client proof yet; brand unknown against HubSpot and established agencies; conservative SMB owners may distrust AI-run marketing.
+
+WHITE SPACE
+Done-for-you outcomes with transparent monthly ROI, delivered Spanish-first to LATAM SMBs at a price agencies cannot reach.
+
+TOP ANGLES TO ACT ON (for Layers 3-4)
+1. "ROI por peso, medible cada mes" — lead with transparent measured results no competitor shows. (high · LinkedIn, Instagram, email)
+2. Private-education admissions-funnel content kit (awareness -> open house -> deadline) as a resellable vertical playbook. (high · Instagram, WhatsApp, landing pages)
+3. "La IA hace el trabajo, tu mantienes la visibilidad" — show the human-reviewed workflow to bridge the tool-vs-agency gap. (medium · LinkedIn, YouTube)
+
+BENCHMARKS TO BEAT (LATAM industry estimates — replaced by Layer 6 live data)
+CPL ~$22 USD · lead-to-customer CVR ~8% · ROAS ~3.5x · social engagement ~2% · competitor posting cadence ~4/week.
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 1.3 — HUMAN GATE SUMMARY ===
+Client: Acme Co. BU
+Date: 2026-05-29
+Markets in scope: Mexico · Colombia · Dominican Republic · Puerto Rico
+Gate status: PENDING REVIEW
+
+--- COMPETITOR IDENTIFICATION (CONFIRM FIRST) ---
+Local full-service digital agency (archetype) — direct — AI-inferred — 52%
+HubSpot Marketing Hub — indirect — discovered — 74%
+Freelance / marketplace marketers — substitute — AI-inferred — 50%
+In-house hire / do-it-yourself — substitute — AI-inferred — 55%
+⚠️ FLAG FOR CONFIRMATION: the client named NO competitors, so three of four are AI-inferred archetypes. Replace "Local full-service digital agency (archetype)" with the 2-3 specific agencies the partners actually lose deals to. Confirm whether HubSpot is treated as a competitor or a partner/integration (ADR-04 names HubSpot as the chosen CRM — verify it is not misclassified).
+
+--- DATA QUALITY SUMMARY ---
+Tier A: none (no client-named competitors or positioning notes provided).
+Tier B: HubSpot profile (public scrape); analysis scope from client_profile.
+Tier C: positioning landscape, content gaps, relative SWOT, three inferred competitors.
+Tier D: CPL / CVR / ROAS / engagement benchmarks (LATAM industry tables).
+
+--- WHAT THE REVIEWER MUST CONFIRM ---
+- The competitor set is correct and complete — most urgently, name the real local agencies.
+- HubSpot is a competitor here (substitute software), NOT the client's own CRM partner — confirm this framing is intended.
+- The white-space USP framing aligns with the pending partner-approved USP (S1-T8).
+
+--- RECOMMENDED ACTION ---
+RETURN — confirm/replace the AI-inferred competitors (especially the agency archetype) and the HubSpot framing, then approve to release competitive_map to Layers 2-4.

@@ -1,0 +1,19 @@
+{
+  "id": "3.1",
+  "name": "Monthly Marketing Deck",
+  "layer": "L3",
+  "slug": "monthly_marketing_deck",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 32000,
+  "memory_block": "content_plan",
+  "schema_name": "content_plan",
+  "reads": [
+    "campaign_registry",
+    "audience_segments",
+    "active_strategy",
+    "trend_signals"
+  ],
+  "gate": "review",
+  "human_gated": true
+}

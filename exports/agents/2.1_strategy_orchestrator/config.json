@@ -1,0 +1,19 @@
+{
+  "id": "2.1",
+  "name": "Strategy Orchestrator",
+  "layer": "L2",
+  "slug": "strategy_orchestrator",
+  "model": "claude-opus-4-7",
+  "model_tier": "deep",
+  "max_tokens": 16000,
+  "memory_block": "active_strategy",
+  "schema_name": "active_strategy",
+  "reads": [
+    "client_profile",
+    "audience_segments",
+    "competitive_map",
+    "trend_signals"
+  ],
+  "gate": "binding",
+  "human_gated": true
+}

@@ -1,0 +1,174 @@
+## OUTPUT 1 — publish_log JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-06-01T15:00:00Z",
+  "gate_status": "auto_approved",
+  "cycle_month": "2026-06",
+  "backend": "ayrshare",
+  "source_block": "content_calendar",
+  "entries": [
+    {
+      "slot_id": "slot-2026-06-w1-ig-01",
+      "content_ref": "ci-edu-roi-01",
+      "campaign_id": "camp-edu-launch-mx",
+      "platform": "instagram",
+      "channel": "instagram",
+      "format": "carousel",
+      "action": "publish_now",
+      "status": "published",
+      "post_ref": "ayr_8f21c0a9",
+      "publish_at": "2026-06-01T09:00:00-06:00",
+      "timezone": "America/Mexico_City",
+      "copy_asset_id": "copy-ci-edu-roi-01",
+      "visual_asset_id": "vis-ci-edu-roi-01",
+      "final_char_count": 612,
+      "formatting": {
+        "hashtags_appended": 6,
+        "hashtags_dropped": 0,
+        "body_truncated": false
+      },
+      "reason": null,
+      "rationale": "Approved organic IG carousel with matched copy + finished visual; publish time reached, dispatched immediately."
+    },
+    {
+      "slot_id": "slot-2026-06-w1-li-01",
+      "content_ref": "ci-edu-roi-01",
+      "campaign_id": "camp-edu-launch-mx",
+      "platform": "linkedin",
+      "channel": "linkedin",
+      "format": "single_image",
+      "action": "schedule",
+      "status": "scheduled",
+      "post_ref": "ayr_sch_2b77e413",
+      "publish_at": "2026-06-03T13:00:00-06:00",
+      "timezone": "America/Mexico_City",
+      "copy_asset_id": "copy-ci-edu-roi-01-li",
+      "visual_asset_id": "vis-ci-edu-roi-01",
+      "final_char_count": 1180,
+      "formatting": {
+        "hashtags_appended": 4,
+        "hashtags_dropped": 0,
+        "body_truncated": false
+      },
+      "reason": null,
+      "rationale": "Approved LinkedIn post; publish time is in the future, handed to Ayrshare as a scheduled post."
+    },
+    {
+      "slot_id": "slot-2026-06-w2-ig-02",
+      "content_ref": "ci-pricing-tiers-02",
+      "campaign_id": "camp-edu-launch-mx",
+      "platform": "instagram",
+      "channel": "instagram",
+      "format": "reel",
+      "action": "none",
+      "status": "held",
+      "post_ref": null,
+      "publish_at": "2026-06-08T18:00:00-06:00",
+      "timezone": "America/Mexico_City",
+      "copy_asset_id": "copy-ci-pricing-tiers-02",
+      "visual_asset_id": null,
+      "final_char_count": null,
+      "reason": "risk_flagged_needs_human",
+      "rationale": "Matched copy carries risk_tier=high (pricing_claims): held for operator review, never auto-published."
+    },
+    {
+      "slot_id": "slot-2026-06-w2-tt-01",
+      "content_ref": "ci-demo-clip-03",
+      "campaign_id": "camp-edu-launch-mx",
+      "platform": "tiktok",
+      "channel": "tiktok",
+      "format": "video",
+      "action": "none",
+      "status": "held",
+      "post_ref": null,
+      "publish_at": "2026-06-09T19:00:00-06:00",
+      "timezone": "America/Mexico_City",
+      "copy_asset_id": "copy-ci-demo-clip-03",
+      "visual_asset_id": null,
+      "final_char_count": null,
+      "reason": "missing_or_unfinished_visual",
+      "rationale": "TikTok requires a finished video; the matched visual_assets item is still in_production, so the slot is not ready."
+    },
+    {
+      "slot_id": "slot-2026-06-w1-meta-01",
+      "content_ref": "ci-edu-roi-01",
+      "campaign_id": "camp-edu-launch-mx",
+      "platform": null,
+      "channel": "meta_ads",
+      "format": "ad_creative",
+      "action": "none",
+      "status": "skipped",
+      "post_ref": null,
+      "publish_at": null,
+      "timezone": null,
+      "copy_asset_id": null,
+      "visual_asset_id": null,
+      "final_char_count": null,
+      "reason": "out_of_scope_paid_or_nonsocial",
+      "rationale": "Paid Meta Ads slot is out of scope for the organic publisher; left to Agent 5.1 (Campaign Launcher)."
+    }
+  ],
+  "alerts": [
+    {
+      "type": "needs_human",
+      "slot_id": "slot-2026-06-w2-ig-02",
+      "message": "IG reel held: copy flagged pricing_claims (risk_tier=high). Operator must clear before it can publish."
+    },
+    {
+      "type": "missing_asset",
+      "slot_id": "slot-2026-06-w2-tt-01",
+      "message": "TikTok video held: required visual still in production. Reschedule once the asset is finished."
+    }
+  ],
+  "summary": {
+    "total_slots": 5,
+    "published": 1,
+    "scheduled": 1,
+    "held": 2,
+    "skipped": 1,
+    "failed": 0,
+    "by_platform": {
+      "instagram": 1,
+      "linkedin": 1
+    }
+  },
+  "notes": "Backend ayrshare. Source content_calendar (2026-06). Matched copy via content_ref<->content_item_ref and media via content_ref<->content_item_id. 2 of 5 slots dispatched (1 now, 1 scheduled); 2 held for the operator (1 risk-flagged copy, 1 unfinished visual); 1 paid slot skipped as out-of-scope. No COGS/margins recorded."
+}
+```
+
+## OUTPUT 2 — Distribution Brief
+
+DISTRIBUTION BRIEF — Acme Co. BU — cycle 2026-06 (Ayrshare)
+
+Processed 5 calendar slots. 2 went out the door: the ROI-focused IG carousel published immediately, and the matching LinkedIn post is scheduled for Jun 3, 13:00 America/Mexico_City. Platform spread this pass: Instagram 1, LinkedIn 1.
+
+Held for you (2):
+- risk_flagged_needs_human (1): the Week-2 IG reel — its caption is flagged for pricing_claims (high risk). It will not auto-publish; clear or revise the copy first.
+- missing_or_unfinished_visual (1): the Week-2 TikTok video — the required clip is still in production. It will publish once the visual is finished and the slot is re-run.
+
+Skipped (1): the Meta Ads creative — paid media is out of scope here and belongs to the Campaign Launcher (5.1).
+
+Nothing failed at dispatch. Action needed only on the two held items above.
+
+## OUTPUT 3 — Ops / Publish Summary
+
+=== AGENT 5.2 — PUBLISH SUMMARY ===
+Client: Acme Co. BU
+Date: 2026-06-01
+Cycle: 2026-06
+Backend: Ayrshare
+Gate status: AUTO-APPROVED
+
+--- TOTALS ---
+Published: 1 | Scheduled: 1 | Held: 2 | Skipped: 1 | Failed: 0 (of 5 slots)
+By platform (live+scheduled): instagram 1, linkedin 1
+
+--- ALERTS ---
+- needs_human: IG reel slot-2026-06-w2-ig-02 held — copy flagged pricing_claims (high risk).
+- missing_asset: TikTok slot-2026-06-w2-tt-01 held — visual still in production.
+
+--- RECOMMENDED ACTION ---
+TRIAGE — two items are held and need the operator: clear/revise the risk-flagged IG reel copy, and finish the TikTok visual then re-run. The published/scheduled posts are live; the skipped Meta Ads slot is correctly out of scope (5.1 owns it).

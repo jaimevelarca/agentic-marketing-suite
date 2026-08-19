@@ -1,0 +1,18 @@
+{
+  "id": "4.3",
+  "name": "Web + Landing Pages",
+  "layer": "L4",
+  "slug": "web_landing_pages",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "page_assets",
+  "schema_name": "page_assets",
+  "reads": [
+    "campaign_registry",
+    "audience_segments",
+    "copy_assets"
+  ],
+  "gate": "full-review",
+  "human_gated": true
+}

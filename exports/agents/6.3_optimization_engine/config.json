@@ -1,0 +1,17 @@
+{
+  "id": "6.3",
+  "name": "Optimization Engine",
+  "layer": "L6",
+  "slug": "optimization_engine",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "content_learnings",
+  "schema_name": "content_learnings",
+  "reads": [
+    "performance_history",
+    "content_learnings"
+  ],
+  "gate": "bounded-auto",
+  "human_gated": false
+}

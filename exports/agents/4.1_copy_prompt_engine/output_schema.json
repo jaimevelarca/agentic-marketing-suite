@@ -1,0 +1,312 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/copy_assets/v1",
+  "version": "1.0.0",
+  "title": "copy_assets",
+  "description": "Canonical memory schema for Agent 4.1 (Copy + Prompt Engine) output. The OUTPUT-1 payload is an OBJECT wrapping the produced copy assets so base.py object-routing (write_memory_block) works. Each asset carries client-facing ES-MX copy (hook/caption/cta/variants/hashtags), the fal.ai image-generation prompts (flux-2-pro / ideogram-3.0) for Agent 4.2, and a risk_tier driving the risk-tiered human gate. Read by Layers 5 (distribution) and 6 (analytics). | Depends on: DEL-26 (system prompt), content_plan/content_calendar (L3), audience_segments (1.2), competitive_map (1.3), client_profile (DEL-17). | First authored: 2026-05-29",
+  "type": "object",
+  "definitions": {
+    "variant": {
+      "type": "object",
+      "required": [
+        "text",
+        "angle"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Alternative hook/short caption for A/B testing. Client-facing — Español (MX)."
+        },
+        "angle": {
+          "type": "string",
+          "minLength": 1,
+          "description": "English. One-line test hypothesis for this variant."
+        }
+      }
+    },
+    "image_prompt": {
+      "type": "object",
+      "required": [
+        "model_target",
+        "prompt",
+        "aspect_ratio"
+      ],
+      "properties": {
+        "model_target": {
+          "type": "string",
+          "enum": [
+            "flux-2-pro",
+            "ideogram-3.0"
+          ],
+          "description": "Target fal.ai image model. flux-2-pro = photoreal/brand hero; ideogram-3.0 = legible in-image text required."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 10,
+          "description": "English positive prompt: subject, composition, lighting, style, color guidance, aspect-ratio guidance."
+        },
+        "negative_prompt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "English. What to avoid (text, competitor logos, watermarks, distortions, brand-safety violations)."
+        },
+        "in_image_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Literal text to render in-image, Español (MX), <= 8 words. Only with ideogram-3.0; null for flux-2-pro."
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "enum": [
+            "9:16",
+            "1:1",
+            "4:5",
+            "16:9"
+          ],
+          "description": "Aspect ratio matched to the channel/format."
+        },
+        "alt_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Español (MX) accessibility alt text, <= 125 chars."
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": [
+        "asset_id",
+        "content_item_ref",
+        "channel",
+        "format",
+        "funnel_stage",
+        "hook",
+        "primary_caption",
+        "cta",
+        "risk_tier"
+      ],
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "pattern": "^cpy-[a-z0-9-]+$",
+          "description": "Format: cpy-{slug}-{NN}. Example: cpy-acme-co-01."
+        },
+        "content_item_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pointer to the briefed content-plan item (topic slug or campaign+week) this copy was produced for."
+        },
+        "channel": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "funnel_stage": {
+          "type": "string",
+          "enum": [
+            "awareness",
+            "consideration",
+            "conversion",
+            "retention"
+          ]
+        },
+        "target_segment_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "messaging_pillar": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "description": "BCP-47-ish tag for the client-facing copy, e.g. es-MX, es-CO."
+        },
+        "hook": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Scroll-stopping opening line. Español (MX). Leads with pain/payoff, not the brand name."
+        },
+        "primary_caption": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Main body copy, sized to channel/format. Español (MX), ROI-grounded, on-brand."
+        },
+        "char_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Character length of primary_caption for platform-limit sanity checks."
+        },
+        "cta": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Call to action, Español (MX), sized to the funnel stage."
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/variant"
+          },
+          "maxItems": 3,
+          "description": "0-3 A/B alternatives."
+        },
+        "hashtags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "description": "0-8 ES-MX hashtags; empty for non-social channels."
+        },
+        "image_prompts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/image_prompt"
+          },
+          "description": "Image-gen prompts for Agent 4.2; empty array for text-only formats."
+        },
+        "risk_tier": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "low = routine, auto-approve-eligible; medium = needs review; high = always human review (claims/competitor/regulated/constraint conflict)."
+        },
+        "risk_reason": {
+          "type": "string",
+          "description": "English. One-line justification for the assigned risk_tier."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "English. Why this copy/angle for this item + segment."
+        },
+        "notes": {
+          "type": "string",
+          "description": "English. Localization calls, constraint handling, fill-ins for the operator."
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_assets",
+        "assets_by_channel",
+        "assets_by_funnel_stage",
+        "assets_by_risk_tier",
+        "total_image_prompts",
+        "assets_needing_review"
+      ],
+      "properties": {
+        "total_assets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assets_by_channel": {
+          "type": "object"
+        },
+        "assets_by_funnel_stage": {
+          "type": "object"
+        },
+        "assets_by_risk_tier": {
+          "type": "object"
+        },
+        "total_image_prompts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assets_needing_review": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of assets with risk_tier medium or high."
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "assets",
+    "summary"
+  ],
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this copy set belongs to. Lowercase-hyphenated. Example: acme-co."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this copy_assets block was produced."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "pending_review",
+      "description": "Risk-tiered rollup. auto_approved when all assets are low-risk; pending_review when any medium/high or a constraint conflict; blocked when no items/missing required input."
+    },
+    "cycle_month": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Cycle this copy serves, format YYYY-MM, or null."
+    },
+    "markets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Markets the copy targets, e.g. Mexico, Colombia, Dominican Republic, Puerto Rico."
+    },
+    "source_plan": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Id/ref of the content_plan or content_calendar this copy was produced from."
+    },
+    "assets": {
+      "type": "array",
+      "description": "Produced copy assets. Empty array on the blocked path (missing required input / no items).",
+      "items": {
+        "$ref": "#/definitions/asset"
+      }
+    },
+    "summary": {
+      "$ref": "#/definitions/summary"
+    },
+    "production_notes": {
+      "type": "string",
+      "description": "English. Choices, constraint handling, localization, and any blocks."
+    }
+  }
+}

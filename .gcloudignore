@@ -1,0 +1,17 @@
+# Keep the Cloud Build upload context lean. The image (deploy/Dockerfile) only
+# needs pyproject.toml, README.md, suite/, and project/resources/schemas/.
+.git/
+__pycache__/
+**/__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+**/.DS_Store
+suite/runs/
+suite/inputs/
+exports/
+tests/
+workflows/
+project/resources/openapi/

@@ -1,0 +1,16 @@
+{
+  "id": "1.2",
+  "name": "Audience Intelligence",
+  "layer": "L1",
+  "slug": "audience_intelligence",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 48000,
+  "memory_block": "audience_segments",
+  "schema_name": "audience_segments",
+  "reads": [
+    "client_profile"
+  ],
+  "gate": "review",
+  "human_gated": true
+}

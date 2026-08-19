@@ -1,0 +1,18 @@
+{
+  "id": "5.2",
+  "name": "Social Publisher",
+  "layer": "L5",
+  "slug": "social_publisher",
+  "model": "claude-haiku-4-5@20251001",
+  "model_tier": "routing",
+  "max_tokens": 16000,
+  "memory_block": "publish_log",
+  "schema_name": "publish_log",
+  "reads": [
+    "content_calendar",
+    "copy_assets",
+    "visual_assets"
+  ],
+  "gate": "autonomous",
+  "human_gated": false
+}

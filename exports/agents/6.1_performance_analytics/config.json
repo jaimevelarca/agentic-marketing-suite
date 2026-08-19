@@ -1,0 +1,20 @@
+{
+  "id": "6.1",
+  "name": "Performance Analytics",
+  "layer": "L6",
+  "slug": "performance_analytics",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "performance_history",
+  "schema_name": "performance_history",
+  "reads": [
+    "ad_campaign_log",
+    "publish_log",
+    "lead_register",
+    "active_strategy",
+    "kpi_contracts"
+  ],
+  "gate": "auto+alert",
+  "human_gated": false
+}

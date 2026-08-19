@@ -1,0 +1,17 @@
+{
+  "id": "3.2",
+  "name": "Content Scheduler",
+  "layer": "L3",
+  "slug": "content_scheduler",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 32000,
+  "memory_block": "content_calendar",
+  "schema_name": "content_calendar",
+  "reads": [
+    "content_plan",
+    "campaign_registry"
+  ],
+  "gate": "review",
+  "human_gated": true
+}

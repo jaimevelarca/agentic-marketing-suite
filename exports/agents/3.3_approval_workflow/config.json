@@ -1,0 +1,16 @@
+{
+  "id": "3.3",
+  "name": "Approval Workflow",
+  "layer": "L3",
+  "slug": "approval_workflow",
+  "model": "claude-haiku-4-5@20251001",
+  "model_tier": "routing",
+  "max_tokens": 16000,
+  "memory_block": "approval_log",
+  "schema_name": "approval_log",
+  "reads": [
+    "content_calendar"
+  ],
+  "gate": "queue-mgr",
+  "human_gated": false
+}

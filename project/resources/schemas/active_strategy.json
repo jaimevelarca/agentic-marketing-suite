@@ -1,0 +1,351 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/active_strategy/v1",
+  "version": "1.0.0",
+  "title": "active_strategy",
+  "description": "Canonical memory schema for Agent 2.1 (Strategy Orchestrator) output. Agent 2.1 is the only binding-decision agent: it writes BOTH the active_strategy block and an embedded kpi_contracts object (objectives -> measurable KPI targets that Layer 6 reconciles against). The block is immutable per marketing cycle and must be human-approved (gate_status='approved') before any Layer 3+ agent reads it. | Reads upstream: client_profile (1.1), audience_segments (1.2), competitive_map (1.3), trend_signals (1.4). | Confidence-metadata pattern: DEL-09. | Depends on: ARCHITECTURE.md memory map.",
+  "type": "object",
+  "definitions": {
+    "confidence_metadata": {
+      "description": "DEL-09 Data Confidence Tagger pattern — required on every strategic leaf the agent commits to memory.",
+      "type": "object",
+      "required": [
+        "data_source",
+        "confidence_score",
+        "tier",
+        "verification_status",
+        "first_set_date"
+      ],
+      "properties": {
+        "data_source": {
+          "type": "string",
+          "enum": ["client", "enriched", "estimated", "benchmark", "synthesized"],
+          "description": "Origin of the value. 'synthesized' = produced by 2.1's reasoning over upstream memory blocks."
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D"]
+        },
+        "source_detail": {
+          "type": "string",
+          "description": "Human-readable note on how this strategic value was derived. Required in practice when tier is C or D."
+        },
+        "verification_status": {
+          "type": "string",
+          "enum": ["verified", "enriched", "ai-proposed", "estimated"]
+        },
+        "first_set_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "last_verified_date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "will_be_replaced_by": {
+          "type": "string"
+        }
+      }
+    },
+    "channel": {
+      "description": "One prioritized channel in the channel mix, with its rationale and indicative budget share.",
+      "type": "object",
+      "required": ["name", "priority", "role", "budget_share_pct"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "meta_ads",
+            "google_ads",
+            "tiktok_ads",
+            "organic_social",
+            "email",
+            "whatsapp",
+            "landing_pages",
+            "content_seo",
+            "referral",
+            "other"
+          ]
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1 = highest-priority channel for this cycle."
+        },
+        "role": {
+          "type": "string",
+          "description": "What this channel does in the funnel (e.g. 'top-of-funnel reach', 'lead capture', 'nurture')."
+        },
+        "budget_share_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Indicative share of the cycle marketing budget allocated to this channel. Shares across channels should sum to ~100."
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "kpi_target": {
+      "description": "A single measurable KPI target. Layer 6 (6.1 Performance Analytics) reconciles actuals against these.",
+      "type": "object",
+      "required": ["metric", "target_value", "unit"],
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "Canonical metric key, e.g. leads_per_month, cpl_usd, conversion_rate_pct, roas, reach_per_month, cac_usd."
+        },
+        "target_value": {
+          "type": ["number", "null"],
+          "description": "The numeric target. Null only when the metric is acknowledged as not-yet-set and flagged for the gate."
+        },
+        "unit": {
+          "type": "string",
+          "description": "e.g. count/month, usd, pct, ratio."
+        },
+        "threshold_floor": {
+          "type": ["number", "null"],
+          "description": "Minimum acceptable value before 6.1 raises an alert. Optional."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "cycle",
+    "primary_objective",
+    "channel_mix",
+    "budget_allocation",
+    "kpi_contracts",
+    "strategic_thesis"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Lowercase-hyphenated. Must match the upstream client_profile."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this strategy was synthesized."
+    },
+    "approved_by": {
+      "type": ["string", "null"],
+      "description": "Human reviewer who approved this binding strategy at the gate. Null until approved."
+    },
+    "approved_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": ["pending_review", "approved", "returned", "blocked", "auto_approved"],
+      "default": "pending_review",
+      "description": "Binding human gate. MUST be 'approved' before any Layer 3+ agent reads active_strategy. 2.1 always defaults to 'pending_review'; 'auto_approved' is NOT permitted for this agent."
+    },
+    "cycle": {
+      "description": "The marketing cycle this immutable strategy governs. Strategy is re-synthesized per cycle, never edited in place.",
+      "type": "object",
+      "required": ["label", "starts_on", "horizon_days"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human label, e.g. '2026-Q3 launch cycle'."
+        },
+        "starts_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "horizon_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Planning horizon in days (e.g. 90 for a 90-day SMART cycle)."
+        }
+      }
+    },
+    "primary_objective": {
+      "description": "The single binding SMART objective for this cycle. Inherited and sharpened from client_profile.goals; the agent must NOT invent a new direction the client never set.",
+      "type": "object",
+      "required": ["statement", "metadata"],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 20,
+          "description": "SMART objective in ES-MX (client-facing value). e.g. 'Firmar 5 clientes piloto de educacion privada en Mexico en 90 dias.'"
+        },
+        "secondary_objectives": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "strategic_thesis": {
+      "type": "string",
+      "minLength": 20,
+      "description": "2-4 sentence ES-MX narrative tying the chosen positioning, channel mix and budget back to the upstream intelligence (profile + segments + competitive gaps + trends)."
+    },
+    "positioning": {
+      "description": "How the offer is positioned this cycle vs the competitive_map gaps.",
+      "type": "object",
+      "properties": {
+        "statement": { "type": "string" },
+        "differentiators": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "competitive_gap_exploited": { "type": "string" },
+        "metadata": { "$ref": "#/definitions/confidence_metadata" }
+      }
+    },
+    "target_segments": {
+      "description": "Prioritized audience segments for this cycle, referencing audience_segments (1.2) by id.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["segment_id", "priority"],
+        "properties": {
+          "segment_id": { "type": "string" },
+          "label": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1 },
+          "rationale": { "type": "string" }
+        }
+      }
+    },
+    "messaging_pillars": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pillar"],
+        "properties": {
+          "pillar": { "type": "string" },
+          "proof_points": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "description": "3-5 ES-MX messaging pillars that downstream Layer 3/4 agents draw from."
+    },
+    "channel_mix": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/channel" },
+      "description": "Prioritized, budget-weighted channel plan."
+    },
+    "budget_allocation": {
+      "description": "How the cycle marketing budget (from client_profile.budget, USD) is allocated. Client-facing USD only; never expose COGS/margins here.",
+      "type": "object",
+      "required": ["monthly_total_usd", "currency", "metadata"],
+      "properties": {
+        "monthly_total_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Monthly marketing budget assumed by this strategy, in USD."
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["USD"],
+          "description": "USD invoicing across all four markets (constraint). Local-currency is reference only."
+        },
+        "by_channel_usd": {
+          "type": "object",
+          "description": "Per-channel monthly USD allocation, keyed by channel name.",
+          "additionalProperties": { "type": "number", "minimum": 0 }
+        },
+        "contingency_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "coherence_note": {
+          "type": "string",
+          "description": "Result of the budget<->objective coherence check (sufficient / warning + detail)."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "kpi_contracts": {
+      "description": "EMBEDDED second memory block. 2.1 writes both active_strategy and kpi_contracts; kpi_contracts maps each objective to measurable KPI targets that Layer 6 reconciles against. This nested object is the authoritative source of the kpi_contracts block.",
+      "type": "object",
+      "required": ["objective_targets", "review_cadence"],
+      "properties": {
+        "objective_targets": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One entry per objective, each carrying its measurable KPI targets.",
+          "items": {
+            "type": "object",
+            "required": ["objective_ref", "kpis"],
+            "properties": {
+              "objective_ref": {
+                "type": "string",
+                "description": "Which objective these KPIs serve ('primary' or a secondary objective label)."
+              },
+              "kpis": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/definitions/kpi_target" }
+              }
+            }
+          }
+        },
+        "review_cadence": {
+          "type": "string",
+          "description": "How often 6.1 reconciles actuals vs these contracts, e.g. 'weekly' / 'monthly'."
+        },
+        "reallocation_rule": {
+          "type": "string",
+          "description": "Bound on autonomous budget reallocation (e.g. '>20% shift requires human per 6.3 rule')."
+        },
+        "metadata": {
+          "$ref": "#/definitions/confidence_metadata"
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Key strategic assumptions the reviewer should validate at the binding gate."
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["risk"],
+        "properties": {
+          "risk": { "type": "string" },
+          "mitigation": { "type": "string" }
+        }
+      }
+    },
+    "upstream_provenance": {
+      "description": "Which upstream memory blocks were available when this strategy was synthesized — drives the gate-summary confidence narrative.",
+      "type": "object",
+      "properties": {
+        "client_profile": { "type": "boolean" },
+        "audience_segments": { "type": "boolean" },
+        "competitive_map": { "type": "boolean" },
+        "trend_signals": { "type": "boolean" }
+      }
+    }
+  }
+}

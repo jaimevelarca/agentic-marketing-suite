@@ -1,0 +1,14 @@
+{
+  "id": "1.1",
+  "name": "Business Diagnostics",
+  "layer": "L1",
+  "slug": "agent_1_1",
+  "model": "claude-sonnet-4-6",
+  "model_tier": "primary",
+  "max_tokens": 16000,
+  "memory_block": "client_profile",
+  "schema_name": "DEL-17",
+  "reads": [],
+  "gate": "review",
+  "human_gated": true
+}

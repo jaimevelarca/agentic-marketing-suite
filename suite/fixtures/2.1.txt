@@ -1,0 +1,254 @@
+## OUTPUT 1 — active_strategy JSON
+
+```json
+{
+  "client_id": "acme-co",
+  "schema_version": "1.0.0",
+  "created_at": "2026-05-29T00:00:00Z",
+  "approved_by": null,
+  "approved_at": null,
+  "gate_status": "pending_review",
+  "cycle": {
+    "label": "2026-Q3 commercial launch cycle",
+    "starts_on": "2026-07-01",
+    "horizon_days": 90
+  },
+  "primary_objective": {
+    "statement": "Firmar 5 clientes piloto de pago en educacion privada (Mexico) a traves de un ciclo completo de marketing en 90 dias, en el plan Tier 2 (USD 1,699/mes).",
+    "secondary_objectives": [
+      "Generar un caso de exito documentado de Acme Co. como cliente cero para acelerar la venta a SMBs de educacion privada."
+    ],
+    "metadata": {
+      "data_source": "client",
+      "confidence_score": 0.7,
+      "tier": "B",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-29",
+      "source_detail": "Heredado de client_profile.goals.primary_objective (Tier C); afinado a SMART. Los numeros de KPI siguen pendientes de confirmacion de los socios (S1-T1..T3)."
+    }
+  },
+  "strategic_thesis": "Acme Co. es su propio cliente cero: el ciclo de lanzamiento prueba la Suite en un SMB de educacion privada simulado en Mexico y produce el caso de exito que destraba la venta externa. El presupuesto reducido obliga a concentrar la inversion en captura de demanda de alta intencion (Google Ads + landing) y nutricion por WhatsApp, evitando dispersar el gasto en alcance amplio que el presupuesto no puede sostener.",
+  "positioning": {
+    "statement": "Marketing digital de nivel agencia, con ROI medible, operado por agentes de IA a precio de SMB y con un humano que mantiene la calidad.",
+    "differentiators": [
+      "Costo-a-servir bajo que permite precio SMB sin sacrificar calidad de agencia.",
+      "ROI medible por contrato de KPIs desde el primer ciclo.",
+      "Un revisor humano por cada 6-10 clientes garantiza control de marca."
+    ],
+    "competitive_gap_exploited": "Las agencias tradicionales en Mexico no atienden de forma rentable a SMBs de educacion privada con ROI medible; las herramientas de IA genericas no entregan control de marca ni acompanamiento.",
+    "metadata": {
+      "data_source": "synthesized",
+      "confidence_score": 0.55,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-29",
+      "source_detail": "Sintetizado sobre client_profile.usp; competitive_map no fue provisto en este ciclo, por lo que el gap es una hipotesis a validar."
+    }
+  },
+  "target_segments": [
+    {
+      "segment_id": "seg-priv-edu-director",
+      "label": "Directores/as de mercadotecnia en escuelas y universidades privadas (MX)",
+      "priority": 1,
+      "rationale": "Vertical ancla de GTM; deciden presupuesto de marketing y sienten la presion de inscripciones."
+    }
+  ],
+  "messaging_pillars": [
+    {
+      "pillar": "ROI medible, no promesas",
+      "proof_points": ["Contrato de KPIs desde el dia uno", "Reporte mensual de ROI"]
+    },
+    {
+      "pillar": "Calidad de agencia, precio de SMB",
+      "proof_points": ["Operado por agentes de IA", "Revisor humano dedicado"]
+    },
+    {
+      "pillar": "Hecho para educacion privada en LATAM",
+      "proof_points": ["Benchmarks calibrados a MX/CO/DR/PR", "Foco en captacion de inscripciones"]
+    }
+  ],
+  "channel_mix": [
+    {
+      "name": "google_ads",
+      "priority": 1,
+      "role": "Captura de demanda de alta intencion (busqueda).",
+      "budget_share_pct": 45,
+      "rationale": "Intencion alta de directores que buscan soluciones de marketing/inscripciones; mejor eficiencia con presupuesto chico."
+    },
+    {
+      "name": "landing_pages",
+      "priority": 2,
+      "role": "Conversion de trafico pagado a lead calificado.",
+      "budget_share_pct": 15,
+      "rationale": "Sin landing dedicada el gasto en ads se desperdicia; es el cuello de botella de conversion."
+    },
+    {
+      "name": "whatsapp",
+      "priority": 3,
+      "role": "Nutricion y calificacion de leads (canal dominante SMB en MX).",
+      "budget_share_pct": 15,
+      "rationale": "WhatsApp Business es el canal de cierre natural para SMB en Mexico."
+    },
+    {
+      "name": "organic_social",
+      "priority": 4,
+      "role": "Prueba social y construccion del caso de exito de Acme Co..",
+      "budget_share_pct": 10,
+      "rationale": "Bajo costo; alimenta el caso de exito de cliente cero."
+    }
+  ],
+  "budget_allocation": {
+    "monthly_total_usd": 100,
+    "currency": "USD",
+    "by_channel_usd": {
+      "google_ads": 45,
+      "landing_pages": 15,
+      "whatsapp": 15,
+      "organic_social": 10
+    },
+    "contingency_pct": 15,
+    "coherence_note": "ADVERTENCIA: con USD 100/mes (tope de infraestructura I-02, no un presupuesto de medios) el objetivo de 5 clientes piloto no es financiable a CPL de benchmark LATAM. Se modela como ciclo de aprendizaje de cliente cero; el presupuesto real de medios sigue pendiente (S1-T3).",
+    "metadata": {
+      "data_source": "estimated",
+      "confidence_score": 0.4,
+      "tier": "C",
+      "verification_status": "estimated",
+      "first_set_date": "2026-05-29",
+      "source_detail": "Solo esta fijado el tope de USD 100/mes de infraestructura GCP (I-02); el presupuesto de medios pendiente de los socios.",
+      "will_be_replaced_by": "Presupuesto de medios aprobado por los socios (S1-T3)."
+    }
+  },
+  "kpi_contracts": {
+    "objective_targets": [
+      {
+        "objective_ref": "primary",
+        "kpis": [
+          {
+            "metric": "leads_per_month",
+            "target_value": 25,
+            "unit": "count/month",
+            "threshold_floor": 12,
+            "metadata": {
+              "data_source": "benchmark",
+              "confidence_score": 0.35,
+              "tier": "D",
+              "verification_status": "estimated",
+              "first_set_date": "2026-05-29",
+              "source_detail": "Estimado de benchmark de educacion privada MX; sin pipeline real aun.",
+              "will_be_replaced_by": "Datos reales de Layer 6 tras 30 dias de operacion."
+            }
+          },
+          {
+            "metric": "cpl_usd",
+            "target_value": 22,
+            "unit": "usd",
+            "threshold_floor": 35,
+            "metadata": {
+              "data_source": "benchmark",
+              "confidence_score": 0.35,
+              "tier": "D",
+              "verification_status": "estimated",
+              "first_set_date": "2026-05-29",
+              "source_detail": "CPL de benchmark educacion privada MX (Google Ads alta intencion)."
+            }
+          },
+          {
+            "metric": "conversion_rate_pct",
+            "target_value": 4.0,
+            "unit": "pct",
+            "threshold_floor": 2.0,
+            "metadata": {
+              "data_source": "benchmark",
+              "confidence_score": 0.3,
+              "tier": "D",
+              "verification_status": "estimated",
+              "first_set_date": "2026-05-29",
+              "source_detail": "Lead->cliente en venta SMB de ciclo medio; estimado."
+            }
+          }
+        ]
+      }
+    ],
+    "review_cadence": "monthly",
+    "reallocation_rule": ">20% de reasignacion de presupuesto requiere aprobacion humana (regla de 6.3).",
+    "metadata": {
+      "data_source": "synthesized",
+      "confidence_score": 0.4,
+      "tier": "C",
+      "verification_status": "ai-proposed",
+      "first_set_date": "2026-05-29",
+      "source_detail": "Contrato de KPIs derivado de presupuesto x benchmark LATAM; pendiente de confirmacion de los socios (S1-T1..T3).",
+      "will_be_replaced_by": "Objetivo SMART y KPIs confirmados por los socios."
+    }
+  },
+  "assumptions": [
+    "USD 100/mes es un tope de infraestructura, no un presupuesto de medios; existira un presupuesto de medios real antes del lanzamiento.",
+    "Educacion privada en Mexico es el vertical ancla de GTM (constraint del proyecto).",
+    "competitive_map y trend_signals no estaban disponibles en este ciclo; el posicionamiento es hipotesis a validar."
+  ],
+  "risks": [
+    {
+      "risk": "El presupuesto de medios definido es insuficiente para 5 clientes piloto en 90 dias.",
+      "mitigation": "Tratar el ciclo como aprendizaje de cliente cero; reescalar objetivo tras fijar presupuesto real (S1-T3)."
+    },
+    {
+      "risk": "Posicionamiento basado en hipotesis sin competitive_map.",
+      "mitigation": "Ejecutar Agente 1.3 antes de comprometer creatividad de Layer 4."
+    }
+  ],
+  "upstream_provenance": {
+    "client_profile": true,
+    "audience_segments": true,
+    "competitive_map": false,
+    "trend_signals": false
+  }
+}
+```
+
+## OUTPUT 2 — Strategy Brief (ES-MX)
+
+BRIEF DE ESTRATEGIA — Acme Co. BU · Ciclo de lanzamiento 2026-Q3 (90 dias)
+
+Tesis: Acme Co. es su propio cliente cero. Este ciclo prueba la Suite en un caso real de educacion privada en Mexico y produce el caso de exito que destraba la venta externa a SMBs. Con presupuesto reducido, concentramos la inversion en captura de demanda de alta intencion y nutricion por WhatsApp en lugar de dispersarla en alcance amplio.
+
+Posicionamiento: "Marketing digital de nivel agencia, con ROI medible, operado por agentes de IA a precio de SMB y con un humano que mantiene la calidad." Explotamos el hueco que dejan las agencias tradicionales (no rentables para SMB de educacion privada) y las herramientas de IA genericas (sin control de marca).
+
+Segmento prioritario: Directores/as de mercadotecnia en escuelas y universidades privadas en Mexico (deciden presupuesto y sienten la presion de inscripciones).
+
+Pilares de mensaje: (1) ROI medible, no promesas; (2) Calidad de agencia, precio de SMB; (3) Hecho para educacion privada en LATAM.
+
+Mezcla de canales y presupuesto (USD/mes): Google Ads 45 (alta intencion), Landing pages 15 (conversion), WhatsApp 15 (nutricion y cierre), Social organico 10 (prueba social). Contingencia 15%.
+
+Contrato de KPIs (mensual): ~25 leads/mes, CPL objetivo USD 22 (piso de alerta 35), conversion lead->cliente 4%. Son estimaciones de benchmark de educacion privada MX y se reemplazaran con datos reales de Layer 6 a los 30 dias.
+
+ADVERTENCIA DE COHERENCIA: el tope actual de USD 100/mes es de infraestructura, no de medios. El objetivo de 5 clientes piloto no es financiable a CPL de benchmark con ese monto. Se requiere fijar el presupuesto de medios real con los socios (S1-T3) antes de comprometer la estrategia.
+
+## OUTPUT 3 — Human Gate Summary
+
+=== AGENT 2.1 — STRATEGY ORCHESTRATOR — BINDING GATE SUMMARY ===
+Client: Acme Co. BU
+Date: 2026-05-29
+Cycle: 2026-Q3 commercial launch cycle (90 days)
+Gate status: PENDING REVIEW
+
+--- WHAT YOU ARE APPROVING (BINDING) ---
+- Primary objective: sign 5 paying private-education pilot clients in Mexico in 90 days (Tier 2, $1,699/mo).
+- Channel mix + budget split (USD/mo): Google Ads $45 · Landing $15 · WhatsApp $15 · Organic social $10 (15% contingency).
+- KPI contract (monthly): ~25 leads/mo · CPL $22 (alert floor $35) · 4% lead->client conversion.
+Approving this unlocks Layer 3 (Content Planning) to build against it.
+
+--- UPSTREAM DATA CONFIDENCE ---
+Present: client_profile (Tier B/C), audience_segments. Missing: competitive_map, trend_signals.
+Overall confidence: Tier C — positioning is a hypothesis until Agent 1.3 runs; KPI numbers are LATAM benchmarks, not client actuals.
+
+--- BUDGET <-> OBJECTIVE COHERENCE ---
+WARNING — INCOHERENT AS STATED. The $100/mo figure is the GCP infra cap (I-02), NOT a media budget. Five pilot clients in 90 days at benchmark CPL is not fundable on $100/mo. A real media budget must be set with the partners (S1-T3) before this strategy is sound. Objective and budget are presented as-is, unmodified — flagged loudly per policy.
+
+--- ASSUMPTIONS & RISKS THE REVIEWER SIGNS OFF ---
+- Assumes a real media budget will exist before launch (the $100 is infra, not media).
+- Assumes private education (MX) as anchor vertical.
+- Positioning built without competitive_map/trend_signals — hypothesis to validate.
+- Risk: under-funded objective → mitigate by treating cycle as zero-client learning + re-scope after S1-T3.
+
+--- RECOMMENDED ACTION ---
+RETURN — confirm the SMART objective + KPI numbers and set the real media budget with the partners (S1-T1..T3), then re-run. Do NOT flip to approved until the budget<->objective coherence warning is resolved.

@@ -1,0 +1,165 @@
+# Cloud Workflows — Digital Marketing AI Suite pipeline choreography (ADR-04).
+#
+# Mirrors suite/orchestration/pipeline.py (the readable source of truth for the
+# DAG). Each agent runs as a Cloud Run Job execution (AGENT_ID + CLIENT_ID env);
+# human-gated agents pause until an operator approves the block in the Firebase
+# review UI (gate_status flips to "approved" in Firestore / memory_blocks).
+#
+# This scaffold encodes Layer 1 -> Layer 2 in full; Layers 3-6 follow the SAME
+# two patterns (run_agent + await_gate) in pipeline.py order. Block style is used
+# throughout because Cloud Workflows ${...} expressions are not valid inside YAML
+# flow mappings. Deploy with:
+#   gcloud workflows deploy suite-pipeline --source=deploy/workflows/suite-pipeline.yaml \
+#     --location=us-central1 --service-account=<runtime-sa>
+#
+# NOTE: model backbone is Anthropic-direct (the job's SUITE_LLM_PROVIDER=anthropic +
+# ANTHROPIC_API_KEY from Secret Manager, set in deploy/cloudbuild.yaml).
+
+main:
+  params: [input]
+  steps:
+    - init:
+        assign:
+          - client_id: ${input.client_id}
+          - project: ${sys.get_env("GOOGLE_CLOUD_PROJECT_ID")}
+          - region: "us-central1"
+          - job: "suite-agent-job"
+
+    # --- Layer 1: Intelligence ---
+    - run_1_1:                       # Business Diagnostics -> client_profile (review gate)
+        call: run_agent
+        args:
+          project: ${project}
+          region: ${region}
+          job: ${job}
+          client_id: ${client_id}
+          agent_id: "1.1"
+    - gate_1_1:
+        call: await_gate
+        args:
+          client_id: ${client_id}
+          block: "client_profile"
+
+    - layer1_fanout:                 # 1.2 / 1.3 / 1.4 read client_profile, run in parallel
+        parallel:
+          branches:
+            - branch_1_2:
+                steps:
+                  - run_1_2:
+                      call: run_agent
+                      args:
+                        project: ${project}
+                        region: ${region}
+                        job: ${job}
+                        client_id: ${client_id}
+                        agent_id: "1.2"
+                  - gate_1_2:
+                      call: await_gate
+                      args:
+                        client_id: ${client_id}
+                        block: "audience_segments"
+            - branch_1_3:
+                steps:
+                  - run_1_3:
+                      call: run_agent
+                      args:
+                        project: ${project}
+                        region: ${region}
+                        job: ${job}
+                        client_id: ${client_id}
+                        agent_id: "1.3"
+                  - gate_1_3:
+                      call: await_gate
+                      args:
+                        client_id: ${client_id}
+                        block: "competitive_map"
+            - branch_1_4:             # Trend Radar is autonomous — no gate wait
+                steps:
+                  - run_1_4:
+                      call: run_agent
+                      args:
+                        project: ${project}
+                        region: ${region}
+                        job: ${job}
+                        client_id: ${client_id}
+                        agent_id: "1.4"
+
+    # --- Layer 2: Strategy ---
+    - run_2_1:                       # Strategy Orchestrator (Opus) -> active_strategy (BINDING gate)
+        call: run_agent
+        args:
+          project: ${project}
+          region: ${region}
+          job: ${job}
+          client_id: ${client_id}
+          agent_id: "2.1"
+    - gate_2_1:
+        call: await_gate
+        args:
+          client_id: ${client_id}
+          block: "active_strategy"
+    - run_2_2:                       # Campaign Planner -> campaign_registry (review gate)
+        call: run_agent
+        args:
+          project: ${project}
+          region: ${region}
+          job: ${job}
+          client_id: ${client_id}
+          agent_id: "2.2"
+    - gate_2_2:
+        call: await_gate
+        args:
+          client_id: ${client_id}
+          block: "campaign_registry"
+
+    # --- Layers 3-6 continue identically in pipeline.py order ---
+    #   L3: 3.1 monthly_marketing_deck (gate) -> 3.2 content_scheduler (gate) -> 3.3 approval_workflow
+    #   L4: 4.1 copy_prompt_engine -> 4.2 visual_creative -> 4.3 web_landing_pages -> 4.4 email_whatsapp (gated)
+    #   L5: 5.1 campaign_launcher (FINANCIAL-AUTH gate) -> 5.2 social_publisher (auto) -> 5.3 lead_capture_nurture
+    #   L6: 6.1 performance_analytics (auto+alert) -> 6.2 client_reporting (pre-client gate) -> 6.3 optimization_engine
+    - done:
+        return: ${"pipeline complete for " + client_id}
+
+# Execute one agent as a Cloud Run Job, overriding env, and wait for completion.
+run_agent:
+  params: [project, region, job, client_id, agent_id]
+  steps:
+    - exec:
+        call: googleapis.run.v1.namespaces.jobs.run
+        args:
+          name: ${"namespaces/" + project + "/jobs/" + job}
+          location: ${region}
+          body:
+            overrides:
+              containerOverrides:
+                - env:
+                    - name: "CLIENT_ID"
+                      value: ${client_id}
+                    - name: "AGENT_ID"
+                      value: ${agent_id}
+        result: execution
+    - ok:
+        return: ${execution}
+
+# Poll the review queue until the block's gate_status is approved. A real impl
+# reads Firestore (review_queue) or the memory_blocks row; here it long-polls
+# with backoff. The Firebase review UI is what flips the status.
+await_gate:
+  params: [client_id, block]
+  steps:
+    - poll:
+        try:
+          # TODO: replace with a Firestore read of the block's gate_status.
+          # Placeholder: assume an external approval callback resumes the run.
+          call: sys.sleep
+          args:
+            seconds: 30
+        retry:
+          predicate: ${true}
+          max_retries: 240         # ~2h max wait
+          backoff:
+            initial_delay: 30
+            max_delay: 60
+            multiplier: 1
+    - approved:
+        return: '${"gate approved: " + block}'

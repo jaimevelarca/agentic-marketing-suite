@@ -1,0 +1,328 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/publish_log/v1",
+  "version": "1.0.0",
+  "title": "publish_log",
+  "description": "Memory block written by Agent 5.2 (Social Publisher). The organic-social publishing ledger for a marketing cycle: one entry per scheduled content_calendar slot recording how it was published (now / scheduled / held / skipped / failed) through Ayrshare (Buffer fallback), with the matched copy/visual asset ids, resolved publish datetime, mechanical formatting applied, and a footing summary. Reads: content_calendar (3.2, primary), copy_assets (4.1), visual_assets (4.2). Read by Layer 6 (6.1 Performance Analytics) for slot-level attribution. Human gate: autonomous queue executor — gate_status is always auto_approved; per-item posture lives in entries[].status.",
+  "type": "object",
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "entries",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "platform": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "instagram",
+        "facebook",
+        "linkedin",
+        "tiktok",
+        "youtube",
+        "twitter_x",
+        null
+      ],
+      "description": "Ayrshare canonical platform key. Null only when a slot is skipped as out-of-scope (paid/non-social)."
+    },
+    "formatting": {
+      "type": ["object", "null"],
+      "required": [
+        "hashtags_appended",
+        "hashtags_dropped",
+        "body_truncated"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "hashtags_appended": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of hashtags placed at the end of the formatted body."
+        },
+        "hashtags_dropped": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of hashtags dropped to fit a hard platform character limit (e.g. X 280)."
+        },
+        "body_truncated": {
+          "type": "boolean",
+          "description": "True if the client copy was truncated at a clean boundary to fit a hard platform limit."
+        }
+      }
+    },
+    "publish_entry": {
+      "type": "object",
+      "required": [
+        "slot_id",
+        "channel",
+        "action",
+        "status"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "slot_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Id of the content_calendar slot this entry resolves."
+        },
+        "content_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The calendar slot content_ref used to match copy/visual assets."
+        },
+        "campaign_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "platform": {
+          "$ref": "#/definitions/platform"
+        },
+        "channel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The content_calendar channel, echoed verbatim (instagram, linkedin, meta_ads, ...)."
+        },
+        "format": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Content format from the slot (reel, carousel, single_image, text, video, ...)."
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "publish_now",
+            "schedule",
+            "none"
+          ],
+          "description": "Dispatch action: publish_now (time reached), schedule (future), none (held/skipped/failed)."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "published",
+            "scheduled",
+            "held",
+            "skipped",
+            "failed"
+          ],
+          "description": "Outcome. published/scheduled = dispatched; held = eligible-but-not-ready (needs human/asset); skipped = out of scope; failed = dispatch error."
+        },
+        "post_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Publisher (Ayrshare) returned post id. Null until/unless published or scheduled."
+        },
+        "publish_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Resolved ISO-8601 publish datetime (with offset where known). Null when not derivable."
+        },
+        "timezone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "IANA timezone the publish time is expressed in (from the slot)."
+        },
+        "copy_asset_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Matched copy_assets asset_id, if any."
+        },
+        "visual_asset_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Matched visual_assets asset_id, if any (null for text-only posts)."
+        },
+        "final_char_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Length of the final formatted post body. Null for skipped/held-before-formatting."
+        },
+        "formatting": {
+          "$ref": "#/definitions/formatting"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Eligibility reason code for held/skipped/failed (e.g. out_of_scope_paid_or_nonsocial, slot_not_approved, missing_copy, missing_or_unfinished_visual, risk_flagged_needs_human, format_uncorrectable, dispatch_error). Null for published/scheduled."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "One short EN sentence explaining the decision."
+        }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "required": [
+        "type",
+        "message"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "publish_failed",
+            "needs_human",
+            "missing_asset",
+            "nothing_to_publish"
+          ]
+        },
+        "slot_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "description": "EN operator-facing alert text."
+        }
+      }
+    }
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client identifier. Format: lowercase-hyphenated."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when this publish_log run was generated. Also the reference 'now' for publish_now vs schedule decisions when no explicit now is supplied."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "returned",
+        "blocked",
+        "auto_approved"
+      ],
+      "default": "auto_approved",
+      "description": "Gate posture of this agent's OWN output. Always 'auto_approved' — Agent 5.2 is an autonomous publishing executor. Per-item posture lives in entries[].status, not here."
+    },
+    "cycle_month": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{4}-[0-9]{2}$",
+      "description": "Marketing cycle this ledger covers, YYYY-MM. Null if not derivable from the upstream calendar."
+    },
+    "backend": {
+      "type": "string",
+      "enum": [
+        "ayrshare",
+        "buffer"
+      ],
+      "default": "ayrshare",
+      "description": "Social-publishing backend used (Ayrshare primary, Buffer fallback — ADR-04)."
+    },
+    "source_block": {
+      "type": "string",
+      "enum": [
+        "content_calendar",
+        "none"
+      ],
+      "description": "Which upstream block the entries were derived from. 'none' when nothing was available to publish."
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/publish_entry"
+      },
+      "description": "One publishing decision per content_calendar slot. May be empty only when nothing was available to publish (source_block = 'none')."
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/alert"
+      },
+      "description": "publish_failed / needs_human / missing_asset / nothing_to_publish alerts surfaced to the operator."
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_slots",
+        "published",
+        "scheduled",
+        "held",
+        "skipped",
+        "failed"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "total_slots": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "published": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scheduled": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "held": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_platform": {
+          "type": "object",
+          "description": "platform key -> count of published+scheduled posts on that platform.",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "EN — assumptions, backend used, fallback notes, empty-cycle reason."
+    }
+  }
+}

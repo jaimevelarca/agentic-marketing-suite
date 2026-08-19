@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acme.com.mx/schemas/lead_register/v1",
+  "version": "1.0.0",
+  "title": "lead_register",
+  "description": "Memory block written by Agent 5.3 (Lead Capture + Nurture, Layer 5 — Distribution). The live, HubSpot-synced register of every inbound lead processed in a run: normalized contact, lead score + breakdown, temperature, routing decision, matched audience segment, CRM sync status, and (for warm/cold) the approved message_flows flow it was enrolled into. Hot leads are flagged for a human (hot_leads_for_human) without blocking the warm/cold automation. Read by Layer 6 (6.1 Performance Analytics attributes lead volume/CPL/conversion). Human gate: conditional — gate_status defaults to 'auto_approved'; hot leads are a notification, not a gate. | Depends on: audience_segments (1.2), message_flows (4.4), client_profile (DEL-17). | First authored: 2026-05-29.",
+  "type": "object",
+  "definitions": {
+    "score_breakdown": {
+      "type": "object",
+      "description": "Points awarded per scoring factor (auditable). Components should sum to `score`.",
+      "additionalProperties": true,
+      "properties": {
+        "intent": { "type": "number", "minimum": 0, "maximum": 45 },
+        "segment_fit": { "type": "number", "minimum": 0, "maximum": 25 },
+        "firmographic_fit": { "type": "number", "minimum": 0, "maximum": 15 },
+        "contactability": { "type": "number", "minimum": 0, "maximum": 10 },
+        "recency": { "type": "number", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "lead": {
+      "type": "object",
+      "required": [
+        "lead_id",
+        "score",
+        "temperature",
+        "routing",
+        "crm_action",
+        "crm_status"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "lead_id": {
+          "type": "string",
+          "pattern": "^lead-[a-z0-9-]+$",
+          "description": "Stable id for this lead within the register. Format: lead-{slug}."
+        },
+        "source": {
+          "type": ["string", "null"],
+          "description": "Where the lead came from, e.g. meta_lead_form / landing_page / whatsapp / referral / chat."
+        },
+        "market": {
+          "type": ["string", "null"],
+          "description": "Inferred target market: Mexico / Colombia / Dominican Republic / Puerto Rico."
+        },
+        "contact": {
+          "type": "object",
+          "description": "Normalized contact details. PII — operator-facing only.",
+          "additionalProperties": true,
+          "properties": {
+            "name": { "type": ["string", "null"] },
+            "email": { "type": ["string", "null"] },
+            "phone": { "type": ["string", "null"], "description": "E.164 where derivable." },
+            "company": { "type": ["string", "null"], "description": "Company / institution name." },
+            "whatsapp_opt_in": { "type": ["boolean", "null"] }
+          }
+        },
+        "segment_id": {
+          "type": ["string", "null"],
+          "description": "Best-fit audience_segments segment_id (seg-...), or null if no segment fits."
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Lead score 0-100 from the scoring model in the system prompt."
+        },
+        "score_breakdown": { "$ref": "#/definitions/score_breakdown" },
+        "temperature": {
+          "type": "string",
+          "enum": ["hot", "warm", "cold", "disqualified"],
+          "description": "hot = score>=70 or explicit high-intent action | warm = 40-69 | cold = <40 | disqualified = clear non-lead."
+        },
+        "routing": {
+          "type": "string",
+          "enum": ["human_followup", "nurture", "hold", "disqualified"],
+          "description": "Action taken: human_followup (hot) | nurture (warm/cold enrolled in a flow) | hold (kept in CRM, no flow) | disqualified."
+        },
+        "enrolled_flow_id": {
+          "type": ["string", "null"],
+          "description": "message_flows flow_id (flow-...) this lead was enrolled into. Null for human_followup / hold / disqualified, or when no approved flow fit."
+        },
+        "crm_action": {
+          "type": "string",
+          "enum": ["create", "update", "skip"],
+          "description": "HubSpot write action chosen after dedupe."
+        },
+        "crm_status": {
+          "type": "string",
+          "enum": ["synced", "pending", "failed", "skipped"],
+          "description": "Result of the HubSpot sync for this lead. 'synced'/'pending' for create|update; 'skipped' pairs with crm_action 'skip' (no sync attempted, e.g. a disqualified test submission); 'failed' on any lead should drive gate_status toward pending_review."
+        },
+        "crm_object_id": {
+          "type": ["string", "null"],
+          "description": "HubSpot contact/object id when known; null while pending."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "One short EN sentence: why this score/temperature/routing."
+        }
+      }
+    },
+    "hot_lead_flag": {
+      "type": "object",
+      "required": ["lead_id", "reason"],
+      "additionalProperties": true,
+      "properties": {
+        "lead_id": { "type": "string", "pattern": "^lead-[a-z0-9-]+$" },
+        "name": { "type": ["string", "null"] },
+        "company": { "type": ["string", "null"] },
+        "score": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One-line EN reason this lead is flagged hot for a human."
+        }
+      }
+    }
+  },
+  "required": [
+    "client_id",
+    "created_at",
+    "gate_status",
+    "leads",
+    "summary"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Client this lead register belongs to. Lowercase-hyphenated. Example: acme-co."
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime this run's lead_register batch was produced."
+    },
+    "gate_status": {
+      "type": "string",
+      "enum": ["pending_review", "approved", "returned", "blocked", "auto_approved"],
+      "default": "auto_approved",
+      "description": "Conditional human gate. Defaults to 'auto_approved' (routine batch is autonomous). 'pending_review' when CRM sync failed / scoring unreliable / message_flows missing; 'blocked' when there are no usable inbound leads (leads: []). Hot leads are flagged in hot_leads_for_human and do NOT by themselves change this from auto_approved."
+    },
+    "lifecycle_stage": {
+      "type": ["string", "null"],
+      "enum": ["pre-launch", "early", "growth", "established", null],
+      "description": "Carried from client_profile; affects expected lead volume and benchmark thresholds."
+    },
+    "batch_window": {
+      "type": ["string", "null"],
+      "description": "The incremental window this batch covers, e.g. '2026-06-01T09:00Z/PT15M' or a human label. Null if not tracked."
+    },
+    "markets": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Target markets represented in this batch (MX/CO/DR/PR)."
+    },
+    "crm": {
+      "type": "object",
+      "description": "CRM target (ADR-04: HubSpot primary).",
+      "additionalProperties": true,
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "CRM platform. Default 'hubspot'."
+        },
+        "sync_cadence_minutes": {
+          "type": ["integer", "null"],
+          "description": "Live sync cadence; ~15 by default."
+        }
+      }
+    },
+    "leads": {
+      "type": "array",
+      "description": "Every lead processed in this run. May be empty only when gate_status is 'blocked'.",
+      "items": { "$ref": "#/definitions/lead" }
+    },
+    "hot_leads_for_human": {
+      "type": "array",
+      "description": "Hot leads flagged for immediate human follow-up. Non-empty is normal and does NOT change gate_status from auto_approved.",
+      "items": { "$ref": "#/definitions/hot_lead_flag" }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_leads", "by_temperature", "by_routing"],
+      "additionalProperties": true,
+      "properties": {
+        "total_leads": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of leads in the `leads` array. The summary must foot to it."
+        },
+        "by_temperature": {
+          "type": "object",
+          "description": "Count of leads per temperature, e.g. {\"hot\": 1, \"warm\": 2, \"cold\": 1}.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "by_routing": {
+          "type": "object",
+          "description": "Count of leads per routing action.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "by_market": {
+          "type": "object",
+          "description": "Count of leads per market.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "enrolled_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Warm/cold leads enrolled into a nurture flow."
+        },
+        "hot_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Leads routed to human_followup. Must equal len(hot_leads_for_human)."
+        },
+        "crm_failed_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Leads whose HubSpot sync failed."
+        }
+      }
+    },
+    "routing_notes": {
+      "type": "string",
+      "description": "EN — assumptions, dedupe merges, unscoreable leads, missing/unapproved flows, CRM failures, blocked reasons."
+    }
+  }
+}
