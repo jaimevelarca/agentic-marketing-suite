@@ -22,7 +22,7 @@
 | Django's own DB | **Small Cloud SQL Postgres for `django.contrib` only** (auth, admin, sessions) | There is no Google-maintained Firestore ORM backend; Django-on-Firestore breaks admin/auth. Domain data stays in Firestore; Django reads/writes it through the suite's Firestore layer. |
 | Hosting | **Cloud Run** — Jobs for pipeline execution, Service for Django, Service for MCP/A2A | Batch-style DAG fits Jobs; container control, commodity pricing. |
 | Gemini Enterprise | **Agent Runtime deploy + registration as a later phase** | A2A registration of Cloud-Run agents went GA Aug 17, 2026; Pay-as-you-go edition (GA Aug 2026) avoids seat commitments. Not needed to run the product. |
-| IaC | **Pulumi (Python), state on a GCS bucket** (`pulumi login gs://…`), stacks `dev`/`prod` in the one project | Whole stack covered by `pulumi-gcp` v9 incl. Agent Runtime (`gcp.vertex.AiReasoningEngine`); OSS backend keeps it free. |
+| IaC | **Pulumi (Python), state on a GCS bucket** (`pulumi login gs://…`); stack `dev` → project `agentic-marketing-suite`, stack `prod` → **its own project** `agentic-marketing-suite-prod` (decided 2026-08-19, see Phase 6b) | Whole stack covered by `pulumi-gcp` v9 incl. Agent Runtime (`gcp.vertex.AiReasoningEngine`); OSS backend keeps it free. Two stacks in one project collide: Firestore `(default)` is per-project, and the service/instance/secret names are unprefixed. A second project keeps the program unchanged and separates the blast radius for ≈ USD 10–12/mo. |
 | Contract to preserve | prompt asset + JSON Schema + fixture per agent; **207 offline tests keep passing at every phase** | The offline contract is the product's crown jewel; every migration step is gated on it. |
 
 ## Phases
@@ -83,6 +83,15 @@ GitHub Actions: tests → build images → `pulumi up` preview/apply → deploy 
 Services; `prod` stack promoted from `dev`; secrets in Secret Manager only; smoke-run
 gate on deploy.
 **Exit:** merge to `main` ships to `dev` automatically; tagged release ships `prod`.
+
+**6b decisions (2026-08-19, design session — see
+[docs/session_logs/2026-08-19_fase-6b-diseno.md](docs/session_logs/2026-08-19_fase-6b-diseno.md)):**
+`prod` is its own GCP project (not a second stack in one project); promotion is a
+git tag `v*` that redeploys the **same image digest** already smoke-tested in
+`dev`; IAP goes on both consoles with the Django login kept behind it (direct
+Cloud Run IAP — GA March 2026, no load balancer, no cost; `pulumi-gcp` 9.34.1
+already exposes `iap_enabled`). Design proposed, **not yet approved** — 6b starts
+at that approval gate, then spec → plan → code.
 
 ### Phase 7 — Gemini Enterprise Agent Platform surface (optional, when wanted)
 Deploy the root agent to **Agent Runtime** (via Pulumi `gcp.vertex.AiReasoningEngine`
