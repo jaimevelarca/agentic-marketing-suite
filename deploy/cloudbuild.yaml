@@ -6,11 +6,9 @@ steps:
   - name: gcr.io/cloud-builders/docker
     args: ["build", "-f", "deploy/Dockerfile",
            "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/orchestrator:${_TAG}",
-           "-t", "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/orchestrator:latest",
            "."]
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/orchestrator:${_TAG}"
-  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/suite/orchestrator:latest"
 substitutions:
   _REGION: us-central1
   _TAG: dev

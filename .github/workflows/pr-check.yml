@@ -1,0 +1,56 @@
+name: PR Quality & Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT: agentic-marketing-suite
+  GCP_REGION: us-central1
+  WIF_PROVIDER: projects/54069477296/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+  WIF_SERVICE_ACCOUNT: pulumi-deployer@agentic-marketing-suite.iam.gserviceaccount.com
+  PULUMI_BACKEND_URL: gs://agentic-marketing-suite-pulumi-state
+
+jobs:
+  test-and-preview:
+    name: Test & Pulumi Preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Run Offline Pytest Suite
+        run: uv run pytest -q
+
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v6
+
+      - name: Pulumi Preview (Dev)
+        run: |
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+          pulumi preview --stack dev

@@ -78,20 +78,19 @@ español profesional, sin anglicismos). Approval writes flip the gate doc → re
 the paused ADK workflow.
 **Exit:** a human runs and approves an entire client pipeline from the browser.
 
-### Phase 6 — CI/CD & prod stack — 6a ✅ 2026-08-19 (app LIVE: console on Cloud Run + orchestrator Job; 6b pending: GitHub Actions WIF, prod stack, IAP, pinned image tags)
+### Phase 6 — CI/CD & prod stack — 6a ✅ 2026-08-19, 6b ✅ 2026-08-21
 GitHub Actions: tests → build images → `pulumi up` preview/apply → deploy Jobs +
 Services; `prod` stack promoted from `dev`; secrets in Secret Manager only; smoke-run
 gate on deploy.
 **Exit:** merge to `main` ships to `dev` automatically; tagged release ships `prod`.
 
-**6b decisions (2026-08-19, design session — see
-[docs/session_logs/2026-08-19_fase-6b-diseno.md](docs/session_logs/2026-08-19_fase-6b-diseno.md)):**
-`prod` is its own GCP project (not a second stack in one project); promotion is a
-git tag `v*` that redeploys the **same image digest** already smoke-tested in
-`dev`; IAP goes on both consoles with the Django login kept behind it (direct
-Cloud Run IAP — GA March 2026, no load balancer, no cost; `pulumi-gcp` 9.34.1
-already exposes `iap_enabled`). Design proposed, **not yet approved** — 6b starts
-at that approval gate, then spec → plan → code.
+**6b completed (2026-08-21, see [docs/superpowers/plans/2026-08-21-phase-6b-cicd-prod.md](docs/superpowers/plans/2026-08-21-phase-6b-cicd-prod.md)):**
+`prod` isolated in GCP project `agentic-marketing-suite-prod` (QHHE folder `274831265727`);
+GitHub Actions with Workload Identity Federation (WIF) with zero secrets stored in GitHub;
+promotion via git tag `v*` redeploying the identical immutable digest tested in `dev`;
+Direct Cloud Run IAP enabled on `console` (`js@qhhe.net`) keeping Django login behind it;
+`scripts/smoke_check.py` automated smoke gate with fixture job execution + 302 IAP redirect check
+and automatic rollback on prod failure.
 
 ### Phase 7 — Gemini Enterprise Agent Platform surface (optional, when wanted)
 Deploy the root agent to **Agent Runtime** (via Pulumi `gcp.vertex.AiReasoningEngine`

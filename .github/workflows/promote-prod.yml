@@ -1,0 +1,132 @@
+name: Promote to Prod (Tagged Release)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  DEV_GCP_PROJECT: agentic-marketing-suite
+  PROD_GCP_PROJECT: agentic-marketing-suite-prod
+  GCP_REGION: us-central1
+  PROD_WIF_PROVIDER: projects/274831265727/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+  PROD_WIF_SERVICE_ACCOUNT: pulumi-deployer@agentic-marketing-suite-prod.iam.gserviceaccount.com
+  PULUMI_BACKEND_URL: gs://agentic-marketing-suite-pulumi-state
+
+jobs:
+  promote-to-prod:
+    name: Promote Immutable Image & Deploy Prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Run Offline Pytest Suite
+        run: uv run pytest -q
+
+      - name: Authenticate to Prod GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.PROD_WIF_PROVIDER }}
+          service_account: ${{ env.PROD_WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Resolve Immutable Image Digests from Dev Registry
+        id: resolve
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "Resolving immutable digests for release tag ${{ github.ref_name }} (commit ${SHORT_SHA})..."
+
+          # Resolve console digest from shared dev registry
+          CONSOLE_DIGEST=$(gcloud artifacts docker images describe \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/console:${SHORT_SHA} \
+            --format='value(image_summary.digest)')
+
+          # Resolve orchestrator digest from shared dev registry
+          ORCHESTRATOR_DIGEST=$(gcloud artifacts docker images describe \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/orchestrator:${SHORT_SHA} \
+            --format='value(image_summary.digest)')
+
+          if [ -z "${CONSOLE_DIGEST}" ] || [ -z "${ORCHESTRATOR_DIGEST}" ]; then
+            echo "❌ Failed to resolve image digests from ${SHORT_SHA} in dev registry."
+            exit 1
+          fi
+
+          CONSOLE_IMG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/console@${CONSOLE_DIGEST}"
+          ORCHESTRATOR_IMG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/orchestrator@${ORCHESTRATOR_DIGEST}"
+
+          echo "console_image=${CONSOLE_IMG}" >> $GITHUB_OUTPUT
+          echo "orchestrator_image=${ORCHESTRATOR_IMG}" >> $GITHUB_OUTPUT
+          echo "console_digest=${CONSOLE_DIGEST}" >> $GITHUB_OUTPUT
+          echo "orchestrator_digest=${ORCHESTRATOR_DIGEST}" >> $GITHUB_OUTPUT
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v6
+
+      - name: Record Previous Prod Images & Deploy Prod Stack
+        id: deploy
+        run: |
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.PROD_GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+
+          PREV_CONSOLE=$(pulumi stack output deployed_console_image --stack prod 2>/dev/null || echo "")
+          PREV_ORCHESTRATOR=$(pulumi stack output deployed_orchestrator_image --stack prod 2>/dev/null || echo "")
+          echo "prev_console=${PREV_CONSOLE}" >> $GITHUB_OUTPUT
+          echo "prev_orchestrator=${PREV_ORCHESTRATOR}" >> $GITHUB_OUTPUT
+
+          echo "Applying Pulumi Prod Stack with promoted images..."
+          pulumi config set consoleImage "${{ steps.resolve.outputs.console_image }}" --stack prod
+          pulumi config set orchestratorImage "${{ steps.resolve.outputs.orchestrator_image }}" --stack prod
+          pulumi up --stack prod --yes
+
+      - name: Execute Smoke Gate Verification on Prod
+        id: smoke
+        run: |
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.PROD_GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+          CONSOLE_URL=$(pulumi stack output web_url --stack prod)
+          cd ..
+
+          echo "Running smoke check against prod console: ${CONSOLE_URL}..."
+          uv run python scripts/smoke_check.py \
+            --project=${{ env.PROD_GCP_PROJECT }} \
+            --region=${{ env.GCP_REGION }} \
+            --stack=prod \
+            --console-url="${CONSOLE_URL}" \
+            --expected-console-image="${{ steps.resolve.outputs.console_digest }}" \
+            --expected-orchestrator-image="${{ steps.resolve.outputs.orchestrator_digest }}"
+
+      - name: Automated Rollback on Smoke Gate Failure
+        if: failure() && steps.deploy.outputs.prev_console != ''
+        run: |
+          echo "🚨 Smoke gate or deployment failed! Initiating atomic Pulumi rollback to previous images..."
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.PROD_GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+          pulumi config set consoleImage "${{ steps.deploy.outputs.prev_console }}" --stack prod
+          pulumi config set orchestratorImage "${{ steps.deploy.outputs.prev_orchestrator }}" --stack prod
+          pulumi up --stack prod --yes
+          echo "✅ Rollback complete. Prod restored to previous stable release."

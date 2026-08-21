@@ -1,0 +1,118 @@
+name: CI & Deploy Dev
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+env:
+  GCP_PROJECT: agentic-marketing-suite
+  GCP_REGION: us-central1
+  WIF_PROVIDER: projects/54069477296/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+  WIF_SERVICE_ACCOUNT: pulumi-deployer@agentic-marketing-suite.iam.gserviceaccount.com
+  PULUMI_BACKEND_URL: gs://agentic-marketing-suite-pulumi-state
+
+jobs:
+  build-and-deploy-dev:
+    name: Build, Deploy & Smoke Test (Dev)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Run Offline Pytest Suite
+        run: uv run pytest -q
+
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and Push Container Images via Cloud Build
+        id: build
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "Building container images for tag: ${SHORT_SHA}..."
+
+          # Build Orchestrator image
+          gcloud builds submit \
+            --config=deploy/cloudbuild.yaml \
+            --substitutions=_REGION=${{ env.GCP_REGION }},_TAG=${SHORT_SHA} \
+            --project=${{ env.GCP_PROJECT }}
+
+          # Build Console web image
+          gcloud builds submit \
+            --config=web/cloudbuild.yaml \
+            --substitutions=_REGION=${{ env.GCP_REGION }},_TAG=${SHORT_SHA} \
+            --project=${{ env.GCP_PROJECT }}
+
+          # Resolve immutable image digests
+          CONSOLE_DIGEST=$(gcloud artifacts docker images describe \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/suite/console:${SHORT_SHA} \
+            --format='value(image_summary.digest)')
+          ORCHESTRATOR_DIGEST=$(gcloud artifacts docker images describe \
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/suite/orchestrator:${SHORT_SHA} \
+            --format='value(image_summary.digest)')
+
+          CONSOLE_IMG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/suite/console@${CONSOLE_DIGEST}"
+          ORCHESTRATOR_IMG="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/suite/orchestrator@${ORCHESTRATOR_DIGEST}"
+
+          echo "console_image=${CONSOLE_IMG}" >> $GITHUB_OUTPUT
+          echo "orchestrator_image=${ORCHESTRATOR_IMG}" >> $GITHUB_OUTPUT
+          echo "console_digest=${CONSOLE_DIGEST}" >> $GITHUB_OUTPUT
+          echo "orchestrator_digest=${ORCHESTRATOR_DIGEST}" >> $GITHUB_OUTPUT
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v6
+
+      - name: Pulumi Deploy (Dev)
+        run: |
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+          pulumi config set consoleImage "${{ steps.build.outputs.console_image }}" --stack dev
+          pulumi config set orchestratorImage "${{ steps.build.outputs.orchestrator_image }}" --stack dev
+          pulumi up --stack dev --yes
+
+      - name: Execute Smoke Gate Verification
+        run: |
+          PULUMI_CONFIG_PASSPHRASE=$(gcloud secrets versions access latest --secret=pulumi-passphrase --project=${{ env.GCP_PROJECT }})
+          export PULUMI_CONFIG_PASSPHRASE
+          pulumi login ${{ env.PULUMI_BACKEND_URL }}
+          cd infra
+          CONSOLE_URL=$(pulumi stack output web_url --stack dev)
+          cd ..
+
+          echo "Running smoke check against console: ${CONSOLE_URL}..."
+          uv run python scripts/smoke_check.py \
+            --project=${{ env.GCP_PROJECT }} \
+            --region=${{ env.GCP_REGION }} \
+            --stack=dev \
+            --console-url="${CONSOLE_URL}" \
+            --expected-console-image="${{ steps.build.outputs.console_digest }}" \
+            --expected-orchestrator-image="${{ steps.build.outputs.orchestrator_digest }}"

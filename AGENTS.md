@@ -14,11 +14,8 @@ como archivo de referencia en `~/dev/qhhe/ai-marketing-suite`).
   fase/exit) y dejar nota de sesión en `docs/session_logs/AAAA-MM-DD_<tema>.md`.
 
 ## GCP / identidad
-- Project **`agentic-marketing-suite`** (folder QHHE `274831265727`, billing
-  `01624A-839C44-1DB4D6`). Identidad: `dispatcher switch qhhe` (js@qhhe.net);
-  la config gcloud `qhhe` ya apunta al project.
-- IaC con **Pulumi (Python)** en `infra/` — nada de recursos a mano (excepto el
-  state bucket, documentado en `infra/README.md` cuando exista).
+- Projects: **`agentic-marketing-suite`** (`dev`) and **`agentic-marketing-suite-prod`** (`prod`), both under folder QHHE `274831265727`, billing `01624A-839C44-1DB4D6`. Identidad: `dispatcher switch qhhe` (js@qhhe.net).
+- IaC con **Pulumi (Python)** en `infra/` (stacks `dev` and `prod`, state bucket `gs://agentic-marketing-suite-pulumi-state`, documented in `infra/README.md`).
 
 ## Convenciones duras
 - **uv + Python 3.12**, venv del proyecto (`uv sync`); repo vive en `~/dev`

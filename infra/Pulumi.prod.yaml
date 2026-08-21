@@ -1,0 +1,8 @@
+config:
+  gcp:project: agentic-marketing-suite-prod
+  gcp:region: us-central1
+  gcp:billingProject: agentic-marketing-suite-prod
+  gcp:userProjectOverride: "true"
+  agentic-marketing-suite-infra:budgetAmount: "4000"
+  agentic-marketing-suite-infra:isArtifactHost: "false"
+  agentic-marketing-suite-infra:artifactHostProject: "agentic-marketing-suite"
