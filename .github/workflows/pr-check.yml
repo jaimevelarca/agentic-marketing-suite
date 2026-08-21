@@ -32,8 +32,11 @@ jobs:
       - name: Setup Python
         run: uv python install 3.12
 
+      - name: Install Dependencies
+        run: uv sync --all-extras
+
       - name: Run Offline Pytest Suite
-        run: uv run pytest -q
+        run: uv run --all-extras pytest -q
 
       - name: Authenticate to GCP via Workload Identity Federation
         uses: google-github-actions/auth@v2
