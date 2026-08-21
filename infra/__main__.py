@@ -401,13 +401,21 @@ for role in DEPLOYER_ROLES:
         member=deployer_sa.email.apply(lambda e: f"serviceAccount:{e}"),
     )
 
-# Grant deployer SA write access to the state bucket
+# Grant deployer SA write access to the state bucket and cloudbuild bucket
 gcp.storage.BucketIAMMember(
     "deployer-state-bucket-access",
     bucket="agentic-marketing-suite-pulumi-state",
     role="roles/storage.objectAdmin",
     member=deployer_sa.email.apply(lambda e: f"serviceAccount:{e}"),
 )
+
+if is_artifact_host:
+    gcp.storage.BucketIAMMember(
+        "deployer-cloudbuild-bucket-access",
+        bucket=f"{project}_cloudbuild",
+        role="roles/storage.admin",
+        member=deployer_sa.email.apply(lambda e: f"serviceAccount:{e}"),
+    )
 
 # --- Outputs ----------------------------------------------------------------
 pulumi.export("web_url", console.uri)
