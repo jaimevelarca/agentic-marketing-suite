@@ -13,10 +13,10 @@
 
 1. **Infraestructura (`infra/`):**
    - Refactorizado [`infra/__main__.py`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/infra/__main__.py) para soportar stacks multi-proyecto (`dev` y `prod`).
-   - Habilitado Direct Cloud Run IAP (`iap_enabled=True`) sobre el servicio `console`. Retirado el invoker `allUsers` y vinculado `serviceAccount:service-{PROJECT_NUMBER}@gcp-sa-iap.iam.gserviceaccount.com` como `roles/run.invoker` y `user:js@qhhe.net` como `roles/iap.httpsResourceAccessor`.
+   - Habilitado Direct Cloud Run IAP (`iap_enabled=True`) sobre el servicio `console`. Retirado el invoker `allUsers` y vinculado `serviceAccount:service-54069477296@gcp-sa-iap.iam.gserviceaccount.com` como `roles/run.invoker` y `user:js@qhhe.net` como `roles/iap.httpsResourceAccessor`.
    - Creado Workload Identity Pool `github-actions` y Provider OIDC con restricción de repositorio en `dev` y repositorio + tag `refs/tags/v*` en `prod`.
    - Creada Service Account `pulumi-deployer` con IAM de despliegue y acceso al bucket de estado `gs://agentic-marketing-suite-pulumi-state`.
-   - Contenedor de secreto `pulumi-passphrase` en Secret Manager administrado por Pulumi (la versión se siembra fuera de banda desde el vault).
+   - Contenedor de secreto `pulumi-passphrase` en Secret Manager administrado por Pulumi (la versión 1 se sembró exitosamente desde el vault `~/.agent_dispatcher/`).
    - Creado [`infra/Pulumi.prod.yaml`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/infra/Pulumi.prod.yaml) y actualizado [`infra/Pulumi.dev.yaml`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/infra/Pulumi.dev.yaml).
 
 2. **Imágenes y Cloud Build:**
@@ -38,8 +38,23 @@
    - Creado [`tests/infra/test_workflow_security.py`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/tests/infra/test_workflow_security.py) (7 tests).
    - **Total de pruebas en verde: 257** (todas offline vía `uv run pytest -q`).
 
-6. **Documentación:**
+6. **Verificación en Vivo (CI/CD Proof):**
+   - Workflow GitHub Actions [`CI & Deploy Dev (Run 32516996210)`](https://github.com/jaimevelarca/agentic-marketing-suite/actions/runs/32516996210) completó en 6m 13s 100% verde de punta a punta: autenticación WIF sin llaves estáticas, construcción de imágenes por Cloud Build, resolución de digests inmutables, `pulumi up --stack dev` y compuerta de humo validando IAP y corrida de Job fixture (19/19 agentes).
+   - Consola activa bajo Direct IAP: `https://console-7vrtvudsya-uc.a.run.app` (redirecciona HTTP 302 a `accounts.google.com` para `js@qhhe.net`).
+
+7. **Documentación:**
    - Actualizado [`ROADMAP.md`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/ROADMAP.md) (Fase 6b ✅).
    - Actualizado [`AGENTS.md`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/AGENTS.md).
    - Actualizado [`infra/README.md`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/infra/README.md).
    - Actualizado [`docs/superpowers/plans/2026-08-21-phase-6b-cicd-prod.md`](file:///Users/jaime/dev/qhhe/agentic-marketing-suite/docs/superpowers/plans/2026-08-21-phase-6b-cicd-prod.md).
+
+---
+
+## Punto de Entrada de la Siguiente Sesión
+
+- El árbol de trabajo local está limpio en la rama `main` y sincronizado con `origin/main`.
+- Las fases 0 a 6b están 100% completas y probadas en vivo.
+- **Siguientes pasos disponibles:**
+  1. **Fase 7 (Superficie Gemini Enterprise Agent Platform):** Evaluar despliegue de agente raíz en Agent Runtime (`gcp.vertex.AiReasoningEngine`) y/o registro de agentes Cloud Run en Gemini Enterprise vía tarjetas A2A (edición Pay-as-you-go).
+  2. **Fase 8 (Integraciones reales de distribución):** Meta Ads / Resend detrás del dominio MCP `platform_apis`.
+  3. **Release a Producción:** Si se desea desplegar `prod`, crear el project `agentic-marketing-suite-prod` en folder `274831265727`, sembrar el secreto `pulumi-passphrase`, inicializar el stack y pushear un git tag `v*`.
