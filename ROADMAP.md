@@ -107,12 +107,13 @@ for Google Gemini Enterprise registration (Pay-as-you-go edition); 271 offline t
 **Exit:** agents discoverable/chattable in Gemini Enterprise for QHHE users.
 
 
-### Phase 8 — Real distribution integrations (post-MVP backlog)
-Layer 4/5 stop being spec-only: pick per-channel order (likely Meta Ads + Resend
-first), implement real clients behind the MCP `platform_apis` domain, human
-financial-authorization gate before any spend. Embeddings/pgvector idea from the
-baseline is dropped unless a concrete retrieval need appears (then: Vertex embeddings
-+ Firestore vector search).
+### Phase 8 — Real distribution integrations ✅ 2026-08-23 (see [docs/superpowers/plans/2026-08-23-phase-8-real-distribution-integrations.md](docs/superpowers/plans/2026-08-23-phase-8-real-distribution-integrations.md))
+Meta Marketing API adapter (`suite/distribution/meta_ads.py`) and Resend Email API adapter (`suite/distribution/resend_email.py`);
+Human Financial Authorization Gate (`suite/distribution/financial_gate.py`) enforcing `#1ebe82` sign-off, gate status `approved`,
+and client budget ceiling validation before any spend or dispatch; FastMCP `platform_apis` server tools (`suite/mcp_servers/server.py`);
+zero-risk `dry_run` simulation mode by default; 289 offline tests green.
+**Exit:** real multi-channel execution (Meta Ads & Email) fully wired and guarded.
+
 
 ## Standing rules
 
