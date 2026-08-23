@@ -416,6 +416,16 @@ if is_artifact_host:
         role="roles/storage.admin",
         member=deployer_sa.email.apply(lambda e: f"serviceAccount:{e}"),
     )
+else:
+    gcp.artifactregistry.RepositoryIamMember(
+        "deployer-host-ar-reader",
+        project=artifact_host_project,
+        location=region,
+        repository=f"projects/{artifact_host_project}/locations/{region}/repositories/suite",
+        role="roles/artifactregistry.reader",
+        member=deployer_sa.email.apply(lambda e: f"serviceAccount:{e}"),
+    )
+
 
 # --- Outputs ----------------------------------------------------------------
 pulumi.export("web_url", console.uri)
