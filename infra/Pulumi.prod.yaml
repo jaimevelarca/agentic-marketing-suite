@@ -3,6 +3,10 @@ config:
   gcp:region: us-central1
   gcp:billingProject: agentic-marketing-suite-prod
   gcp:userProjectOverride: "true"
+  agentic-marketing-suite-infra:projectNumber: "198112926147"
   agentic-marketing-suite-infra:budgetAmount: "4000"
   agentic-marketing-suite-infra:isArtifactHost: "false"
   agentic-marketing-suite-infra:artifactHostProject: "agentic-marketing-suite"
+  agentic-marketing-suite-infra:consoleImage: us-central1-docker.pkg.dev/agentic-marketing-suite/suite/console@sha256:4efebdaa6a8eb4dd55bb3fa353f31b37996adff72f7353a020b578f401137807
+  agentic-marketing-suite-infra:orchestratorImage: us-central1-docker.pkg.dev/agentic-marketing-suite/suite/orchestrator@sha256:62df046ed768a270aaa50b11669ac5bbfd6d15002ebb08564debe71406b0a816
+encryptionsalt: v1:5bg9XmdkDIs=:v1:VSmpZt4MU0Ma8v9H:lNug/B45TaD55nMiCP9ccqMDFQ3EMg==

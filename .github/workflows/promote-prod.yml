@@ -17,7 +17,7 @@ env:
   DEV_GCP_PROJECT: agentic-marketing-suite
   PROD_GCP_PROJECT: agentic-marketing-suite-prod
   GCP_REGION: us-central1
-  PROD_WIF_PROVIDER: projects/274831265727/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
+  PROD_WIF_PROVIDER: projects/198112926147/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider
   PROD_WIF_SERVICE_ACCOUNT: pulumi-deployer@agentic-marketing-suite-prod.iam.gserviceaccount.com
   PULUMI_BACKEND_URL: gs://agentic-marketing-suite-pulumi-state
 
