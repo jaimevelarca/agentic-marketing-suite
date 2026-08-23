@@ -98,12 +98,14 @@ Pulumi `prod` stack provisioned; GitHub Actions release pipeline verified live v
 Direct IAP console active at `https://console-m6hls6q6ua-uc.a.run.app`; zero-cost fixture orchestrator job verified (19/19 agents).
 
 
-### Phase 7 — Gemini Enterprise Agent Platform surface (optional, when wanted)
-Deploy the root agent to **Agent Runtime** (via Pulumi `gcp.vertex.AiReasoningEngine`
-or the `agent_engines` SDK) and/or register the Cloud Run agents into **Gemini
-Enterprise** via A2A agent cards (Pay-as-you-go edition). Managed sessions/Memory
-Bank evaluated here (note: new billing from Sept 1, 2026).
+### Phase 7 — Gemini Enterprise Agent Platform surface ✅ 2026-08-23 (see [docs/superpowers/plans/2026-08-23-phase-7-gemini-enterprise-reasoning-engine.md](docs/superpowers/plans/2026-08-23-phase-7-gemini-enterprise-reasoning-engine.md))
+Vertex AI Reasoning Engine runtime (`suite/reasoning_engine/`) with Gemini 3.7 Flash (`gemini-3.7-flash`);
+typed domain query tools over Firestore Native (`get_client_summary`, `get_audience_and_competition`,
+`get_marketing_strategy`, `get_content_and_campaigns`, `get_creative_deliverables`, `get_run_execution_status`);
+A2A agent card manifest (`deploy/a2a/marketing_suite_agent_card.json`) and OpenAPI discovery spec (`deploy/a2a/openapi_spec.yaml`)
+for Google Gemini Enterprise registration (Pay-as-you-go edition); 271 offline tests green.
 **Exit:** agents discoverable/chattable in Gemini Enterprise for QHHE users.
+
 
 ### Phase 8 — Real distribution integrations (post-MVP backlog)
 Layer 4/5 stop being spec-only: pick per-channel order (likely Meta Ads + Resend

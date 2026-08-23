@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: QHHE Marketing Suite Agent API
+  description: OpenAPI service specification for Gemini Enterprise discovery and tool invocation over the Marketing Suite Reasoning Engine.
+  version: 1.0.0
+servers:
+  - url: https://us-central1-aiplatform.googleapis.com/v1/projects/{project}/locations/us-central1/reasoningEngines/{reasoningEngineId}
+    description: Vertex AI Reasoning Engine endpoint
+paths:
+  /:query:
+    post:
+      summary: Query Marketing Suite Reasoning Engine
+      operationId: queryReasoningEngine
+      description: Execute natural language question answering and data synthesis over marketing blocks.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                  description: Natural language query in Spanish (es-MX).
+                  example: "¿Cuál es el reparto de presupuesto y la tesis estratégica de U-Storage?"
+                client_id:
+                  type: string
+                  description: Client ID
+                  example: "u-storage"
+                tool_name:
+                  type: string
+                  description: Optional explicit tool name to invoke
+                  enum:
+                    - get_client_summary
+                    - get_audience_and_competition
+                    - get_marketing_strategy
+                    - get_content_and_campaigns
+                    - get_creative_deliverables
+                    - get_run_execution_status
+              required:
+                - prompt
+      responses:
+        '200':
+          description: Successful synthesis and tool output
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    description: Synthesized response in professional es-MX.
+                  client_id:
+                    type: string
+                  tools_invoked:
+                    type: array
+                    items:
+                      type: string
+                  tool_data:
+                    type: object

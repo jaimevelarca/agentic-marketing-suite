@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developers.google.com/gemini-enterprise/schemas/a2a-agent-card.v1.json",
+  "agent_id": "qhhe-marketing-suite",
+  "name": "QHHE Marketing Suite Agent",
+  "version": "1.0.0",
+  "description": "Conversational intelligence agent fronting QHHE's 19-agent marketing engine. Consults client strategies, audience segments, competitive radar, content calendars, and creative assets directly from Firestore Native persistence.",
+  "author": "Que Hueva Hacerlo Enterprise (QHHE)",
+  "language": "es-MX",
+  "runtime": {
+    "platform": "vertex_ai_reasoning_engine",
+    "engine_class": "suite.reasoning_engine.engine.MarketingSuiteReasoningEngine",
+    "model": "gemini-3.7-flash",
+    "region": "us-central1"
+  },
+  "access_control": {
+    "auth_type": "google_oidc_iap",
+    "allowed_identities": [
+      "user:js@qhhe.net"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "get_client_summary",
+      "name": "Resumen de Perfil de Cliente",
+      "description": "Consulta el perfil comercial, industria, propuesta de valor (USP) y presupuesto mensual asignado.",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente (ej. 'u-storage', 'alonso-y-cia', 'ceneval').",
+          "required": true
+        }
+      }
+    },
+    {
+      "id": "get_audience_and_competition",
+      "name": "Audiencia y Radar Competitivo",
+      "description": "Consulta los perfiles de cliente ideal (ICP), segmentos de audiencia, competidores mapeados y brechas de contenido.",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente.",
+          "required": true
+        }
+      }
+    },
+    {
+      "id": "get_marketing_strategy",
+      "name": "Estrategia Activa y Presupuesto",
+      "description": "Consulta la tesis estratégica de 90 días, pilares de comunicación, reparto de presupuesto por canal y KPIs.",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente.",
+          "required": true
+        }
+      }
+    },
+    {
+      "id": "get_content_and_campaigns",
+      "name": "Campañas y Calendario de Contenido",
+      "description": "Consulta el registro de campañas activas y el calendario editorial de 4 semanas con sus canales.",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente.",
+          "required": true
+        }
+      }
+    },
+    {
+      "id": "get_creative_deliverables",
+      "name": "Entregables Creativos y Mensajería",
+      "description": "Consulta textos publicitarios (copys), especificaciones visuales y flujos automatizados de correo y WhatsApp.",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente.",
+          "required": true
+        }
+      }
+    },
+    {
+      "id": "get_run_execution_status",
+      "name": "Estado de Ejecución y Compuertas",
+      "description": "Consulta el estado de avance de la corrida de 19 agentes y compuertas de revisión humana pendientes (#1ebe82).",
+      "parameters": {
+        "client_id": {
+          "type": "string",
+          "description": "Identificador único del cliente.",
+          "required": true
+        }
+      }
+    }
+  ]
+}

@@ -389,6 +389,7 @@ DEPLOYER_ROLES = [
     "roles/storage.admin",
     "roles/logging.logWriter",
     "roles/iap.admin",
+    "roles/aiplatform.admin",
 ]
 if is_artifact_host:
     DEPLOYER_ROLES.append("roles/artifactregistry.admin")
