@@ -92,6 +92,12 @@ Direct Cloud Run IAP enabled on `console` (`js@qhhe.net`) keeping Django login b
 `scripts/smoke_check.py` automated smoke gate with fixture job execution + 302 IAP redirect check
 and automatic rollback on prod failure.
 
+**Production Release v0.1.0 ✅ 2026-08-22 (see [docs/superpowers/plans/2026-08-22-prod-bootstrap-and-release-v0.1.0.md](docs/superpowers/plans/2026-08-22-prod-bootstrap-and-release-v0.1.0.md)):**
+GCP project `agentic-marketing-suite-prod` (Project Number `198112926147`) bootstrapped and linked to billing `01624A-839C44-1DB4D6`;
+Pulumi `prod` stack provisioned; GitHub Actions release pipeline verified live via git tag `v0.1.0` (Run 32621989376);
+Direct IAP console active at `https://console-m6hls6q6ua-uc.a.run.app`; zero-cost fixture orchestrator job verified (19/19 agents).
+
+
 ### Phase 7 — Gemini Enterprise Agent Platform surface (optional, when wanted)
 Deploy the root agent to **Agent Runtime** (via Pulumi `gcp.vertex.AiReasoningEngine`
 or the `agent_engines` SDK) and/or register the Cloud Run agents into **Gemini

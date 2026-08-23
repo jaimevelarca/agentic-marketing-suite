@@ -31,22 +31,22 @@
 **Objective:**
 Create project `agentic-marketing-suite-prod` in folder `274831265727`, link billing account `01624A-839C44-1DB4D6`, enable foundational service APIs, and capture the assigned `PROD_PROJECT_NUMBER`.
 
-- [ ] **Step 1.1:** Create GCP project `agentic-marketing-suite-prod`:
+- [x] **Step 1.1:** Create GCP project `agentic-marketing-suite-prod`:
   ```bash
   gcloud projects create agentic-marketing-suite-prod \
     --folder=274831265727 \
     --name="agentic-marketing-suite-prod"
   ```
-- [ ] **Step 1.2:** Link billing account:
+- [x] **Step 1.2:** Link billing account:
   ```bash
   gcloud beta billing projects link agentic-marketing-suite-prod \
     --billing-account=01624A-839C44-1DB4D6
   ```
-- [ ] **Step 1.3:** Enable baseline APIs (`serviceusage`, `cloudresourcemanager`, `secretmanager`):
+- [x] **Step 1.3:** Enable baseline APIs (`serviceusage`, `cloudresourcemanager`, `secretmanager`):
   ```bash
   gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com secretmanager.googleapis.com --project=agentic-marketing-suite-prod
   ```
-- [ ] **Step 1.4:** Retrieve assigned `PROD_PROJECT_NUMBER`:
+- [x] **Step 1.4:** Retrieve assigned `PROD_PROJECT_NUMBER`:
   ```bash
   gcloud projects describe agentic-marketing-suite-prod --format="value(projectNumber)"
   ```
@@ -63,17 +63,17 @@ Create project `agentic-marketing-suite-prod` in folder `274831265727`, link bil
 **Objective:**
 Seed `pulumi-passphrase` into `agentic-marketing-suite-prod` Secret Manager, update `infra/Pulumi.prod.yaml` with the real `projectNumber`, and configure `PROD_WIF_PROVIDER` in `.github/workflows/promote-prod.yml`.
 
-- [ ] **Step 2.1:** Create and seed `pulumi-passphrase` in `agentic-marketing-suite-prod`:
+- [x] **Step 2.1:** Create and seed `pulumi-passphrase` in `agentic-marketing-suite-prod`:
   ```bash
   gcloud secrets create pulumi-passphrase --replication-policy="automatic" --project=agentic-marketing-suite-prod
   gcloud secrets versions add pulumi-passphrase \
     --project=agentic-marketing-suite-prod \
     --data-file=<(grep PULUMI_CONFIG_PASSPHRASE ~/.agent_dispatcher/agentic-marketing-suite-pulumi.env | cut -d= -f2-)
   ```
-- [ ] **Step 2.2:** Update `infra/Pulumi.prod.yaml` with `projectNumber: "<PROD_PROJECT_NUMBER>"`.
-- [ ] **Step 2.3:** Update `.github/workflows/promote-prod.yml`:
+- [x] **Step 2.2:** Update `infra/Pulumi.prod.yaml` with `projectNumber: "<PROD_PROJECT_NUMBER>"`.
+- [x] **Step 2.3:** Update `.github/workflows/promote-prod.yml`:
   - Set `PROD_WIF_PROVIDER` to `projects/<PROD_PROJECT_NUMBER>/locations/global/workloadIdentityPools/github-actions/providers/github-actions-provider`.
-- [ ] **Step 2.4:** Run `uv run --all-extras pytest -q` to ensure all 257+ offline tests remain 100% green.
+- [x] **Step 2.4:** Run `uv run --all-extras pytest -q` to ensure all 257+ offline tests remain 100% green.
 
 ---
 
@@ -86,7 +86,7 @@ Seed `pulumi-passphrase` into `agentic-marketing-suite-prod` Secret Manager, upd
 **Objective:**
 Initialize and execute `pulumi up --stack prod` locally using ADC credentials (`js@qhhe.net`) to provision all prod resources (Firestore, Cloud SQL, WIF pool/provider, Cloud Run console & orchestrator, IAM, cross-project Artifact Registry permissions).
 
-- [ ] **Step 3.1:** Resolve the latest verified container image digests deployed in `dev`:
+- [x] **Step 3.1:** Resolve the latest verified container image digests deployed in `dev`:
   ```bash
   cd infra
   export PULUMI_CONFIG_PASSPHRASE=$(grep PULUMI_CONFIG_PASSPHRASE ~/.agent_dispatcher/agentic-marketing-suite-pulumi.env | cut -d= -f2-)
@@ -94,13 +94,13 @@ Initialize and execute `pulumi up --stack prod` locally using ADC credentials (`
   DEV_CONSOLE=$(pulumi stack output deployed_console_image --stack dev)
   DEV_ORCHESTRATOR=$(pulumi stack output deployed_orchestrator_image --stack dev)
   ```
-- [ ] **Step 3.2:** Set initial image configs on `prod` stack:
+- [x] **Step 3.2:** Set initial image configs on `prod` stack:
   ```bash
   pulumi config set consoleImage "${DEV_CONSOLE}" --stack prod
   pulumi config set orchestratorImage "${DEV_ORCHESTRATOR}" --stack prod
   ```
-- [ ] **Step 3.3:** Run `pulumi up --stack prod --yes` and verify all GCP resources are created cleanly.
-- [ ] **Step 3.4:** Run `scripts/smoke_check.py` against `prod` to verify initial health:
+- [x] **Step 3.3:** Run `pulumi up --stack prod --yes` and verify all GCP resources are created cleanly.
+- [x] **Step 3.4:** Run `scripts/smoke_check.py` against `prod` to verify initial health:
   ```bash
   cd ..
   PROD_CONSOLE_URL=$(cd infra && pulumi stack output web_url --stack prod)
@@ -121,19 +121,19 @@ Initialize and execute `pulumi up --stack prod` locally using ADC credentials (`
 **Objective:**
 Commit the updated configuration (`Pulumi.prod.yaml`, `promote-prod.yml`), push to `origin/main`, tag release `v0.1.0`, and monitor the automated GitHub Actions workflow `.github/workflows/promote-prod.yml` to verify end-to-end WIF auth, image digest promotion, and smoke gate verification in production.
 
-- [ ] **Step 4.1:** Commit configuration changes and push to `origin/main`:
+- [x] **Step 4.1:** Commit configuration changes and push to `origin/main`:
   ```bash
   git add infra/Pulumi.prod.yaml .github/workflows/promote-prod.yml
   git commit -m "chore(infra): configure prod project number and WIF provider for v0.1.0 release"
   git push origin main
   ```
-- [ ] **Step 4.2:** Create and push release tag `v0.1.0`:
+- [x] **Step 4.2:** Create and push release tag `v0.1.0`:
   ```bash
   git tag -a v0.1.0 -m "Release v0.1.0 — Production baseline with Direct IAP, ADK 2.x, Firestore, and CI/CD"
   git push origin v0.1.0
   ```
-- [ ] **Step 4.3:** Monitor GitHub Actions run for `Promote to Prod (Tagged Release)` on tag `v0.1.0` until completion (expected green).
-- [ ] **Step 4.4:** Inspect live prod console URL to confirm Direct IAP 302 redirect for `js@qhhe.net`.
+- [x] **Step 4.3:** Monitor GitHub Actions run for `Promote to Prod (Tagged Release)` on tag `v0.1.0` until completion (expected green).
+- [x] **Step 4.4:** Inspect live prod console URL to confirm Direct IAP 302 redirect for `js@qhhe.net`.
 
 ---
 
@@ -148,6 +148,6 @@ Commit the updated configuration (`Pulumi.prod.yaml`, `promote-prod.yml`), push 
 **Objective:**
 Document the production release, record live proofs and URLs, update ROADMAP, and document the ready state for Phase 7 (Gemini Enterprise Platform Surface) and Phase 8 (Real Distribution Integrations).
 
-- [ ] **Step 5.1:** Update `ROADMAP.md` recording production deployment of `agentic-marketing-suite-prod` and release `v0.1.0`.
-- [ ] **Step 5.2:** Create session log `docs/session_logs/2026-08-22_prod-release-v0.1.0.md` capturing all live outputs and validation proofs.
-- [ ] **Step 5.3:** Run `uv run --all-extras pytest -q` to confirm full test suite passes.
+- [x] **Step 5.1:** Update `ROADMAP.md` recording production deployment of `agentic-marketing-suite-prod` and release `v0.1.0`.
+- [x] **Step 5.2:** Create session log `docs/session_logs/2026-08-22_prod-release-v0.1.0.md` capturing all live outputs and validation proofs.
+- [x] **Step 5.3:** Run `uv run --all-extras pytest -q` to confirm full test suite passes.

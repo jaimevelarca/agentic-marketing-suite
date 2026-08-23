@@ -19,7 +19,7 @@ como archivo de referencia en `~/dev/qhhe/ai-marketing-suite`).
 
 ## Convenciones duras
 - **uv + Python 3.12**, venv del proyecto (`uv sync`); repo vive en `~/dev`
-  (NUNCA en Drive). Tests offline siempre verdes: `python -m pytest -q` (207).
+  (NUNCA en Drive). Tests offline siempre verdes: `uv run --all-extras pytest -q` (257).
 - **Secretos:** local → vault `~/.agent_dispatcher/`; nube → Secret Manager.
   Jamás en el repo ni en `.env` dentro del repo.
 - **Datos de cliente:** jamás commiteados (el baseline traía
