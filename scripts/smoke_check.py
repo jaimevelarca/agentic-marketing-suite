@@ -84,7 +84,7 @@ def run_orchestrator_smoke_job(
         "gcloud", "run", "jobs", "execute", job_name,
         f"--region={region}",
         f"--project={project}",
-        "--update-env-vars=SUITE_LLM_PROVIDER=fixture",
+        f"--update-env-vars=SUITE_LLM_PROVIDER=fixture,GCP_PROJECT_ID={project},SUITE_BACKEND=gcp",
         f"--args=start,--client-id={client_id},--auto-approve",
         "--wait",
         "--format=json",

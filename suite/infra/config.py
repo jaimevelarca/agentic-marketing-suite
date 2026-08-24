@@ -14,7 +14,7 @@ from pathlib import Path
 @dataclass(frozen=True)
 class Settings:
     # --- GCP project / region ---
-    project_id: str = os.getenv("GCP_PROJECT_ID", "ai-mkt-suite")
+    project_id: str = os.getenv("GCP_PROJECT_ID", "agentic-marketing-suite")
     region: str = os.getenv("GCP_REGION", "us-central1")  # GCP resources (Cloud SQL etc.)
     # Vertex endpoint region for Claude. "global" = no 10% regional premium + max
     # availability (Anthropic-recommended). Set to e.g. "us-central1" for data

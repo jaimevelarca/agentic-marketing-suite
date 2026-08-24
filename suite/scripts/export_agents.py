@@ -14,7 +14,7 @@ For each agent in the pipeline registry this writes, under `exports/agents/<id>_
 …and a top-level `exports/manifest.json` describing the whole roster.
 
 Run offline (no GCP / no API key):
-    cd ai-mkt-suite
+    cd agentic-marketing-suite
     PYTHONPATH=suite python -m scripts.export_agents
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ from infra import clients, skeleton
 from infra.config import settings
 from orchestration.pipeline import PIPELINE
 
-_ROOT = Path(__file__).resolve().parents[2]   # ai-mkt-suite/
+_ROOT = Path(__file__).resolve().parents[2]   # agentic-marketing-suite/
 _OUT = _ROOT / "exports"
 
 _TIERS = {
