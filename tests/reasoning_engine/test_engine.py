@@ -16,7 +16,7 @@ def test_reasoning_engine_setup():
     assert not engine._is_setup
     engine.set_up()
     assert engine._is_setup
-    assert len(engine.tools_map) == 6
+    assert len(engine.tools_map) == 7
 
 
 def test_reasoning_engine_query_strategy_routing():

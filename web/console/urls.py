@@ -10,4 +10,8 @@ urlpatterns = [
     path("clientes/<str:client_id>/bloques/<str:block>/", views.block_review, name="bloque"),
     path("clientes/<str:client_id>/bloques/<str:block>/decidir/", views.block_decide,
          name="decidir"),
+    path("propuestas/<str:client_id>/generar/", views.proposal_generate, name="propuesta_generar"),
+    path("propuestas/<str:client_id>/<str:doc_type>/", views.proposal_view, name="propuesta_ver"),
+    path("propuestas/<str:client_id>/<str:doc_type>/descargar/", views.proposal_download,
+         name="propuesta_descargar"),
 ]

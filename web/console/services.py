@@ -132,3 +132,34 @@ def resume_run(session_id: str) -> bool:
 
     _run_in_thread(drive)
     return True
+
+
+def get_client_proposal(client_id: str, doc_type: str = "deck") -> tuple[str, str]:
+    """Compile and return (html_content, filename) for presentation deck or detail report."""
+    from suite.rendering import compile_detail_report, compile_presentation_deck, derive_theme_from_profile
+    profile = clients.read_memory_block(client_id, "client_profile")
+    theme = derive_theme_from_profile(profile, client_id=client_id)
+    safe_name = "".join(c for c in theme.name if c.isalnum() or c in ("-", "_")).strip() or client_id
+
+    import datetime
+    today_str = datetime.date.today().strftime("%Y%m%d")
+
+    if doc_type in ("detail", "report", "anexo", "pdf"):
+        html_doc = compile_detail_report(client_id=client_id, theme=theme)
+        filename = f"Detalle_{safe_name}_QHHE_{today_str}.html"
+    else:
+        html_doc = compile_presentation_deck(client_id=client_id, theme=theme)
+        filename = f"Plan_{safe_name}_QHHE_{today_str}.html"
+
+    return html_doc, filename
+
+
+def compile_and_export_proposal(client_id: str, out_dir: str | None = None) -> dict:
+    """Compile both presentation deck and detail report, optionally writing to exports/."""
+    from pathlib import Path
+    from suite.rendering import compile_proposal
+
+    default_out = Path(__file__).resolve().parents[2] / "exports" / "proposals" / client_id
+    target_out = Path(out_dir) if out_dir else default_out
+    return compile_proposal(client_id=client_id, out_dir=target_out)
+

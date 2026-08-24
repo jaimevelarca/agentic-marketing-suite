@@ -97,6 +97,11 @@ class MarketingSuiteReasoningEngine:
                 tools_invoked.append("get_run_execution_status")
                 tool_results["get_run_execution_status"] = res
 
+            if any(k in prompt_lower for k in ("propuesta", "presentacion", "deck", "compilar", "anexo", "pdf", "reporte")):
+                res = tools.compile_client_proposal(client_id)
+                tools_invoked.append("compile_client_proposal")
+                tool_results["compile_client_proposal"] = res
+
             # Fallback: if no specific keyword matched, load summary & status
             if not tools_invoked:
                 res_sum = tools.get_client_summary(client_id)
@@ -174,6 +179,12 @@ class MarketingSuiteReasoningEngine:
             lines.append(f"- **Bloques Generados:** {stat.get('populated_blocks_count')}/{stat.get('total_blocks_checked')}")
             if stat.get("pending_human_gates"):
                 lines.append(f"- **Compuertas Humanas Pendientes (#1ebe82):** {', '.join(stat.get('pending_human_gates'))}")
+
+        if "compile_client_proposal" in tool_data:
+            pr = tool_data["compile_client_proposal"]
+            lines.append(f"- **Propuesta Generada:** {pr.get('presentation_filename')} y {pr.get('detail_filename')}")
+            lines.append(f"- **Presentación:** {pr.get('presentation_size_chars')} caracteres (9 actos interactivos)")
+            lines.append(f"- **Anexo Ejecutivo:** {pr.get('detail_size_chars')} caracteres (dossier completo)")
 
         lines.append(f"\n*Respuesta generada en base a la consulta:* «{prompt}»")
         return "\n".join(lines)

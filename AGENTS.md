@@ -7,7 +7,7 @@ Sucesor de `ai-marketing-suite` (baseline importado en `a65f48e`; aquel repo que
 como archivo de referencia en `~/dev/qhhe/ai-marketing-suite`).
 
 ## Estado y mapa
-- **Plan estratégico:** `ROADMAP.md` (fases 0–8, decisiones de stack verificadas
+- **Plan estratégico:** `ROADMAP.md` (fases 0–9, decisiones de stack verificadas
   2026-08-19). **Review del baseline:** `docs/REVIEW-2026-08-19.md`.
 - **Planes por fase:** `docs/superpowers/plans/` (uno por fase al arrancarla).
 - Al cerrar sesión que cambie el estado del proyecto: actualizar ROADMAP (marcar
@@ -19,7 +19,7 @@ como archivo de referencia en `~/dev/qhhe/ai-marketing-suite`).
 
 ## Convenciones duras
 - **uv + Python 3.12**, venv del proyecto (`uv sync`); repo vive en `~/dev`
-  (NUNCA en Drive). Tests offline siempre verdes: `uv run --all-extras pytest -q` (289).
+  (NUNCA en Drive). Tests offline siempre verdes: `uv run --all-extras pytest -q` (313).
 - **Secretos:** local → vault `~/.agent_dispatcher/`; nube → Secret Manager.
   Jamás en el repo ni en `.env` dentro del repo.
 - **Datos de cliente:** jamás commiteados (el baseline traía

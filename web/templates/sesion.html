@@ -26,6 +26,15 @@
 <h2>Bloques aprobados ({{ s.blocks|length }})</h2>
 <p>{% for b in s.blocks %}<a class="chip" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">{{ b }}</a> {% endfor %}</p>
 
+<h2>Propuesta y Entregables</h2>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 20px;">
+  <a class="btn btn-pri" target="_blank" href="{% url 'propuesta_ver' s.client_id 'deck' %}">Ver Presentación (9 Actos)</a>
+  <a class="btn btn-sec" target="_blank" href="{% url 'propuesta_ver' s.client_id 'detail' %}">Ver Anexo de Detalle / PDF</a>
+  <a class="btn btn-sec" href="{% url 'propuesta_descargar' s.client_id 'deck' %}">Descargar Presentación</a>
+  <a class="btn btn-sec" href="{% url 'propuesta_descargar' s.client_id 'detail' %}">Descargar Anexo</a>
+  <a class="btn btn-sec" href="{% url 'propuesta_generar' s.client_id %}?volver={{ s.id }}">Exportar Archivos</a>
+</div>
+
 <h2>Bitácora de agentes</h2>
 <table>
 <thead><tr><th>Agente</th><th>Capa</th><th>Compuerta</th><th>Resultado</th></tr></thead>

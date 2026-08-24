@@ -115,6 +115,17 @@ zero-risk `dry_run` simulation mode by default; 289 offline tests green.
 **Exit:** real multi-channel execution (Meta Ads & Email) fully wired and guarded.
 
 
+### Phase 9 — Automated Proposal & Presentation Compiler ✅ 2026-08-24 (see [docs/superpowers/plans/2026-08-24-phase-9-automated-proposal-presentation-compiler.md](docs/superpowers/plans/2026-08-24-phase-9-automated-proposal-presentation-compiler.md))
+Deliverables and Presentation Rendering Engine (`suite/rendering/`);
+Interactive, standalone, responsive **9-Act HTML Presentation Deck** (`presentation_compiler.py`) with metric counters, 2x2 competitive positioning quadrants, real copy artifacts, and `#1ebe82` human gate checklist;
+Comprehensive **Executive Detail / PDF Report Annex** (`detail_compiler.py`) with complete ICP breakdowns, 4-week calendar slot matrices, creative registers, and `@media print` layout;
+Theme loader and validation (`theme.toml` & dynamic profile derivation in `theme.py`);
+Visual creative engine routing (`gemini-3.1-flash-image` vs `gemini-3.1-pro-preview` with safe offline `StubRenderer`);
+Django review console endpoints (`/propuestas/<client_id>/<doc_type>/` and `/propuestas/<client_id>/generar/`) and Vertex AI Reasoning Engine tool (`compile_client_proposal`);
+313 offline tests green (24 new tests added).
+**Exit:** one-click standalone client presentation decks and executive PDF dossiers compiled from Firestore pipeline memory blocks.
+
+
 ## Standing rules
 
 - Human gate is sacred: nothing publishes or spends without explicit approval;
@@ -123,3 +134,4 @@ zero-risk `dry_run` simulation mode by default; 289 offline tests green.
   repo/env files.
 - Client-facing output: español es-MX profesional, sin anglicismos.
 - Every phase keeps the 207-test offline suite green and adds its own tests.
+

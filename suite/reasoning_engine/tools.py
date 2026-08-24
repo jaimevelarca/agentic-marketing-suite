@@ -160,6 +160,24 @@ def get_run_execution_status(client_id: str) -> dict[str, Any]:
     }
 
 
+def compile_client_proposal(client_id: str, format: str = "both") -> dict[str, Any]:
+    """Compile the interactive 9-act HTML presentation deck and executive detail dossier for a client."""
+    from suite.rendering import compile_proposal
+
+    res = compile_proposal(client_id=client_id)
+    return {
+        "client_id": client_id,
+        "client_name": res["client_name"],
+        "presentation_filename": res["presentation_filename"],
+        "detail_filename": res["detail_filename"],
+        "presentation_size_chars": len(res["presentation_html"]),
+        "detail_size_chars": len(res["detail_html"]),
+        "generated_at": res["generated_at"],
+        "status": "ready",
+        "format": format,
+    }
+
+
 TOOLS = [
     get_client_summary,
     get_audience_and_competition,
@@ -167,4 +185,6 @@ TOOLS = [
     get_content_and_campaigns,
     get_creative_deliverables,
     get_run_execution_status,
+    compile_client_proposal,
 ]
+

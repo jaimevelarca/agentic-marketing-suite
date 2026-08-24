@@ -7,7 +7,7 @@ from pathlib import Path
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
@@ -94,3 +94,45 @@ def run_new(request):
         return redirect("sesion", session_id=session_id)
     sample = _SAMPLE_INPUT.read_text(encoding="utf-8") if _SAMPLE_INPUT.exists() else "{}"
     return render(request, "nueva.html", {"inputs_json": sample, "client_id": ""})
+
+
+@login_required
+def proposal_view(request, client_id: str, doc_type: str = "deck"):
+    """Render standalone HTML presentation deck or detail report in browser."""
+    try:
+        html_doc, _ = services.get_client_proposal(client_id, doc_type=doc_type)
+        return HttpResponse(html_doc, content_type="text/html; charset=utf-8")
+    except Exception as e:
+        messages.error(request, f"Error al generar propuesta: {e}")
+        return redirect("panel")
+
+
+@login_required
+def proposal_download(request, client_id: str, doc_type: str = "deck"):
+    """Download the standalone proposal as an HTML attachment."""
+    try:
+        html_doc, filename = services.get_client_proposal(client_id, doc_type=doc_type)
+        resp = HttpResponse(html_doc, content_type="text/html; charset=utf-8")
+        resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return resp
+    except Exception as e:
+        messages.error(request, f"Error al descargar propuesta: {e}")
+        return redirect("panel")
+
+
+@login_required
+def proposal_generate(request, client_id: str):
+    """Trigger proposal export to exports/ directory."""
+    try:
+        res = services.compile_and_export_proposal(client_id)
+        messages.success(
+            request,
+            f"Propuesta generada para {client_id}: {res['presentation_filename']} y {res['detail_filename']}."
+        )
+    except Exception as e:
+        messages.error(request, f"Error al compilar propuesta: {e}")
+    volver = request.GET.get("volver", "")
+    if volver:
+        return redirect("sesion", session_id=volver)
+    return redirect("panel")
+
