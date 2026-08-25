@@ -130,6 +130,11 @@ Promoted Phases 7, 8 and 9 to `agentic-marketing-suite-prod` (Project Number `19
 GitHub Actions release pipeline verified live via git tag `v0.2.0` (Run 32797756714);
 Direct IAP console active on prod; zero-cost fixture orchestrator job verified with all 19 agents.
 
+**Production Release v0.2.1 ✅ 2026-08-25:**
+IAP SSO auto-login (`IAPHeaderAuthMiddleware`) and flexible dual authentication (`EmailOrUsernameModelBackend`);
+Interactive 6-step client onboarding wizard (`web/templates/nueva.html`) with smart drag & drop file importer (JSON/CSV/TXT), structured fields and executive validation cards (no raw JSON required);
+GitHub Actions release pipeline verified live via git tag `v0.2.1` (Run 32865424742); 316 offline tests green.
+
 
 ## Standing rules
 
