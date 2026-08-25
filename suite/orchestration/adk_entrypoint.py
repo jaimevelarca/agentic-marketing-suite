@@ -28,9 +28,14 @@ USER_ID = "operator"
 
 def _runner_and_service():
     from google.adk.runners import Runner
-    from infra.adk_sessions import FirestoreSessionService
+    from infra.config import settings
     from orchestration.adk_workflow import build_workflow
-    service = FirestoreSessionService()
+    if settings.backend == "memory":
+        from google.adk.sessions import InMemorySessionService
+        service = InMemorySessionService()
+    else:
+        from infra.adk_sessions import FirestoreSessionService
+        service = FirestoreSessionService()
     return Runner(node=build_workflow(), app_name=APP_NAME, session_service=service), service
 
 
