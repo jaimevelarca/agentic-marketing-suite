@@ -125,6 +125,11 @@ Django review console endpoints (`/propuestas/<client_id>/<doc_type>/` and `/pro
 313 offline tests green (24 new tests added).
 **Exit:** one-click standalone client presentation decks and executive PDF dossiers compiled from Firestore pipeline memory blocks.
 
+**Production Release v0.2.0 ✅ 2026-08-25:**
+Promoted Phases 7, 8 and 9 to `agentic-marketing-suite-prod` (Project Number `198112926147`);
+GitHub Actions release pipeline verified live via git tag `v0.2.0` (Run 32797756714);
+Direct IAP console active on prod; zero-cost fixture orchestrator job verified with all 19 agents.
+
 
 ## Standing rules
 
