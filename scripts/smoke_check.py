@@ -108,6 +108,29 @@ def run_orchestrator_smoke_job(
 
     if res.returncode != 0:
         logger.error("❌ gcloud run jobs execute failed (exit %d): %s", res.returncode, res.stderr)
+        # Fetch execution logs from Cloud Logging and describe to print exact error
+        try:
+            import re
+            m = re.search(r"suite-orchestrator-[a-z0-9]+", res.stderr + " " + res.stdout)
+            exec_name = m.group(0) if m else None
+            if exec_name:
+                logger.info("Fetching execution details for %s...", exec_name)
+                desc = subprocess.run(
+                    ["gcloud", "run", "jobs", "executions", "describe", exec_name,
+                     f"--region={region}", f"--project={project}", "--format=yaml"],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False
+                )
+                logger.info("Execution describe:\n%s", desc.stdout or desc.stderr)
+
+            logs_res = subprocess.run(
+                ["gcloud", "logging", "read",
+                 f'resource.type="cloud_run_job" AND resource.labels.job_name="{job_name}"',
+                 f"--project={project}", "--limit=50", "--format=value(textPayload)"],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False
+            )
+            logger.info("Recent job container logs:\n%s", logs_res.stdout or logs_res.stderr)
+        except Exception as log_err:
+            logger.warning("Could not fetch execution logs: %s", log_err)
         return False
 
     try:
