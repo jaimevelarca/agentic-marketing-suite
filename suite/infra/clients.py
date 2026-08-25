@@ -206,10 +206,14 @@ def publish(topic: str, payload: dict) -> str:
     if settings.backend == "memory":
         MEMORY_STORE["published"].append({"topic": topic, "payload": payload})
         return "memory"
-    publisher = _publisher()
-    topic_path = publisher.topic_path(settings.project_id, topic)
-    future = publisher.publish(topic_path, json.dumps(payload).encode("utf-8"))
-    return future.result(timeout=30)
+    try:
+        publisher = _publisher()
+        topic_path = publisher.topic_path(settings.project_id, topic)
+        future = publisher.publish(topic_path, json.dumps(payload).encode("utf-8"))
+        return future.result(timeout=10)
+    except Exception as e:
+        _llm_log.warning("Pub/Sub publish to %s failed or timed out: %s", topic, e)
+        return ""
 
 
 # --- Firestore persistence (memory blocks + gate state) ----------------------

@@ -60,11 +60,17 @@ def _make_agent_fn(step: AgentStep):
             if blk in blocks:
                 payload[blk] = blocks[blk]
 
-        result = _load_run(step.module)(payload)
+        try:
+            result = _load_run(step.module)(payload)
+            valid, error, structured = result.valid, result.error, result.structured
+        except Exception as e:
+            log.exception("agent %s crashed: %s", step.id, e)
+            valid, error, structured = False, str(e), None
+
         entry = {"agent": step.id, "name": step.name, "layer": step.layer,
-                 "gate": step.gate, "valid": result.valid, "error": result.error}
-        if result.valid and result.structured:
-            obj = dict(result.structured)
+                 "gate": step.gate, "valid": valid, "error": error}
+        if valid and structured:
+            obj = dict(structured)
             gate_status = obj.get("gate_status", "auto_approved")
             if ctx.state.get("auto_approve") and gate_status in (
                     "pending_review", "returned", "blocked"):

@@ -388,6 +388,7 @@ DEPLOYER_ROLES = [
     "roles/serviceusage.serviceUsageConsumer",
     "roles/storage.admin",
     "roles/logging.logWriter",
+    "roles/logging.viewer",
     "roles/iap.admin",
     "roles/aiplatform.admin",
 ]
