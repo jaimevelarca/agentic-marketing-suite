@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Acceso{% endblock %}
 {% block content %}
-<h1>Acceso</h1>
-<form method="post" style="max-width:22rem">{% csrf_token %}
-  <label for="id_username">Usuario</label>
-  <input type="text" name="username" id="id_username" autofocus>
-  <label for="id_password">Contraseña</label>
-  <input type="password" name="password" id="id_password"
-         style="width:100%;padding:.5em;border:1px solid var(--line);border-radius:6px;font:inherit">
-  {% if form.errors %}<p class="nota" style="color:var(--bad)">Usuario o contraseña incorrectos.</p>{% endif %}
-  <p><button class="btn btn-sec" type="submit">Entrar</button></p>
-</form>
+<h1>Acceso a la Consola</h1>
+<div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.5rem;max-width:24rem">
+  <p class="nota" style="margin-top:0;margin-bottom:1.2rem">
+    Inicia sesión con tu <strong>usuario</strong> (<code>jaime</code>) o tu <strong>correo electrónico</strong> (<code>js@qhhe.net</code>).
+  </p>
+  <form method="post">{% csrf_token %}
+    <label for="id_username">Usuario o Correo Electrónico</label>
+    <input type="text" name="username" id="id_username" placeholder="jaime o js@qhhe.net" autofocus required>
+    <label for="id_password" style="margin-top:1rem">Contraseña</label>
+    <input type="password" name="password" id="id_password" required
+           style="width:100%;padding:.5em;border:1px solid var(--line);border-radius:6px;font:inherit;background:var(--paper)">
+    {% if form.errors %}
+      <p class="nota" style="color:var(--bad);background:#FAEFEC;padding:.6rem .8rem;border-radius:6px;margin:1rem 0">
+        Usuario o contraseña incorrectos. Verifica tus credenciales de Secret Manager.
+      </p>
+    {% endif %}
+    <p style="margin-top:1.4rem"><button class="btn btn-sec" style="width:100%;padding:.65em 1em" type="submit">Iniciar Sesión</button></p>
+  </form>
+</div>
 {% endblock %}

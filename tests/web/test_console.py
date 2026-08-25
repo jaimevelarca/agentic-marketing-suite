@@ -92,3 +92,55 @@ def test_nueva_rejects_bad_json(web, monkeypatch):
     monkeypatch.setattr(views.services, "start_run", lambda *a, **k: pytest.fail("no debió iniciar"))
     response = web.post("/corridas/nueva/", {"client_id": "acme-co", "inputs_json": "{malo"})
     assert response.status_code == 200  # re-render con mensaje de error
+
+
+def test_iap_header_auto_login(db, monkeypatch):
+    """Verify that Google IAP email header auto-authenticates the user seamlessly."""
+    monkeypatch.setattr(services, "list_sessions", lambda: [])
+    c = Client()
+    # Unauthenticated client with IAP header
+    response = c.get("/", HTTP_X_GOOG_AUTHENTICATED_USER_EMAIL="accounts.google.com:js@qhhe.net")
+    assert response.status_code == 200
+    assert "_auth_user_id" in c.session
+
+
+def test_email_or_username_login(db):
+    """Verify that users can log in via username OR email address."""
+    User.objects.create_user(username="jaime", email="js@qhhe.net", password="clave-de-prueba")
+    c = Client()
+    # Log in via email
+    assert c.login(username="js@qhhe.net", password="clave-de-prueba") is True
+    c.logout()
+    # Log in via username
+    assert c.login(username="jaime", password="clave-de-prueba") is True
+
+
+def test_nueva_starts_run_with_structured_wizard_fields(web, monkeypatch):
+    """Verify that submitting visual structured wizard fields compiles the canonical input structure."""
+    started = {}
+    monkeypatch.setattr(views.services, "start_run",
+                        lambda cid, inputs, auto_approve, session_id: started.update(
+                            cid=cid, inputs=inputs, auto=auto_approve, sid=session_id))
+    
+    post_data = {
+        "company_name": "Alonso y Cía.",
+        "client_id": "alonso-y-cia",
+        "website_url": "https://alonsoycia.com.mx",
+        "industry": "Seguridad Industrial y Contra Incendios",
+        "offer_description": "Instalación y mantenimiento de sistemas contra incendios",
+        "value_propositions": "Certificación NFPA\nAtención 24/7",
+        "primary_market": "México",
+        "target_customer": "Gerentes de Planta y Seguridad Industrial",
+        "marketing_objective": "Generar 30 prospectos calificados por mes",
+        "monthly_budget": "$35,000 MXN",
+        "channels": "Meta Ads, Email Marketing, Google Ads",
+        "brand_voice_tone": "professional/corporate",
+        "primary_hex": "#1E3A8A",
+    }
+    response = web.post("/corridas/nueva/", post_data)
+    assert response.status_code == 302
+    assert started["cid"] == "alonso-y-cia"
+    assert started["inputs"]["quick_start_form"]["company_name"] == "Alonso y Cía."
+    assert started["inputs"]["quick_start_form"]["industry"] == "Seguridad Industrial y Contra Incendios"
+    assert "Certificación NFPA" in started["inputs"]["scraper_output"]["value_propositions"]
+    assert started["inputs"]["scraper_output"]["visual_identity"]["top_5_hex"] == ["#1E3A8A"]

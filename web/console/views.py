@@ -72,28 +72,135 @@ def block_decide(request, client_id, block):
     return redirect("panel")
 
 
+def _build_inputs_from_form(post: dict) -> tuple[str, dict]:
+    """Convert structured form fields or raw JSON into the canonical client input payload."""
+    raw_json = post.get("inputs_json", "").strip()
+    use_raw = post.get("use_raw_json") == "1"
+
+    # If raw JSON is provided without structured company_name or in explicit raw mode
+    if raw_json and (use_raw or not post.get("company_name")):
+        inputs = json.loads(raw_json)
+        client_id = post.get("client_id", "").strip() or inputs.get("client_id", "")
+        return client_id, inputs
+
+    # Structured visual wizard / form builder
+    company_name = post.get("company_name", "").strip()
+    trade_name = post.get("trade_name", "").strip() or company_name
+    website_url = post.get("website_url", "").strip()
+    industry = post.get("industry", "").strip()
+    offer_desc = post.get("offer_description", "").strip()
+    target_customer = post.get("target_customer", "").strip()
+    value_props = [v.strip() for v in post.get("value_propositions", "").splitlines() if v.strip()]
+    if not value_props and offer_desc:
+        value_props = [offer_desc]
+    services_list = [s.strip() for s in post.get("services_extracted", "").splitlines() if s.strip()]
+    if not services_list and offer_desc:
+        services_list = [offer_desc]
+
+    target_markets = [m.strip() for m in post.get("target_markets", "México").split(",") if m.strip()]
+    primary_market = post.get("primary_market", "México").strip()
+
+    client_id = post.get("client_id", "").strip()
+    if not client_id and company_name:
+        import re
+        client_id = re.sub(r"[^a-zA-Z0-9_-]", "-", company_name.lower().strip()).strip("-")
+    client_id = client_id or "nuevo-cliente"
+
+    marketing_obj = post.get("marketing_objective", "").strip() or None
+    monthly_budget = post.get("monthly_budget", "").strip() or None
+    sales_cycle = post.get("sales_cycle", "").strip() or None
+    languages = [lang.strip() for lang in post.get("languages", "es-MX").split(",") if lang.strip()]
+
+    channels = [c.strip() for c in post.get("channels", "Meta Ads, Email Marketing").split(",") if c.strip()]
+    voice_tone = post.get("brand_voice_tone", "professional/corporate").strip()
+    voice_tokens = [t.strip() for t in post.get("brand_voice_tokens", "profesional, confiable, orientado a resultados").split(",") if t.strip()]
+
+    inputs = {
+        "client_id": client_id,
+        "quick_start_form": {
+            "company_name": company_name or trade_name or client_id,
+            "website_url": website_url,
+            "industry": industry,
+            "offer_description": offer_desc,
+            "target_markets": target_markets,
+            "primary_market": primary_market,
+            "target_customer": target_customer,
+            "marketing_objective": marketing_obj,
+            "monthly_budget": monthly_budget,
+            "sales_cycle": sales_cycle,
+            "languages": languages,
+            "notes": post.get("notes", "").strip(),
+        },
+        "scraper_output": {
+            "scrape_status": "manual_entry",
+            "meta_description": offer_desc,
+            "about_text_excerpt": offer_desc,
+            "services_extracted": services_list,
+            "value_propositions": value_props,
+            "primary_cta": post.get("primary_cta", "Agendar llamada de diagnóstico").strip(),
+            "locations_detected": target_markets,
+            "visual_identity": {
+                "top_5_hex": [post.get("primary_hex", "#0E6B5C").strip()] if post.get("primary_hex") else [],
+                "heading_font": post.get("heading_font", "").strip() or None,
+                "body_font": post.get("body_font", "").strip() or None,
+                "logo": {"url": post.get("logo_url", "").strip() or None},
+            },
+            "brand_voice": {
+                "detected_language": "es",
+                "vocabulary_register": voice_tone,
+                "proposed_voice_tokens": voice_tokens,
+                "sample_sentences": [offer_desc] if offer_desc else [],
+            },
+            "company_context": {
+                "channels_recommended": channels,
+                "social_links_found": {},
+            },
+        },
+        "operator_notes": post.get("operator_notes", "").strip() or f"Cliente incorporado vía Asistente Interactivo de Consola para {client_id}.",
+    }
+    return client_id, inputs
+
+
 @login_required
 def run_new(request):
     if request.method == "POST":
-        raw = request.POST.get("inputs_json", "").strip()
         try:
-            inputs = json.loads(raw) if raw else {}
+            client_id, inputs = _build_inputs_from_form(request.POST)
         except json.JSONDecodeError as e:
             messages.error(request, f"El JSON de entrada no es válido: {e}")
-            return render(request, "nueva.html", {"inputs_json": raw,
-                                                  "client_id": request.POST.get("client_id", "")})
-        client_id = request.POST.get("client_id", "").strip() or inputs.get("client_id")
+            return render(request, "nueva.html", {
+                "inputs_json": request.POST.get("inputs_json", ""),
+                "client_id": request.POST.get("client_id", ""),
+            })
+        except Exception as e:
+            messages.error(request, f"Error al procesar los datos del cliente: {e}")
+            return render(request, "nueva.html", {
+                "inputs_json": request.POST.get("inputs_json", ""),
+                "client_id": request.POST.get("client_id", ""),
+            })
+
         if not client_id:
-            messages.error(request, "Falta el identificador del cliente.")
-            return render(request, "nueva.html", {"inputs_json": raw, "client_id": ""})
+            messages.error(request, "Falta el identificador del cliente o el nombre de la empresa.")
+            return render(request, "nueva.html", {
+                "inputs_json": request.POST.get("inputs_json", ""),
+                "client_id": "",
+            })
+
         session_id = f"run-{time.strftime('%Y%m%d-%H%M%S')}"
-        services.start_run(client_id, inputs,
-                           auto_approve=bool(request.POST.get("auto_approve")),
-                           session_id=session_id)
-        messages.success(request, f"Corrida {session_id} iniciada.")
+        services.start_run(
+            client_id,
+            inputs,
+            auto_approve=bool(request.POST.get("auto_approve")),
+            session_id=session_id,
+        )
+        messages.success(request, f"Corrida {session_id} iniciada con éxito para «{client_id}».")
         return redirect("sesion", session_id=session_id)
+
     sample = _SAMPLE_INPUT.read_text(encoding="utf-8") if _SAMPLE_INPUT.exists() else "{}"
-    return render(request, "nueva.html", {"inputs_json": sample, "client_id": ""})
+    return render(request, "nueva.html", {
+        "inputs_json": sample,
+        "client_id": "",
+    })
 
 
 @login_required

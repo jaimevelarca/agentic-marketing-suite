@@ -1,16 +1,704 @@
 {% extends "base.html" %}
-{% block title %}Nueva corrida{% endblock %}
+{% block title %}Nueva corrida · Asistente de Incorporación{% endblock %}
 {% block content %}
-<h1>Nueva corrida</h1>
-<form method="post">{% csrf_token %}
-  <label for="id_client">Identificador del cliente</label>
-  <input type="text" name="client_id" id="id_client" value="{{ client_id }}"
-         placeholder="p. ej. acme-co (si se omite, se toma del JSON)">
-  <label for="id_inputs">Datos de incorporación (JSON)</label>
-  <textarea name="inputs_json" id="id_inputs">{{ inputs_json }}</textarea>
-  <p><label style="display:inline;font-weight:400">
-    <input type="checkbox" name="auto_approve" value="1">
-    Aprobación automática (solo pruebas — omite las compuertas humanas)</label></p>
-  <p><button class="btn btn-sec" type="submit">Iniciar corrida</button></p>
+<style>
+  .wizard-nav{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid var(--line);padding-bottom:1rem;overflow-x:auto}
+  .wizard-tab{background:none;border:0;padding:.6rem 1rem;font-size:.9rem;font-weight:600;color:var(--ink2);cursor:pointer;border-radius:6px}
+  .wizard-tab:hover{background:#EDF2F0;color:var(--ink)}
+  .wizard-tab.active{background:var(--accent);color:#fff}
+  
+  .step-indicator{display:flex;justify-content:space-between;margin-bottom:2rem;position:relative}
+  .step-indicator::before{content:"";position:absolute;top:18px;left:20px;right:20px;height:2px;background:var(--line);z-index:1}
+  .step-item{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;cursor:pointer;background:var(--paper);padding:0 .5rem}
+  .step-num{width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--ink2);margin-bottom:.3rem;transition:all .2s}
+  .step-item.active .step-num{background:var(--accent);border-color:var(--accent);color:#fff}
+  .step-item.done .step-num{background:var(--gate);border-color:var(--gate);color:#fff}
+  .step-label{font-size:.78rem;font-weight:600;color:var(--ink2);text-align:center}
+  .step-item.active .step-label{color:var(--accent)}
+  
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.6rem;margin-bottom:1.5rem}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+  .form-grid.full{grid-template-columns:1fr}
+  
+  .dropzone{border:2px dashed var(--line);border-radius:8px;padding:2.5rem 1.5rem;text-align:center;background:var(--paper);cursor:pointer;transition:all .2s}
+  .dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:#EAF4EE}
+  
+  .summary-card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1rem 1.2rem;margin-bottom:1rem}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+  
+  .btn-prev{background:#EDF2F0;color:var(--ink2)}
+  .btn-next{background:var(--gate);color:#fff}
+  .field-hint{font-size:.8rem;color:var(--ink2);margin-top:.25rem}
+</style>
+
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.5rem">
+  <h1>Nueva Corrida · Incorporación de Cliente</h1>
+  <span class="nota">19 Agentes de Marketing Autónomos</span>
+</div>
+
+<!-- Tabs de Modo -->
+<div class="wizard-nav">
+  <button type="button" class="wizard-tab active" onclick="switchMode('wizard')">🎯 Asistente Guiado</button>
+  <button type="button" class="wizard-tab" onclick="switchMode('file')">📂 Cargar Archivo (JSON / CSV / TXT)</button>
+  <button type="button" class="wizard-tab" onclick="switchMode('full')">📝 Formulario Completo</button>
+  <button type="button" class="wizard-tab" onclick="switchMode('json')">💻 Editor JSON Avanzado</button>
+</div>
+
+<form method="post" id="clientForm" enctype="multipart/form-data">{% csrf_token %}
+  <input type="hidden" name="use_raw_json" id="use_raw_json" value="0">
+
+  <!-- ======================================================== -->
+  <!-- MODO 1: ASISTENTE PASO A PASO                            -->
+  <!-- ======================================================== -->
+  <div id="mode-wizard">
+    <!-- Indicador de pasos -->
+    <div class="step-indicator">
+      <div class="step-item active" id="dot-1" onclick="goToStep(1)">
+        <div class="step-num">1</div>
+        <div class="step-label">Identidad</div>
+      </div>
+      <div class="step-item" id="dot-2" onclick="goToStep(2)">
+        <div class="step-num">2</div>
+        <div class="step-label">Negocio & Oferta</div>
+      </div>
+      <div class="step-item" id="dot-3" onclick="goToStep(3)">
+        <div class="step-num">3</div>
+        <div class="step-label">Audiencia & ICP</div>
+      </div>
+      <div class="step-item" id="dot-4" onclick="goToStep(4)">
+        <div class="step-num">4</div>
+        <div class="step-label">Metas & Presupuesto</div>
+      </div>
+      <div class="step-item" id="dot-5" onclick="goToStep(5)">
+        <div class="step-num">5</div>
+        <div class="step-label">Canales & Marca</div>
+      </div>
+      <div class="step-item" id="dot-6" onclick="goToStep(6)">
+        <div class="step-num">6</div>
+        <div class="step-label">Validación Final</div>
+      </div>
+    </div>
+
+    <!-- PASO 1: IDENTIDAD -->
+    <div class="card wizard-step" id="step-1">
+      <h2 style="margin-top:0">🏢 1. Identidad de la Empresa</h2>
+      <p class="nota">Datos básicos de identificación y presencia digital de la marca.</p>
+      
+      <div class="form-grid">
+        <div>
+          <label for="wiz_company_name">Nombre de la Empresa / Marca *</label>
+          <input type="text" id="wiz_company_name" name="company_name" placeholder="p. ej. Acme Transformación Organizacional" oninput="handleCompanyNameInput(this.value)" required>
+          <div class="field-hint">Nombre con el que opera y se presenta al mercado.</div>
+        </div>
+        <div>
+          <label for="wiz_client_id">Identificador del Cliente (Slug) *</label>
+          <input type="text" id="wiz_client_id" name="client_id" placeholder="p. ej. acme" required>
+          <div class="field-hint">Clave única en minúsculas para Firestore y Cloud Storage.</div>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:1rem">
+        <div>
+          <label for="wiz_website_url">Sitio Web Oficial</label>
+          <input type="text" id="wiz_website_url" name="website_url" placeholder="https://www.ejemplo.com.mx">
+        </div>
+        <div>
+          <label for="wiz_trade_name">Razón Social o Denominación</label>
+          <input type="text" id="wiz_trade_name" name="trade_name" placeholder="p. ej. Acme Consulting S.A. de C.V.">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:1.5rem">
+        <button type="button" class="btn btn-next" onclick="validateAndNext(1)">Aprobar y Continuar ➔</button>
+      </div>
+    </div>
+
+    <!-- PASO 2: NEGOCIO Y OFERTA -->
+    <div class="card wizard-step" id="step-2" style="display:none">
+      <h2 style="margin-top:0">💼 2. Negocio, Servicios y Propuesta de Valor</h2>
+      <p class="nota">Describe la oferta principal y las ventajas competitivas clave del cliente.</p>
+
+      <div class="form-grid full">
+        <div>
+          <label for="wiz_industry">Industria / Sector de Actividad *</label>
+          <input type="text" id="wiz_industry" name="industry" placeholder="p. ej. Consultoría B2B, Software SaaS, Retail, Inmobiliario" required>
+        </div>
+        <div>
+          <label for="wiz_offer_description">Descripción de la Oferta y Servicios Principales *</label>
+          <textarea id="wiz_offer_description" name="offer_description" style="min-height:7rem" placeholder="Detalla qué productos o servicios ofrece la empresa, cuál es su modelo y beneficios principales..." required></textarea>
+        </div>
+        <div>
+          <label for="wiz_value_propositions">Propuestas de Valor / Diferenciadores (1 por línea)</label>
+          <textarea id="wiz_value_propositions" name="value_propositions" style="min-height:5rem" placeholder="Resultados garantizados contractualmente&#10;ROI promedio 5:1&#10;Metodología propietaria"></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:1.5rem">
+        <button type="button" class="btn btn-prev" onclick="goToStep(1)">⬅ Anterior</button>
+        <button type="button" class="btn btn-next" onclick="validateAndNext(2)">Aprobar y Continuar ➔</button>
+      </div>
+    </div>
+
+    <!-- PASO 3: AUDIENCIA Y MERCADO -->
+    <div class="card wizard-step" id="step-3" style="display:none">
+      <h2 style="margin-top:0">🎯 3. Audiencia Objetivo y Clientes Ideales (ICP)</h2>
+      <p class="nota">Define a quién va dirigida la comunicación y los mercados geográficos.</p>
+
+      <div class="form-grid">
+        <div>
+          <label for="wiz_primary_market">Mercado Geográfico Principal</label>
+          <input type="text" id="wiz_primary_market" name="primary_market" value="México" placeholder="p. ej. México">
+        </div>
+        <div>
+          <label for="wiz_target_markets">Mercados Secundarios (separados por coma)</label>
+          <input type="text" id="wiz_target_markets" name="target_markets" value="México, Colombia, Chile, USA" placeholder="México, Colombia, Chile, USA">
+        </div>
+      </div>
+
+      <div class="form-grid full" style="margin-top:1rem">
+        <div>
+          <label for="wiz_target_customer">Perfil del Cliente Ideal (ICP / Tomador de Decisión) *</label>
+          <textarea id="wiz_target_customer" name="target_customer" style="min-height:6rem" placeholder="p. ej. Directores Generales, CFOs y Dueños de Medianas y Grandes Empresas con más de 50 empleados..." required></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:1.5rem">
+        <button type="button" class="btn btn-prev" onclick="goToStep(2)">⬅ Anterior</button>
+        <button type="button" class="btn btn-next" onclick="validateAndNext(3)">Aprobar y Continuar ➔</button>
+      </div>
+    </div>
+
+    <!-- PASO 4: METAS Y PRESUPUESTO -->
+    <div class="card wizard-step" id="step-4" style="display:none">
+      <h2 style="margin-top:0">📊 4. Metas de Marketing y Presupuesto</h2>
+      <p class="nota">Parámetros comerciales y límites financieros para la estrategia.</p>
+
+      <div class="form-grid">
+        <div>
+          <label for="wiz_marketing_objective">Objetivo de Marketing Principal</label>
+          <input type="text" id="wiz_marketing_objective" name="marketing_objective" placeholder="p. ej. Generación de 50 Leads Calificados B2B mensuales">
+        </div>
+        <div>
+          <label for="wiz_monthly_budget">Presupuesto Mensual Estimado</label>
+          <input type="text" id="wiz_monthly_budget" name="monthly_budget" placeholder="p. ej. $45,000 MXN o $2,500 USD">
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:1rem">
+        <div>
+          <label for="wiz_sales_cycle">Ciclo de Venta Típico</label>
+          <input type="text" id="wiz_sales_cycle" name="sales_cycle" placeholder="p. ej. 30 a 60 días">
+        </div>
+        <div>
+          <label for="wiz_primary_cta">Llamado a la Acción Principal (CTA)</label>
+          <input type="text" id="wiz_primary_cta" name="primary_cta" value="Agendar llamada de diagnóstico" placeholder="Agendar llamada de diagnóstico">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:1.5rem">
+        <button type="button" class="btn btn-prev" onclick="goToStep(3)">⬅ Anterior</button>
+        <button type="button" class="btn btn-next" onclick="validateAndNext(4)">Aprobar y Continuar ➔</button>
+      </div>
+    </div>
+
+    <!-- PASO 5: CANALES Y MARCA -->
+    <div class="card wizard-step" id="step-5" style="display:none">
+      <h2 style="margin-top:0">📣 5. Canales y Lineamientos de Marca</h2>
+      <p class="nota">Canales de distribución prioritarios y voz corporativa.</p>
+
+      <div class="form-grid">
+        <div>
+          <label for="wiz_channels">Canales de Distribución Prioritarios</label>
+          <input type="text" id="wiz_channels" name="channels" value="Meta Ads, Email Marketing, LinkedIn" placeholder="Meta Ads, Email Marketing, LinkedIn">
+        </div>
+        <div>
+          <label for="wiz_brand_voice_tone">Tono de Voz Deseado</label>
+          <input type="text" id="wiz_brand_voice_tone" name="brand_voice_tone" value="professional/corporate" placeholder="professional/corporate, consultivo, cercano">
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top:1rem">
+        <div>
+          <label for="wiz_primary_hex">Color Primario de Marca (HEX)</label>
+          <div style="display:flex;gap:.6rem;align-items:center">
+            <input type="color" id="wiz_color_picker" value="#0E6B5C" onchange="document.getElementById('wiz_primary_hex').value=this.value" style="width:42px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;cursor:pointer">
+            <input type="text" id="wiz_primary_hex" name="primary_hex" value="#0E6B5C" placeholder="#0E6B5C" onchange="document.getElementById('wiz_color_picker').value=this.value">
+          </div>
+        </div>
+        <div>
+          <label for="wiz_logo_url">URL del Logotipo (Opcional)</label>
+          <input type="text" id="wiz_logo_url" name="logo_url" placeholder="https://.../logo.png">
+        </div>
+      </div>
+
+      <div class="form-grid full" style="margin-top:1rem">
+        <div>
+          <label for="wiz_operator_notes">Notas Adicionales del Operador</label>
+          <textarea id="wiz_operator_notes" name="operator_notes" style="min-height:4rem" placeholder="Contexto especial, clientes prioritarios, restricciones o antecedentes..."></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:1.5rem">
+        <button type="button" class="btn btn-prev" onclick="goToStep(4)">⬅ Anterior</button>
+        <button type="button" class="btn btn-next" onclick="validateAndNext(5)">Aprobar y Revisar Resumen ➔</button>
+      </div>
+    </div>
+
+    <!-- PASO 6: RESUMEN Y VALIDACIÓN FINAL -->
+    <div class="card wizard-step" id="step-6" style="display:none">
+      <h2 style="margin-top:0">✅ 6. Validación Final y Resumen de Incorporación</h2>
+      <p class="nota">Revisa que toda la información esté en orden antes de lanzar el pipeline de 19 agentes.</p>
+
+      <div id="validation-summary" class="summary-grid">
+        <!-- Renderizado dinámicamente con JS -->
+      </div>
+
+      <div style="background:#EDF2F0;border:1px solid var(--line);border-radius:6px;padding:1rem;margin:1.5rem 0">
+        <label style="display:inline;font-weight:600;cursor:pointer">
+          <input type="checkbox" name="auto_approve" value="1">
+          Aprobación automática (modo prueba rápida — omite pausas de compuertas humanas)
+        </label>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem">
+        <button type="button" class="btn btn-prev" onclick="goToStep(5)">⬅ Modificar Datos</button>
+        <button type="submit" class="btn btn-sec" style="font-size:1.05rem;padding:.7em 1.6em;background:var(--accent)">
+          🚀 Iniciar Corrida de 19 Agentes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODO 2: CARGAR ARCHIVO (JSON / CSV / TXT)                -->
+  <!-- ======================================================== -->
+  <div id="mode-file" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">📂 Cargar Archivo de Datos del Cliente</h2>
+      <p class="nota">Sube un archivo existente en formato <strong>JSON</strong>, <strong>CSV</strong> o <strong>TXT</strong>. El sistema extraerá los datos automáticamente, prellenará el formulario y te presentará la pantalla de validación.</p>
+
+      <div class="dropzone" id="fileDropzone" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:2.4rem;margin-bottom:.5rem">📄</div>
+        <div style="font-weight:700;font-size:1.05rem;color:var(--ink)">Arrastra y suelta tu archivo aquí</div>
+        <div class="field-hint" style="margin-top:.4rem">o haz clic para explorar en tu computadora (.json, .csv, .txt, .md)</div>
+        <input type="file" id="fileInput" accept=".json,.csv,.txt,.md" style="display:none" onchange="handleFileSelect(this.files)">
+      </div>
+
+      <div id="fileUploadStatus" style="display:none;margin-top:1rem;padding:.8rem 1rem;background:#EAF4EE;border:1px solid var(--line);border-radius:6px;color:#176A4A;font-weight:600"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODO 3: FORMULARIO COMPLETO TODO EN UNO                  -->
+  <!-- ======================================================== -->
+  <div id="mode-full" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">📋 Formulario Completo de Incorporación</h2>
+      <p class="nota">Todos los campos disponibles en una sola vista estructurada.</p>
+      
+      <!-- Se replica la visualización y se enlaza dinámicamente -->
+      <div id="full-form-fields">
+        <!-- Campos espejo -->
+      </div>
+      
+      <p style="margin-top:1.5rem">
+        <button type="submit" class="btn btn-sec" style="font-size:1rem;padding:.6em 1.4em">
+          🚀 Iniciar Corrida
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODO 4: EDITOR JSON AVANZADO                             -->
+  <!-- ======================================================== -->
+  <div id="mode-json" style="display:none">
+    <div class="card">
+      <h2 style="margin-top:0">💻 Editor JSON de Incorporación (Avanzado)</h2>
+      <p class="nota">Edita o inspecciona directamente la estructura cruda que consumen los agentes del sistema.</p>
+
+      <label for="id_inputs">Payload de Entrada (JSON)</label>
+      <textarea name="inputs_json" id="id_inputs" style="font-family:ui-monospace,Menlo,monospace;font-size:.84rem;min-height:22rem">{{ inputs_json }}</textarea>
+
+      <div style="display:flex;gap:1rem;margin-top:1rem">
+        <button type="button" class="btn btn-sec" style="background:#4A5751" onclick="syncJsonToFields()">🔄 Sincronizar hacia Asistente Visual</button>
+        <button type="button" class="btn btn-sec" style="background:#4A5751" onclick="syncFieldsToJson()">🔄 Generar JSON desde Asistente Visual</button>
+      </div>
+
+      <p style="margin-top:1.5rem">
+        <button type="submit" class="btn btn-sec" onclick="document.getElementById('use_raw_json').value='1'">
+          🚀 Iniciar Corrida con este JSON
+        </button>
+      </p>
+    </div>
+  </div>
 </form>
+
+<script>
+  let currentStep = 1;
+
+  function switchMode(mode) {
+    document.querySelectorAll('.wizard-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('mode-wizard').style.display = (mode === 'wizard') ? 'block' : 'none';
+    document.getElementById('mode-file').style.display = (mode === 'file') ? 'block' : 'none';
+    document.getElementById('mode-full').style.display = (mode === 'full') ? 'block' : 'none';
+    document.getElementById('mode-json').style.display = (mode === 'json') ? 'block' : 'none';
+    
+    // Activar botón de tab
+    const tabs = document.querySelectorAll('.wizard-tab');
+    if (mode === 'wizard') tabs[0].classList.add('active');
+    if (mode === 'file') tabs[1].classList.add('active');
+    if (mode === 'full') {
+      tabs[2].classList.add('active');
+      renderFullForm();
+    }
+    if (mode === 'json') {
+      tabs[3].classList.add('active');
+      syncFieldsToJson();
+    }
+  }
+
+  function handleCompanyNameInput(val) {
+    const slugInput = document.getElementById('wiz_client_id');
+    if (!slugInput.dataset.manual) {
+      slugInput.value = val.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9_-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+  }
+
+  document.getElementById('wiz_client_id').addEventListener('input', function() {
+    this.dataset.manual = 'true';
+  });
+
+  function goToStep(step) {
+    document.querySelectorAll('.wizard-step').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.step-item').forEach((el, idx) => {
+      el.classList.remove('active');
+      if (idx + 1 < step) el.classList.add('done');
+      else el.classList.remove('done');
+    });
+    
+    document.getElementById('step-' + step).style.display = 'block';
+    document.getElementById('dot-' + step).classList.add('active');
+    currentStep = step;
+    
+    if (step === 6) {
+      renderSummary();
+    }
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function validateAndNext(step) {
+    // Validar campos requeridos del paso actual
+    const currentStepEl = document.getElementById('step-' + step);
+    const requiredInputs = currentStepEl.querySelectorAll('input[required], textarea[required]');
+    for (const input of requiredInputs) {
+      if (!input.value.trim()) {
+        input.focus();
+        input.style.borderColor = 'var(--bad)';
+        alert('Por favor completa el campo requerido: ' + (input.previousElementSibling ? input.previousElementSibling.innerText : 'Campo obligatorio'));
+        return;
+      } else {
+        input.style.borderColor = 'var(--line)';
+      }
+    }
+    goToStep(step + 1);
+  }
+
+  function renderSummary() {
+    const data = getFormData();
+    const html = `
+      <div class="summary-card">
+        <h3 style="margin:0 0 .5rem;color:var(--accent)">🏢 Identidad</h3>
+        <div><strong>Empresa:</strong> ${escapeHtml(data.company_name || '-')}</div>
+        <div><strong>ID (Slug):</strong> <code>${escapeHtml(data.client_id || '-')}</code></div>
+        <div><strong>Sitio Web:</strong> ${escapeHtml(data.website_url || '-')}</div>
+        <div><strong>Razón Social:</strong> ${escapeHtml(data.trade_name || '-')}</div>
+      </div>
+      <div class="summary-card">
+        <h3 style="margin:0 0 .5rem;color:var(--accent)">💼 Negocio & Oferta</h3>
+        <div><strong>Industria:</strong> ${escapeHtml(data.industry || '-')}</div>
+        <div><strong>Oferta:</strong> ${escapeHtml(data.offer_description ? (data.offer_description.substring(0, 90) + '...') : '-')}</div>
+        <div><strong>Propuesta de Valor:</strong> ${escapeHtml(data.value_propositions ? (data.value_propositions.substring(0, 90) + '...') : '-')}</div>
+      </div>
+      <div class="summary-card">
+        <h3 style="margin:0 0 .5rem;color:var(--accent)">🎯 Audiencia & Metas</h3>
+        <div><strong>Mercado:</strong> ${escapeHtml(data.primary_market || '-')}</div>
+        <div><strong>ICP:</strong> ${escapeHtml(data.target_customer ? (data.target_customer.substring(0, 90) + '...') : '-')}</div>
+        <div><strong>Objetivo:</strong> ${escapeHtml(data.marketing_objective || '-')}</div>
+        <div><strong>Presupuesto:</strong> ${escapeHtml(data.monthly_budget || '-')}</div>
+      </div>
+      <div class="summary-card">
+        <h3 style="margin:0 0 .5rem;color:var(--accent)">📣 Canales & Marca</h3>
+        <div><strong>Canales:</strong> ${escapeHtml(data.channels || '-')}</div>
+        <div><strong>Tono de Voz:</strong> ${escapeHtml(data.brand_voice_tone || '-')}</div>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <strong>Color Primario:</strong> 
+          <span style="display:inline-block;width:14px;height:14px;background:${escapeHtml(data.primary_hex)};border:1px solid #ccc;border-radius:3px"></span>
+          <code>${escapeHtml(data.primary_hex || '-')}</code>
+        </div>
+      </div>
+    `;
+    document.getElementById('validation-summary').innerHTML = html;
+  }
+
+  function getFormData() {
+    return {
+      company_name: document.getElementById('wiz_company_name').value.trim(),
+      client_id: document.getElementById('wiz_client_id').value.trim(),
+      website_url: document.getElementById('wiz_website_url').value.trim(),
+      trade_name: document.getElementById('wiz_trade_name').value.trim(),
+      industry: document.getElementById('wiz_industry').value.trim(),
+      offer_description: document.getElementById('wiz_offer_description').value.trim(),
+      value_propositions: document.getElementById('wiz_value_propositions').value.trim(),
+      primary_market: document.getElementById('wiz_primary_market').value.trim(),
+      target_markets: document.getElementById('wiz_target_markets').value.trim(),
+      target_customer: document.getElementById('wiz_target_customer').value.trim(),
+      marketing_objective: document.getElementById('wiz_marketing_objective').value.trim(),
+      monthly_budget: document.getElementById('wiz_monthly_budget').value.trim(),
+      sales_cycle: document.getElementById('wiz_sales_cycle').value.trim(),
+      primary_cta: document.getElementById('wiz_primary_cta').value.trim(),
+      channels: document.getElementById('wiz_channels').value.trim(),
+      brand_voice_tone: document.getElementById('wiz_brand_voice_tone').value.trim(),
+      primary_hex: document.getElementById('wiz_primary_hex').value.trim() || '#0E6B5C',
+      logo_url: document.getElementById('wiz_logo_url').value.trim(),
+      operator_notes: document.getElementById('wiz_operator_notes').value.trim(),
+    };
+  }
+
+  function populateFormData(obj) {
+    if (obj.company_name) document.getElementById('wiz_company_name').value = obj.company_name;
+    if (obj.client_id) document.getElementById('wiz_client_id').value = obj.client_id;
+    if (obj.website_url) document.getElementById('wiz_website_url').value = obj.website_url;
+    if (obj.trade_name) document.getElementById('wiz_trade_name').value = obj.trade_name;
+    if (obj.industry) document.getElementById('wiz_industry').value = obj.industry;
+    if (obj.offer_description) document.getElementById('wiz_offer_description').value = obj.offer_description;
+    if (obj.value_propositions) document.getElementById('wiz_value_propositions').value = Array.isArray(obj.value_propositions) ? obj.value_propositions.join('\n') : obj.value_propositions;
+    if (obj.primary_market) document.getElementById('wiz_primary_market').value = obj.primary_market;
+    if (obj.target_markets) document.getElementById('wiz_target_markets').value = Array.isArray(obj.target_markets) ? obj.target_markets.join(', ') : obj.target_markets;
+    if (obj.target_customer) document.getElementById('wiz_target_customer').value = obj.target_customer;
+    if (obj.marketing_objective) document.getElementById('wiz_marketing_objective').value = obj.marketing_objective;
+    if (obj.monthly_budget) document.getElementById('wiz_monthly_budget').value = obj.monthly_budget;
+    if (obj.sales_cycle) document.getElementById('wiz_sales_cycle').value = obj.sales_cycle;
+    if (obj.primary_cta) document.getElementById('wiz_primary_cta').value = obj.primary_cta;
+    if (obj.channels) document.getElementById('wiz_channels').value = Array.isArray(obj.channels) ? obj.channels.join(', ') : obj.channels;
+    if (obj.brand_voice_tone) document.getElementById('wiz_brand_voice_tone').value = obj.brand_voice_tone;
+    if (obj.primary_hex) {
+      document.getElementById('wiz_primary_hex').value = obj.primary_hex;
+      document.getElementById('wiz_color_picker').value = obj.primary_hex;
+    }
+    if (obj.logo_url) document.getElementById('wiz_logo_url').value = obj.logo_url;
+    if (obj.operator_notes) document.getElementById('wiz_operator_notes').value = obj.operator_notes;
+  }
+
+  function syncFieldsToJson() {
+    const d = getFormData();
+    const jsonPayload = {
+      client_id: d.client_id || 'nuevo-cliente',
+      quick_start_form: {
+        company_name: d.company_name,
+        website_url: d.website_url,
+        industry: d.industry,
+        offer_description: d.offer_description,
+        target_markets: d.target_markets ? d.target_markets.split(',').map(s=>s.trim()).filter(Boolean) : ['México'],
+        primary_market: d.primary_market || 'México',
+        target_customer: d.target_customer,
+        marketing_objective: d.marketing_objective || null,
+        monthly_budget: d.monthly_budget || null,
+        sales_cycle: d.sales_cycle || null,
+        languages: ['es-MX'],
+        notes: ''
+      },
+      scraper_output: {
+        scrape_status: 'manual_entry',
+        meta_description: d.offer_description,
+        about_text_excerpt: d.offer_description,
+        services_extracted: d.offer_description ? [d.offer_description] : [],
+        value_propositions: d.value_propositions ? d.value_propositions.split('\n').map(s=>s.trim()).filter(Boolean) : [],
+        primary_cta: d.primary_cta || 'Agendar llamada',
+        locations_detected: d.target_markets ? d.target_markets.split(',').map(s=>s.trim()).filter(Boolean) : ['México'],
+        visual_identity: {
+          top_5_hex: d.primary_hex ? [d.primary_hex] : ['#0E6B5C'],
+          heading_font: null,
+          body_font: null,
+          logo: {url: d.logo_url || null}
+        },
+        brand_voice: {
+          detected_language: 'es',
+          vocabulary_register: d.brand_voice_tone || 'professional/corporate',
+          proposed_voice_tokens: ['profesional', 'orientado a resultados', 'confiable'],
+          sample_sentences: []
+        },
+        company_context: {
+          channels_recommended: d.channels ? d.channels.split(',').map(s=>s.trim()).filter(Boolean) : [],
+          social_links_found: {}
+        }
+      },
+      operator_notes: d.operator_notes || `Cliente incorporado vía Asistente para ${d.client_id}.`
+    };
+    document.getElementById('id_inputs').value = JSON.stringify(jsonPayload, null, 2);
+  }
+
+  function syncJsonToFields() {
+    try {
+      const parsed = JSON.parse(document.getElementById('id_inputs').value);
+      const q = parsed.quick_start_form || {};
+      const s = parsed.scraper_output || {};
+      const v = (s.visual_identity || {}).top_5_hex || [];
+      const extracted = {
+        client_id: parsed.client_id || '',
+        company_name: q.company_name || parsed.company_name || '',
+        website_url: q.website_url || parsed.website_url || '',
+        industry: q.industry || parsed.industry || '',
+        offer_description: q.offer_description || s.about_text_excerpt || '',
+        value_propositions: Array.isArray(s.value_propositions) ? s.value_propositions.join('\n') : (s.value_propositions || ''),
+        primary_market: q.primary_market || 'México',
+        target_markets: Array.isArray(q.target_markets) ? q.target_markets.join(', ') : (q.target_markets || ''),
+        target_customer: q.target_customer || '',
+        marketing_objective: q.marketing_objective || '',
+        monthly_budget: q.monthly_budget || '',
+        sales_cycle: q.sales_cycle || '',
+        primary_cta: s.primary_cta || '',
+        channels: ((s.company_context || {}).channels_recommended || []).join(', '),
+        brand_voice_tone: (s.brand_voice || {}).vocabulary_register || '',
+        primary_hex: v.length > 0 ? v[0] : '#0E6B5C',
+        logo_url: ((s.visual_identity || {}).logo || {}).url || '',
+        operator_notes: parsed.operator_notes || ''
+      };
+      populateFormData(extracted);
+      alert('✅ Datos sincronizados correctamente desde el JSON hacia el asistente.');
+      switchMode('wizard');
+      goToStep(1);
+    } catch(e) {
+      alert('❌ Error al parsear JSON: ' + e.message);
+    }
+  }
+
+  function handleFileSelect(files) {
+    if (!files || !files.length) return;
+    const file = files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+      const content = e.target.result;
+      let parsed = {};
+      
+      if (file.name.endsWith('.json') || content.trim().startsWith('{')) {
+        try {
+          const raw = JSON.parse(content);
+          document.getElementById('id_inputs').value = JSON.stringify(raw, null, 2);
+          syncJsonToFields();
+          showFileSuccess(`✅ Archivo JSON «${file.name}» cargado. Revisa los datos y aprueba.`);
+          return;
+        } catch(err) {
+          alert('Error al leer JSON: ' + err.message);
+        }
+      } else if (file.name.endsWith('.csv')) {
+        const lines = content.split('\n');
+        lines.forEach(line => {
+          const parts = line.split(',');
+          if (parts.length >= 2) {
+            const k = parts[0].trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+            parsed[k] = parts[1].trim();
+          }
+        });
+      } else {
+        // Formato TXT / Notas por líneas clave: valor
+        const lines = content.split('\n');
+        lines.forEach(line => {
+          if (line.includes(':')) {
+            const [k, ...v] = line.split(':');
+            parsed[k.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_')] = v.join(':').trim();
+          }
+        });
+      }
+
+      // Mapear campos detectados
+      populateFormData({
+        company_name: parsed.empresa || parsed.company_name || parsed.nombre || parsed.cliente || '',
+        client_id: parsed.client_id || parsed.id || '',
+        website_url: parsed.web || parsed.sitio_web || parsed.website || parsed.url || '',
+        industry: parsed.industria || parsed.sector || parsed.industry || '',
+        offer_description: parsed.oferta || parsed.descripcion || parsed.servicios || parsed.offer || '',
+        value_propositions: parsed.propuesta_de_valor || parsed.diferenciadores || '',
+        target_customer: parsed.cliente_ideal || parsed.icp || parsed.audiencia || '',
+        monthly_budget: parsed.presupuesto || parsed.budget || '',
+        primary_market: parsed.mercado || parsed.pais || 'México',
+        marketing_objective: parsed.objetivo || parsed.meta || ''
+      });
+
+      showFileSuccess(`✅ Archivo «${file.name}» procesado. Te dirigimos a la validación final.`);
+      switchMode('wizard');
+      goToStep(6);
+    };
+
+    reader.readAsText(file);
+  }
+
+  function showFileSuccess(msg) {
+    const st = document.getElementById('fileUploadStatus');
+    st.innerText = msg;
+    st.style.display = 'block';
+  }
+
+  // Soporte de Drag & Drop
+  const dropzone = document.getElementById('fileDropzone');
+  ['dragenter', 'dragover'].forEach(n => {
+    dropzone.addEventListener(n, e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(n => {
+    dropzone.addEventListener(n, e => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+  });
+  dropzone.addEventListener('drop', e => {
+    const dt = e.dataTransfer;
+    if (dt && dt.files) handleFileSelect(dt.files);
+  });
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Prellenar al iniciar si existe JSON inicial
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = document.getElementById('id_inputs').value.trim();
+    if (raw && raw !== '{}') {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.client_id || parsed.quick_start_form) {
+          const q = parsed.quick_start_form || {};
+          const s = parsed.scraper_output || {};
+          populateFormData({
+            client_id: parsed.client_id || '',
+            company_name: q.company_name || '',
+            website_url: q.website_url || '',
+            industry: q.industry || '',
+            offer_description: q.offer_description || s.about_text_excerpt || '',
+            value_propositions: Array.isArray(s.value_propositions) ? s.value_propositions.join('\n') : (s.value_propositions || ''),
+            primary_market: q.primary_market || 'México',
+            target_markets: Array.isArray(q.target_markets) ? q.target_markets.join(', ') : (q.target_markets || ''),
+            target_customer: q.target_customer || '',
+            marketing_objective: q.marketing_objective || '',
+            monthly_budget: q.monthly_budget || '',
+            sales_cycle: q.sales_cycle || '',
+            primary_cta: s.primary_cta || '',
+            channels: ((s.company_context || {}).channels_recommended || []).join(', '),
+            brand_voice_tone: (s.brand_voice || {}).vocabulary_register || '',
+            primary_hex: ((s.visual_identity || {}).top_5_hex || ['#0E6B5C'])[0] || '#0E6B5C',
+            logo_url: ((s.visual_identity || {}).logo || {}).url || '',
+            operator_notes: parsed.operator_notes || ''
+          });
+        }
+      } catch(e) {}
+    }
+  });
+</script>
 {% endblock %}
