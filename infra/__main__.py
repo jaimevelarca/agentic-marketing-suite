@@ -254,7 +254,7 @@ console = gcp.cloudrunv2.Service(
         "scaling": {"max_instance_count": 2},
         "containers": [{
             "image": console_image,
-            "resources": {"cpu_idle": False,
+            "resources": {"cpu_idle": True,
                           "limits": {"cpu": "1", "memory": "1Gi"}},
             "envs": [
                 {"name": "GCP_PROJECT_ID", "value": project},
