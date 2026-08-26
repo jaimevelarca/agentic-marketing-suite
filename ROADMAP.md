@@ -135,6 +135,11 @@ IAP SSO auto-login (`IAPHeaderAuthMiddleware`) and flexible dual authentication 
 Interactive 6-step client onboarding wizard (`web/templates/nueva.html`) with smart drag & drop file importer (JSON/CSV/TXT), structured fields and executive validation cards (no raw JSON required);
 GitHub Actions release pipeline verified live via git tag `v0.2.1` (Run 32865424742); 316 offline tests green.
 
+**Production Release v0.2.2 ✅ 2026-08-26:**
+Enabled request-based serverless billing (`cpu_idle: true`) on Cloud Run `console` service in both Dev and Prod stacks;
+Eliminated continuous 24/7 idle compute cost, ensuring $0.00 compute spend when idle;
+GitHub Actions release pipeline verified live via git tag `v0.2.2` (Run 33007620897); 316 offline tests green.
+
 
 ## Standing rules
 
