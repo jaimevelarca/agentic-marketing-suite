@@ -140,6 +140,12 @@ Enabled request-based serverless billing (`cpu_idle: true`) on Cloud Run `consol
 Eliminated continuous 24/7 idle compute cost, ensuring $0.00 compute spend when idle;
 GitHub Actions release pipeline verified live via git tag `v0.2.2` (Run 33007620897); 316 offline tests green.
 
+**Production Release v0.2.3 ✅ 2026-08-27:**
+Interactive, human-friendly deliverable cards (`web/console/block_renderers.py` & `bloque.html`) for client profile, audiences, competitive map, strategy, KPI contracts, 4-week calendar, copy library, visual assets, and landing pages (raw JSON relegated to collapsible dev accordion);
+Real-time pipeline visibility and live status banners in `sesion.html` (auto-refreshing every 4s during runs, prominent pause warnings with one-click `#1ebe82` approval buttons);
+Complete 19-agent value chain DAG organized by 6 layers with mission, deliverable, and handoff tracking (`pipeline_meta.py`);
+319 offline tests green.
+
 
 ## Standing rules
 
