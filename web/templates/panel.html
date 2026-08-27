@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Tablero{% endblock %}
 {% block content %}
-<h1>Tablero</h1>
-<p class="nota">{{ sessions|length }} corrida{{ sessions|length|pluralize }} ·
-  {{ pendientes }} bloque{{ pendientes|pluralize }} en espera de revisión.</p>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
+  <div>
+    <h1 style="margin:0 0 .3rem">Tablero</h1>
+    <div class="nota">{{ sessions|length }} corrida{{ sessions|length|pluralize }} ·
+      {{ pendientes }} bloque{{ pendientes|pluralize }} en espera de revisión.</div>
+  </div>
+  {% if sessions %}
+    <form method="post" action="{% url 'limpiar_pruebas' %}" style="display:inline" onsubmit="return confirm('¿Confirmas que deseas eliminar todas las corridas anteriores y reiniciar el tablero a 0?');">
+      {% csrf_token %}
+      <button type="submit" class="btn" style="background:#EDF2F0;color:var(--ink2);font-size:.82rem;padding:.4em .9em">
+        🗑️ Limpiar historial de pruebas (Empezar desde 0)
+      </button>
+    </form>
+  {% endif %}
+</div>
 <table>
 <thead><tr><th>Corrida</th><th>Cliente</th><th>Estado</th><th>Bloques</th><th>Agentes válidos</th></tr></thead>
 <tbody>

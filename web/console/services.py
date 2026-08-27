@@ -189,3 +189,26 @@ def compile_and_export_proposal(client_id: str, out_dir: str | None = None) -> d
     target_out = Path(out_dir) if out_dir else default_out
     return compile_proposal(client_id=client_id, out_dir=target_out)
 
+
+def clean_all_test_sessions() -> int:
+    """Delete all session documents and client data from Firestore."""
+    fs = clients.firestore_client()
+    count = 0
+    # Clean adk_sessions
+    for snap in fs.collection("adk_sessions").stream():
+        for ev in snap.reference.collection("events").stream():
+            ev.reference.delete()
+        snap.reference.delete()
+        count += 1
+
+    # Clean clients collection and their blocks
+    for c_snap in fs.collection("clients").stream():
+        for b_snap in c_snap.reference.collection("blocks").stream():
+            for a_snap in b_snap.reference.collection("audit").stream():
+                a_snap.reference.delete()
+            b_snap.reference.delete()
+        c_snap.reference.delete()
+
+    return count
+
+

@@ -223,3 +223,12 @@ def test_block_review_renders_human_friendly_cards(web, monkeypatch):
     assert "Decisión de Compuerta Humana" in content
     assert "Ver JSON Técnico Crudo" in content  # Collapsible JSON present
 
+
+def test_clean_test_data_view(web, monkeypatch):
+    cleaned = {"count": 0}
+    monkeypatch.setattr(views.services, "clean_all_test_sessions", lambda: 5)
+    response = web.post("/mantenimiento/limpiar-pruebas/")
+    assert response.status_code == 302
+    assert response["Location"] == "/"
+
+

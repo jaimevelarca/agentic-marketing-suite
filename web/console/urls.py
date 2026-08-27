@@ -14,4 +14,5 @@ urlpatterns = [
     path("propuestas/<str:client_id>/<str:doc_type>/", views.proposal_view, name="propuesta_ver"),
     path("propuestas/<str:client_id>/<str:doc_type>/descargar/", views.proposal_download,
          name="propuesta_descargar"),
+    path("mantenimiento/limpiar-pruebas/", views.clean_test_data, name="limpiar_pruebas"),
 ]

@@ -243,3 +243,16 @@ def proposal_generate(request, client_id: str):
         return redirect("sesion", session_id=volver)
     return redirect("panel")
 
+
+@login_required
+@require_POST
+def clean_test_data(request):
+    """Delete previous test sessions and client blocks from Firestore to start clean."""
+    try:
+        count = services.clean_all_test_sessions()
+        messages.success(request, f"Se eliminaron {count} corridas de prueba anteriores. La base de datos está limpia desde 0.")
+    except Exception as e:
+        messages.error(request, f"Error al limpiar datos: {e}")
+    return redirect("panel")
+
+
