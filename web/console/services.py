@@ -110,6 +110,14 @@ def decide(client_id: str, block: str, decision: str, actor: str, note: str = ""
     clients.set_gate_status(client_id, block, decision, actor=actor, note=note or None)
 
 
+def update_block_payload(client_id: str, block: str, payload: dict, decision: str | None = None, actor: str = "operator", note: str = "") -> None:
+    """Update deliverable payload in memory block, and optionally set gate decision."""
+    status = decision if decision in GATE_DECISIONS else (clients.read_gate_status(client_id, block) or "pending_review")
+    clients.write_memory_block(client_id, block, payload, gate_status=status)
+    if decision and decision in GATE_DECISIONS:
+        clients.set_gate_status(client_id, block, decision, actor=actor, note=note or "Editado y aprobado por operador")
+
+
 def _run_in_thread(fn, *args):
     t = threading.Thread(target=fn, args=args, daemon=True)
     t.start()

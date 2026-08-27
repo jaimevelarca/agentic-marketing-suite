@@ -41,6 +41,9 @@
       <button class="btn btn-aprobar" name="decision" value="approved" type="submit" style="padding:.6em 1.4em;font-size:.95rem">
         ✅ Aprobar Entregable
       </button>
+      <button type="button" onclick="toggleEditSection()" class="btn" style="background:#EDF2F0;color:var(--accent);border:1px solid var(--accent);padding:.6em 1.2em;font-weight:600">
+        ✏️ Modificar Entregable
+      </button>
       <button class="btn btn-devolver" name="decision" value="returned" type="submit" style="padding:.6em 1.2em">
         ↩️ Devolver con Observaciones
       </button>
@@ -52,6 +55,35 @@
           ⬅ Regresar a la Corrida
         </a>
       {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Editor de Entregables (Modificar entregable directamente) -->
+<div id="edit-section" style="display:none;background:var(--card);border:2px solid var(--accent);border-radius:8px;padding:1.4rem;margin-bottom:1.6rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+    <h3 style="margin:0;color:var(--accent)">✏️ Modificar Datos del Entregable («{{ b.block }}»)</h3>
+    <button type="button" onclick="toggleEditSection()" class="btn" style="padding:.3em .8em;background:#EDF2F0;font-size:.82rem">Cerrar Editor ✖</button>
+  </div>
+  <p class="nota" style="margin-top:0">
+    Edita los campos o datos de este entregable (por ejemplo, corregir la URL del sitio web, refinar textos, agregar canales o ajustar propuestas).
+    Los cambios se guardan directamente en la memoria del bloque en Firestore para que los siguientes agentes operen con la información corregida.
+  </p>
+  <form method="post" action="{% url 'editar_bloque' b.client_id b.block %}">{% csrf_token %}
+    <input type="hidden" name="volver" value="{{ volver }}">
+    <label for="edit_payload_json">Estructura del Entregable (JSON)</label>
+    <textarea name="payload_json" id="edit_payload_json" style="width:100%;min-height:22rem;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:#F9FBFA;border:1px solid var(--line);border-radius:6px;padding:.8rem;box-sizing:border-box">{{ b.payload_json }}</textarea>
+    
+    <label for="edit_nota" style="margin-top:.8rem">Nota o justificación del cambio</label>
+    <input type="text" name="nota" id="edit_nota" placeholder="p. ej. Se corrigió la URL del sitio web y se refinó la propuesta de valor">
+
+    <div style="display:flex;gap:.8rem;margin-top:1.2rem;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sec" type="submit" name="action" value="save" style="background:#2C534D;padding:.6em 1.4em">
+        💾 Guardar Cambios en Entregable
+      </button>
+      <button class="btn btn-aprobar" type="submit" name="action" value="save_and_approve" style="padding:.6em 1.4em">
+        ✅ Guardar Cambios y Aprobar Entregable
+      </button>
     </div>
   </form>
 </div>
@@ -85,7 +117,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       <div><strong>Nombre Comercial:</strong> {{ b.visual.company_name }}</div>
       <div><strong>Industria:</strong> {{ b.visual.industry|default:"No especificada" }}</div>
-      <div><strong>Sitio Web:</strong> <a href="{{ b.visual.website_url }}" target="_blank">{{ b.visual.website_url|default:"No especificado" }}</a></div>
+      <div><strong>Sitio Web:</strong> {% if b.visual.website_url %}<a href="{{ b.visual.website_url }}" target="_blank" style="color:var(--accent);font-weight:600">{{ b.visual.website_url }} ↗</a>{% else %}<span style="color:var(--bad)">No registrado (haz clic en «Modificar Entregable» para agregarlo)</span>{% endif %}</div>
       <div><strong>Mercado Principal:</strong> {{ b.visual.primary_market }}</div>
     </div>
   </div>
@@ -325,4 +357,16 @@
   </summary>
   <pre style="margin-top:1rem;max-height:35rem;overflow-y:auto">{{ b.payload_json }}</pre>
 </details>
+
+<script>
+  function toggleEditSection() {
+    const el = document.getElementById('edit-section');
+    if (el.style.display === 'none' || !el.style.display) {
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      el.style.display = 'none';
+    }
+  }
+</script>
 {% endblock %}

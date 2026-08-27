@@ -72,6 +72,42 @@ def block_decide(request, client_id, block):
     return redirect("panel")
 
 
+@login_required
+@require_POST
+def block_edit(request, client_id, block):
+    raw_payload = request.POST.get("payload_json", "").strip()
+    action = request.POST.get("action", "save")
+    note = request.POST.get("nota", "").strip() or "Modificado por el operador humano"
+    volver = request.POST.get("volver", "")
+
+    try:
+        payload = json.loads(raw_payload)
+    except json.JSONDecodeError as e:
+        messages.error(request, f"Error en la estructura JSON: {e}")
+        return redirect("bloque", client_id=client_id, block=block)
+
+    decision = "approved" if action == "save_and_approve" else None
+    try:
+        services.update_block_payload(
+            client_id=client_id,
+            block=block,
+            payload=payload,
+            decision=decision,
+            actor=request.user.get_username(),
+            note=note,
+        )
+        if decision == "approved":
+            messages.success(request, f"Entregable «{block}» actualizado y aprobado con éxito.")
+            if volver:
+                return redirect("sesion", session_id=volver)
+        else:
+            messages.success(request, f"Cambios guardados en el entregable «{block}».")
+    except Exception as e:
+        messages.error(request, f"Error al guardar cambios en el entregable: {e}")
+
+    return redirect("bloque", client_id=client_id, block=block)
+
+
 def _build_inputs_from_form(post: dict) -> tuple[str, dict]:
     """Convert structured form fields or raw JSON into the canonical client input payload."""
     raw_json = post.get("inputs_json", "").strip()
@@ -117,6 +153,7 @@ def _build_inputs_from_form(post: dict) -> tuple[str, dict]:
 
     inputs = {
         "client_id": client_id,
+        "website_url": website_url,
         "quick_start_form": {
             "company_name": company_name or trade_name or client_id,
             "website_url": website_url,
@@ -133,6 +170,8 @@ def _build_inputs_from_form(post: dict) -> tuple[str, dict]:
         },
         "scraper_output": {
             "scrape_status": "manual_entry",
+            "website_url": website_url,
+            "scraped_urls": [website_url] if website_url else [],
             "meta_description": offer_desc,
             "about_text_excerpt": offer_desc,
             "services_extracted": services_list,

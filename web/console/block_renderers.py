@@ -8,6 +8,20 @@ from __future__ import annotations
 from typing import Any
 
 
+def _val(x: Any) -> Any:
+    """Recursively extract value from DEL-09 confidence_metadata tagged leaf fields."""
+    if isinstance(x, dict):
+        if "value" in x:
+            return _val(x["value"])
+        if "primary" in x:
+            return _val(x["primary"])
+        if "statement" in x:
+            return _val(x["statement"])
+        if "description" in x and len(x) <= 2 and "metadata" in x:
+            return _val(x["description"])
+    return x
+
+
 def format_block_payload(block_name: str, payload: Any) -> dict[str, Any]:
     """Inspect block payload and produce structured visual data for template rendering."""
     if not isinstance(payload, dict):
@@ -23,31 +37,102 @@ def format_block_payload(block_name: str, payload: Any) -> dict[str, Any]:
 def _format_client_profile(payload: dict) -> dict[str, Any]:
     quick = payload.get("quick_start_form") or {}
     scraper = payload.get("scraper_output") or {}
-    visual = scraper.get("visual_identity") or {}
-    voice = scraper.get("brand_voice") or {}
+    visual = payload.get("visual_identity") or scraper.get("visual_identity") or {}
+    voice = payload.get("brand_voice_tokens") or scraper.get("brand_voice") or {}
 
-    colors = visual.get("top_5_hex") or []
-    if not colors and payload.get("primary_hex"):
-        colors = [payload.get("primary_hex")]
+    # Company name
+    name_obj = payload.get("name")
+    if isinstance(name_obj, dict):
+        company_name = name_obj.get("trade") or name_obj.get("legal") or _val(name_obj.get("value"))
+    else:
+        company_name = name_obj or quick.get("company_name") or payload.get("company_name")
+    company_name = company_name or payload.get("client_id", "")
+
+    # Website URL
+    web_obj = payload.get("website_url")
+    if isinstance(web_obj, dict):
+        website_url = web_obj.get("primary") or _val(web_obj.get("value"))
+        if not website_url and web_obj.get("additional"):
+            website_url = web_obj["additional"][0]
+    else:
+        website_url = web_obj or quick.get("website_url") or scraper.get("website_url") or payload.get("website_url") or ""
+
+    # Industry
+    ind_obj = payload.get("industry")
+    if isinstance(ind_obj, dict):
+        industry = ind_obj.get("primary") or _val(ind_obj.get("value"))
+    else:
+        industry = ind_obj or quick.get("industry") or payload.get("industry") or ""
+
+    # Offer description
+    offers_obj = payload.get("offers")
+    if isinstance(offers_obj, dict):
+        offer_desc = offers_obj.get("description") or _val(offers_obj.get("value"))
+    else:
+        offer_desc = offers_obj or quick.get("offer_description") or scraper.get("meta_description") or ""
+
+    # USP / Value propositions
+    usp_obj = payload.get("usp")
+    if isinstance(usp_obj, dict):
+        usp_stmt = usp_obj.get("statement") or _val(usp_obj.get("value"))
+    else:
+        usp_stmt = usp_obj or ""
+    
+    value_props = scraper.get("value_propositions") or ([usp_stmt] if usp_stmt else [])
+    if isinstance(value_props, str):
+        value_props = [value_props]
+
+    # Colors
+    colors = (
+        visual.get("primary_colors_hex")
+        or visual.get("top_5_hex")
+        or ([payload.get("primary_hex")] if payload.get("primary_hex") else [])
+    )
+
+    # Voice register & tokens
+    if isinstance(voice, dict):
+        voice_register = voice.get("vocabulary_register") or voice.get("tone_selected") or "professional/corporate"
+        voice_tokens = voice.get("tokens") or voice.get("proposed_voice_tokens") or []
+    else:
+        voice_register = "professional/corporate"
+        voice_tokens = []
+
+    # Target markets & customer
+    tgt_obj = payload.get("target_markets")
+    if isinstance(tgt_obj, dict):
+        target_markets = tgt_obj.get("ranked") or _val(tgt_obj.get("value")) or []
+    else:
+        target_markets = tgt_obj or quick.get("target_markets") or scraper.get("locations_detected") or []
+
+    goals_obj = payload.get("goals")
+    if isinstance(goals_obj, dict):
+        primary_goal = goals_obj.get("primary_objective") or _val(goals_obj.get("value"))
+    else:
+        primary_goal = goals_obj or quick.get("marketing_objective") or ""
+
+    logo_url = visual.get("logo_url")
+    if not logo_url and isinstance(visual.get("logo"), dict):
+        logo_url = visual["logo"].get("url")
 
     return {
         "type": "client_profile",
         "title": "Ficha Maestra de Cliente e Identidad de Marca",
-        "company_name": quick.get("company_name") or payload.get("company_name") or payload.get("client_id", ""),
-        "website_url": quick.get("website_url") or scraper.get("website_url") or "",
-        "industry": quick.get("industry") or "",
-        "offer_description": quick.get("offer_description") or scraper.get("meta_description") or "",
+        "company_name": company_name,
+        "website_url": website_url,
+        "industry": industry,
+        "offer_description": offer_desc,
         "primary_market": quick.get("primary_market") or "México",
-        "target_markets": quick.get("target_markets") or scraper.get("locations_detected") or [],
-        "target_customer": quick.get("target_customer") or "",
-        "value_propositions": scraper.get("value_propositions") or [],
+        "target_markets": target_markets,
+        "target_customer": quick.get("target_customer") or primary_goal or "",
+        "value_propositions": value_props,
         "services_extracted": scraper.get("services_extracted") or [],
         "primary_cta": scraper.get("primary_cta") or "Solicitar información",
         "colors": colors,
-        "voice_register": voice.get("vocabulary_register") or "professional/corporate",
-        "voice_tokens": voice.get("proposed_voice_tokens") or [],
-        "logo_url": (visual.get("logo") or {}).get("url"),
+        "voice_register": voice_register,
+        "voice_tokens": voice_tokens,
+        "logo_url": logo_url,
         "operator_notes": payload.get("operator_notes") or "",
+        "lifecycle_stage": payload.get("lifecycle_stage") or "pre-launch",
     }
 
 
@@ -59,16 +144,46 @@ def _format_audience_segments(payload: dict) -> dict[str, Any]:
     segments_out = []
     for idx, s in enumerate(raw_segments, 1):
         if not isinstance(s, dict):
-            segments_out.append({"name": f"Segmento {idx}", "summary": str(s)})
+            segments_out.append({"name": f"Segmento {idx}", "description": str(s)})
             continue
+
+        name = _val(s.get("segment_name") or s.get("name")) or f"Segmento {idx}"
+        desc = _val(s.get("funnel_focus") or s.get("description") or s.get("profile") or "")
+
+        pains = _val(s.get("pain_points") or s.get("pains") or [])
+        if isinstance(pains, dict):
+            pains = _val(pains.get("value") or [])
+        if isinstance(pains, str):
+            pains = [pains]
+
+        motivations = _val(s.get("motivations") or s.get("desires") or [])
+        if isinstance(motivations, dict):
+            motivations = _val(motivations.get("value") or [])
+        if isinstance(motivations, str):
+            motivations = [motivations]
+
+        core_msg = _val(s.get("core_message") or s.get("key_message") or "")
+        if isinstance(core_msg, dict):
+            core_msg = _val(core_msg.get("value") or "")
+
+        raw_channels = _val(s.get("preferred_channels") or s.get("channels") or [])
+        if isinstance(raw_channels, dict):
+            raw_channels = _val(raw_channels.get("value") or [])
+        channels = []
+        for ch in (raw_channels if isinstance(raw_channels, list) else [raw_channels]):
+            if isinstance(ch, dict):
+                channels.append(ch.get("channel") or ch.get("name") or str(ch))
+            elif isinstance(ch, str):
+                channels.append(ch)
+
         segments_out.append({
-            "name": s.get("name") or s.get("segment_name") or f"Segmento {idx}",
-            "description": s.get("description") or s.get("profile") or "",
-            "demographics": s.get("demographics") or s.get("demographic_profile") or {},
-            "pain_points": s.get("pain_points") or s.get("pains") or [],
-            "motivations": s.get("motivations") or s.get("desires") or [],
-            "core_message": s.get("core_message") or s.get("key_message") or "",
-            "channels": s.get("channels") or s.get("preferred_channels") or [],
+            "name": name,
+            "description": desc,
+            "demographics": _val(s.get("demographics") or s.get("demographic_profile") or {}),
+            "pain_points": pains,
+            "motivations": motivations,
+            "core_message": core_msg,
+            "channels": channels,
         })
 
     return {
@@ -91,74 +206,106 @@ def _format_competitive_map(payload: dict) -> dict[str, Any]:
             out_comps.append({"name": str(c)})
             continue
         out_comps.append({
-            "name": c.get("name") or c.get("competitor_name") or "Competidor",
-            "type": c.get("type") or c.get("category") or "Directo",
-            "strengths": c.get("strengths") or [],
-            "weaknesses": c.get("weaknesses") or [],
-            "price_point": c.get("price_point") or c.get("pricing") or "Medio",
-            "differentiation": c.get("differentiation") or c.get("value_prop") or "",
+            "name": _val(c.get("name") or c.get("competitor_name") or "Competidor"),
+            "type": _val(c.get("type") or c.get("tier") or c.get("category") or "Directo"),
+            "strengths": _val(c.get("strengths") or []),
+            "weaknesses": _val(c.get("weaknesses") or []),
+            "price_point": _val(c.get("price_point") or c.get("pricing") or "Medio"),
+            "differentiation": _val(c.get("differentiation") or c.get("value_prop") or c.get("positioning") or ""),
         })
 
     return {
         "type": "competitive_map",
         "title": "Auditoría de Competencia & Matriz de Posicionamiento",
         "competitors": out_comps,
-        "quadrant_summary": payload.get("quadrant_summary") or payload.get("market_gaps") or "",
-        "our_advantage": payload.get("our_advantage") or payload.get("strategic_advantage") or "",
+        "quadrant_summary": _val(payload.get("quadrant_summary") or payload.get("market_gaps") or payload.get("differentiation_opportunities") or ""),
+        "our_advantage": _val(payload.get("our_advantage") or payload.get("strategic_advantage") or payload.get("strategic_positioning") or ""),
     }
 
-
 def _format_active_strategy(payload: dict) -> dict[str, Any]:
+    thesis = payload.get("strategic_thesis")
+    if isinstance(thesis, dict):
+        thesis_text = thesis.get("statement") or _val(thesis.get("value")) or str(thesis)
+    else:
+        thesis_text = thesis or payload.get("summary") or payload.get("thesis") or ""
+
+    channel_mix = payload.get("channel_mix") or payload.get("target_channels") or payload.get("channels") or []
+    channels_out = []
+    for ch in channel_mix:
+        if isinstance(ch, dict):
+            name = ch.get("name", "Canal")
+            share = f" ({ch.get('budget_share_pct')}%)" if ch.get("budget_share_pct") else ""
+            role = f" — {ch.get('role')}" if ch.get("role") else ""
+            channels_out.append(f"{name}{share}{role}")
+        elif isinstance(ch, str):
+            channels_out.append(ch)
+
     pillars = payload.get("pillars") or payload.get("strategic_pillars") or []
     if isinstance(pillars, dict):
         pillars = list(pillars.values())
+    if not pillars and channels_out:
+        pillars = channels_out
 
     return {
         "type": "active_strategy",
         "title": "Estrategia Activa de Crecimiento & Objetivos",
-        "summary": payload.get("summary") or payload.get("thesis") or payload.get("strategy_summary") or "",
+        "summary": thesis_text,
         "pillars": pillars,
         "budget_allocation": payload.get("budget_allocation") or payload.get("budgets") or {},
-        "target_channels": payload.get("target_channels") or payload.get("channels") or [],
-        "kpi_summary": payload.get("kpi_summary") or payload.get("kpis") or {},
+        "target_channels": channels_out,
+        "kpi_summary": payload.get("kpi_contracts") or payload.get("kpi_summary") or payload.get("kpis") or {},
+        "primary_objective": _val(payload.get("primary_objective") or ""),
     }
 
 
 def _format_kpi_contracts(payload: dict) -> dict[str, Any]:
-    contracts = payload.get("kpis") or payload.get("contracts") or payload.get("metrics") or []
+    contracts = payload.get("kpi_contracts") or payload.get("kpis") or payload.get("contracts") or payload.get("metrics") or []
     if isinstance(contracts, dict):
-        contracts = [{"name": k, **(v if isinstance(v, dict) else {"target": str(v)})} for k, v in contracts.items()]
+        targets = contracts.get("targets") or contracts
+        if isinstance(targets, list):
+            contracts_out = targets
+        else:
+            contracts_out = [{"name": k, **(v if isinstance(v, dict) else {"target": str(v)})} for k, v in targets.items()]
+    else:
+        contracts_out = contracts
 
     return {
         "type": "kpi_contracts",
         "title": "Contratos de KPI & Compromisos de Conversión",
-        "contracts": contracts,
+        "contracts": contracts_out,
         "review_period": payload.get("review_period") or "Mensual",
         "primary_metric": payload.get("primary_metric") or "CPL / Leads Calificados",
     }
 
 
 def _format_content_calendar(payload: dict) -> dict[str, Any]:
-    raw_posts = payload.get("calendar") or payload.get("posts") or payload.get("items") or []
+    raw_posts = payload.get("slots") or payload.get("calendar") or payload.get("posts") or payload.get("items") or []
     posts_out = []
 
     for p in raw_posts:
         if not isinstance(p, dict):
             posts_out.append({"title": str(p)})
             continue
+        
+        content_ref = p.get("content_ref") or {}
+        topic = content_ref.get("topic_title") or p.get("topic") or p.get("title") or p.get("campaign_name") or ""
+        teaser = content_ref.get("messaging_pillar") or p.get("copy_teaser") or p.get("hook") or p.get("copy") or ""
+        week_val = p.get("week") or p.get("semana") or 1
+        week_label = f"S{week_val}" if isinstance(week_val, int) else str(week_val)
+
         posts_out.append({
-            "week": p.get("week") or p.get("semana") or "S1",
-            "day": p.get("day") or p.get("dia") or "Lunes",
+            "week": week_label,
+            "day": p.get("publish_date") or p.get("day") or p.get("dia") or "Fecha programada",
             "channel": p.get("channel") or p.get("canal") or "Meta",
             "format": p.get("format") or p.get("formato") or "Post",
-            "topic": p.get("topic") or p.get("title") or p.get("tema") or "",
-            "teaser": p.get("copy_teaser") or p.get("hook") or p.get("copy") or "",
-            "approved": p.get("approved", True),
+            "topic": topic,
+            "teaser": teaser,
+            "approved": p.get("status") == "approved" or p.get("approved", True),
         })
 
     return {
         "type": "content_calendar",
-        "title": "Calendario Editorial (Parrilla de 4 Semanas)",
+        "title": "Calendario Editorial (Parrilla de Contenido)",
         "posts": posts_out,
         "total_posts": len(posts_out),
         "duration_weeks": payload.get("duration_weeks") or 4,
@@ -175,13 +322,15 @@ def _format_copy_assets(payload: dict) -> dict[str, Any]:
         if not isinstance(c, dict):
             copies_out.append({"body": str(c)})
             continue
+        headline = c.get("hook") or c.get("headline") or c.get("title") or c.get("h1") or ""
+        body = c.get("primary_caption") or c.get("body") or c.get("text") or c.get("copy") or ""
         copies_out.append({
             "channel": c.get("channel") or c.get("platform") or "General",
-            "target_audience": c.get("target_audience") or c.get("segment") or "Audiencia Principal",
-            "headline": c.get("headline") or c.get("title") or c.get("h1") or "",
-            "body": c.get("body") or c.get("text") or c.get("copy") or "",
+            "target_audience": c.get("target_segment_id") or c.get("target_audience") or c.get("segment") or "Audiencia Principal",
+            "headline": headline,
+            "body": body,
             "cta": c.get("cta") or c.get("button_text") or "",
-            "variation": c.get("variation") or c.get("version") or "A",
+            "variation": c.get("risk_tier") or c.get("variation") or c.get("version") or "A",
         })
 
     return {
@@ -202,13 +351,17 @@ def _format_visual_assets(payload: dict) -> dict[str, Any]:
         if not isinstance(v, dict):
             visuals_out.append({"description": str(v)})
             continue
+        concept = v.get("concept_rationale") or v.get("rationale") or v.get("concept") or v.get("description") or ""
+        prompt = v.get("prompt") or v.get("image_prompt") or ""
+        if isinstance(prompt, dict):
+            prompt = prompt.get("prompt") or str(prompt)
         visuals_out.append({
-            "name": v.get("name") or v.get("title") or "Creativo",
-            "ratio": v.get("ratio") or v.get("aspect_ratio") or "1:1",
+            "name": v.get("asset_id") or v.get("name") or v.get("title") or "Creativo",
+            "ratio": v.get("aspect_ratio") or v.get("ratio") or "1:1",
             "channel": v.get("channel") or v.get("platform") or "Redes",
-            "concept": v.get("concept") or v.get("description") or "",
-            "prompt": v.get("prompt") or v.get("image_prompt") or "",
-            "colors": v.get("colors") or [],
+            "concept": concept,
+            "prompt": prompt,
+            "colors": v.get("palette_applied") or v.get("colors") or [],
         })
 
     return {
@@ -222,12 +375,16 @@ def _format_visual_assets(payload: dict) -> dict[str, Any]:
 def _format_generic_block(payload: dict) -> dict[str, Any]:
     items = []
     for k, v in payload.items():
-        if isinstance(v, (str, int, float, bool)):
-            items.append({"key": k.replace("_", " ").title(), "val": str(v), "is_list": False})
-        elif isinstance(v, list) and all(isinstance(x, (str, int, float)) for x in v):
-            items.append({"key": k.replace("_", " ").title(), "val": v, "is_list": True})
+        v_unwrapped = _val(v)
+        if isinstance(v_unwrapped, (str, int, float, bool)):
+            items.append({"key": k.replace("_", " ").title(), "val": str(v_unwrapped), "is_list": False})
+        elif isinstance(v_unwrapped, list) and all(isinstance(x, (str, int, float)) for x in v_unwrapped):
+            items.append({"key": k.replace("_", " ").title(), "val": v_unwrapped, "is_list": True})
+        elif isinstance(v_unwrapped, dict):
+            clean_d = {dk: str(_val(dv)) for dk, dv in v_unwrapped.items() if dk != "metadata"}
+            items.append({"key": k.replace("_", " ").title(), "val": str(clean_d), "is_list": False})
         else:
-            items.append({"key": k.replace("_", " ").title(), "val": str(v), "is_list": False})
+            items.append({"key": k.replace("_", " ").title(), "val": str(v_unwrapped), "is_list": False})
 
     return {
         "type": "generic",

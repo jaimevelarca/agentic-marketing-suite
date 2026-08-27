@@ -232,3 +232,92 @@ def test_clean_test_data_view(web, monkeypatch):
     assert response["Location"] == "/"
 
 
+def test_block_renderer_formats_real_del17_client_profile():
+    # Test real DEL-17 output shape as emitted by Agent 1.1
+    del17_payload = {
+        "client_id": "real-client",
+        "name": {"trade": "Mi Empresa Real", "legal": "Mi Empresa Real S.A."},
+        "website_url": {"primary": "https://www.miempresa.com.mx", "additional": []},
+        "industry": {"primary": "technology_consulting"},
+        "offers": {"description": "Consultoría especializada en marketing agéntico"},
+        "usp": {"statement": "Resultados comprobados con agentes de IA autónomos"},
+        "visual_identity": {"primary_colors_hex": ["#1A365D", "#1EBE82"]},
+        "brand_voice_tokens": {"tokens": ["profesional", "estratégico"], "languages": ["es-MX"]},
+    }
+    cp = block_renderers.format_block_payload("client_profile", del17_payload)
+    assert cp["type"] == "client_profile"
+    assert cp["company_name"] == "Mi Empresa Real"
+    assert cp["website_url"] == "https://www.miempresa.com.mx"
+    assert cp["industry"] == "technology_consulting"
+    assert cp["offer_description"] == "Consultoría especializada en marketing agéntico"
+    assert "Resultados comprobados" in cp["value_propositions"][0]
+    assert cp["colors"] == ["#1A365D", "#1EBE82"]
+    assert "profesional" in cp["voice_tokens"]
+
+
+def test_block_renderer_formats_content_calendar_slots_and_copy():
+    # Test content_calendar with real slots schema
+    cal = block_renderers.format_block_payload("content_calendar", {
+        "slots": [{
+            "slot_id": "s-1",
+            "week": 1,
+            "publish_date": "2026-09-01",
+            "channel": "linkedin",
+            "format": "carousel",
+            "content_ref": {"topic_title": "Estrategia Agéntica", "messaging_pillar": "Innovación B2B"},
+        }]
+    })
+    assert cal["type"] == "content_calendar"
+    assert cal["total_posts"] == 1
+    assert cal["posts"][0]["topic"] == "Estrategia Agéntica"
+    assert cal["posts"][0]["day"] == "2026-09-01"
+
+    # Test copy_assets with hook and primary_caption
+    cpy = block_renderers.format_block_payload("copy_assets", {
+        "assets": [{
+            "channel": "meta_ads",
+            "hook": "¿Sigues perdiendo leads?",
+            "primary_caption": "Automatiza la prospección B2B con agentes inteligentes.",
+            "cta": "Agenda tu diagnóstico",
+            "risk_tier": "low",
+        }]
+    })
+    assert cpy["type"] == "copy_assets"
+    assert cpy["total_copies"] == 1
+    assert cpy["copies"][0]["headline"] == "¿Sigues perdiendo leads?"
+    assert "Automatiza la prospección" in cpy["copies"][0]["body"]
+
+
+def test_block_edit_view_saves_and_approves(web, monkeypatch):
+    updated = {}
+
+    def mock_update(client_id, block, payload, decision, actor, note=""):
+        updated["client_id"] = client_id
+        updated["block"] = block
+        updated["payload"] = payload
+        updated["decision"] = decision
+
+    monkeypatch.setattr(views.services, "update_block_payload", mock_update)
+
+    # 1. Action = save (keep in review)
+    res = web.post("/clientes/nuevo-cliente/bloques/client_profile/editar/", {
+        "payload_json": '{"name": "Actualizado"}',
+        "action": "save",
+        "nota": "Corrección de datos",
+    })
+    assert res.status_code == 302
+    assert updated["payload"] == {"name": "Actualizado"}
+    assert updated["decision"] is None
+
+    # 2. Action = save_and_approve
+    res_approve = web.post("/clientes/nuevo-cliente/bloques/client_profile/editar/", {
+        "payload_json": '{"name": "Aprobado Final"}',
+        "action": "save_and_approve",
+        "nota": "Aprobación con cambios",
+    })
+    assert res_approve.status_code == 302
+    assert updated["payload"] == {"name": "Aprobado Final"}
+    assert updated["decision"] == "approved"
+
+
+

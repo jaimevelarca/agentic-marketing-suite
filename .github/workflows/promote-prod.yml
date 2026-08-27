@@ -58,18 +58,28 @@ jobs:
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "Resolving immutable digests for release tag ${{ github.ref_name }} (commit ${SHORT_SHA})..."
 
-          # Resolve console digest from shared dev registry
-          CONSOLE_DIGEST=$(gcloud artifacts docker images describe \
-            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/console:${SHORT_SHA} \
-            --format='value(image_summary.digest)')
+          # Resolve digests with polling retry (in case CI & Deploy Dev is currently building them)
+          CONSOLE_DIGEST=""
+          ORCHESTRATOR_DIGEST=""
+          for i in {1..25}; do
+            CONSOLE_DIGEST=$(gcloud artifacts docker images describe \
+              ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/console:${SHORT_SHA} \
+              --format='value(image_summary.digest)' 2>/dev/null || true)
 
-          # Resolve orchestrator digest from shared dev registry
-          ORCHESTRATOR_DIGEST=$(gcloud artifacts docker images describe \
-            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/orchestrator:${SHORT_SHA} \
-            --format='value(image_summary.digest)')
+            ORCHESTRATOR_DIGEST=$(gcloud artifacts docker images describe \
+              ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.DEV_GCP_PROJECT }}/suite/orchestrator:${SHORT_SHA} \
+              --format='value(image_summary.digest)' 2>/dev/null || true)
+
+            if [ -n "${CONSOLE_DIGEST}" ] && [ -n "${ORCHESTRATOR_DIGEST}" ]; then
+              echo "✅ Both container images resolved successfully on attempt $i!"
+              break
+            fi
+            echo "Waiting for container images with tag ${SHORT_SHA} in dev registry (attempt $i/25)..."
+            sleep 15
+          done
 
           if [ -z "${CONSOLE_DIGEST}" ] || [ -z "${ORCHESTRATOR_DIGEST}" ]; then
-            echo "❌ Failed to resolve image digests from ${SHORT_SHA} in dev registry."
+            echo "❌ Failed to resolve image digests from ${SHORT_SHA} in dev registry after 25 attempts."
             exit 1
           fi
 
