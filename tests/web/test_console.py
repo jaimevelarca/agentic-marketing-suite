@@ -23,6 +23,8 @@ def web(operator):
     return c
 
 
+from console import block_renderers, pipeline_meta
+
 SESSION = {
     "id": "run-1", "client_id": "acme-co", "auto_approve": False,
     "blocks": ["client_profile"], "pending": ["audience_segments"],
@@ -30,6 +32,7 @@ SESSION = {
                     "gate": "review", "gate_status": "approved", "valid": True, "error": None}],
     "status": "en pausa (compuerta humana)", "paused": True,
 }
+SESSION.update(pipeline_meta.build_pipeline_tree(SESSION))
 
 
 def test_login_required(db):
@@ -144,3 +147,79 @@ def test_nueva_starts_run_with_structured_wizard_fields(web, monkeypatch):
     assert started["inputs"]["quick_start_form"]["industry"] == "Seguridad Industrial y Contra Incendios"
     assert "Certificación NFPA" in started["inputs"]["scraper_output"]["value_propositions"]
     assert started["inputs"]["scraper_output"]["visual_identity"]["top_5_hex"] == ["#1E3A8A"]
+
+
+def test_pipeline_meta_builds_complete_dag():
+    tree = pipeline_meta.build_pipeline_tree({
+        "blocks": ["client_profile", "audience_segments"],
+        "pending": ["active_strategy"],
+        "transcript": [{"agent": "1.1", "valid": True}, {"agent": "1.2", "valid": True}],
+        "paused": True,
+    })
+    assert tree["total_agents"] == 19
+    assert tree["total_completed"] == 2
+    assert len(tree["layers"]) == 6
+    assert tree["percent"] == 10
+    # Layer 1 has 4 agents
+    l1 = tree["layers"][0]
+    assert l1["id"] == "L1"
+    assert len(l1["agents"]) == 4
+    # Agent 1.1 has complete mission, deliverable, handoff
+    a11 = l1["agents"][0]
+    assert a11["id"] == "1.1"
+    assert a11["status"] == "completed"
+    assert "Diagnóstico" in a11["title"]
+    assert len(a11["mission"]) > 10
+    assert len(a11["deliverable"]) > 10
+    assert len(a11["handoff"]) > 10
+
+
+def test_block_renderer_formats_deliverables():
+    # Test client_profile
+    cp = block_renderers.format_block_payload("client_profile", {
+        "quick_start_form": {"company_name": "Hausit Studio", "industry": "Arquitectura"},
+        "scraper_output": {
+            "value_propositions": ["Diseño de interiores premium"],
+            "visual_identity": {"top_5_hex": ["#2C3E50", "#E74C3C"]},
+        },
+    })
+    assert cp["type"] == "client_profile"
+    assert cp["company_name"] == "Hausit Studio"
+    assert cp["colors"] == ["#2C3E50", "#E74C3C"]
+
+    # Test audience_segments
+    aud = block_renderers.format_block_payload("audience_segments", {
+        "segments": [
+            {"name": "Compradores Residenciales", "pain_points": ["Falta de tiempo"], "core_message": "Diseño sin fricción"}
+        ]
+    })
+    assert aud["type"] == "audience_segments"
+    assert aud["total_segments"] == 1
+    assert aud["segments"][0]["name"] == "Compradores Residenciales"
+
+
+def test_block_review_renders_human_friendly_cards(web, monkeypatch):
+    sample_block = {
+        "client_id": "hausit-studio",
+        "block": "client_profile",
+        "gate_status": "approved",
+        "agent_info": pipeline_meta.find_agent_for_block("client_profile"),
+        "visual": block_renderers.format_block_payload("client_profile", {
+            "quick_start_form": {"company_name": "Hausit Studio", "industry": "Arquitectura y Diseño"},
+            "scraper_output": {"value_propositions": ["Arquitectura residencial boutique"]},
+        }),
+        "payload": {"client_id": "hausit-studio"},
+        "payload_json": '{"client_id": "hausit-studio"}',
+    }
+    monkeypatch.setattr(views.services, "block_detail", lambda cid, blk: sample_block)
+
+    response = web.get("/clientes/hausit-studio/bloques/client_profile/")
+    assert response.status_code == 200
+    content = response.content.decode()
+    # Check that human-friendly sections render
+    assert "Hausit Studio" in content
+    assert "Arquitectura y Diseño" in content
+    assert "Arquitectura residencial boutique" in content
+    assert "Decisión de Compuerta Humana" in content
+    assert "Ver JSON Técnico Crudo" in content  # Collapsible JSON present
+

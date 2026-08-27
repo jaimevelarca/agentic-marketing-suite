@@ -50,6 +50,8 @@ def _last_interrupt_ids(session) -> list[str]:
 
 
 def get_session(session_id: str) -> dict | None:
+    from . import pipeline_meta
+
     s = asyncio.run(_service().get_session(
         app_name=APP_NAME, user_id=USER_ID, session_id=session_id))
     if s is None:
@@ -58,7 +60,8 @@ def get_session(session_id: str) -> dict | None:
     pending = sorted((state.get("pending_blocks") or {}).keys())
     paused = bool(_last_interrupt_ids(s))
     done = len([t for t in (state.get("transcript") or []) if t]) >= 19 and not paused
-    return {
+
+    session_base = {
         "id": s.id,
         "client_id": state.get("client_id"),
         "auto_approve": state.get("auto_approve", False),
@@ -70,12 +73,35 @@ def get_session(session_id: str) -> dict | None:
         "paused": paused,
     }
 
+    # Enrich with complete 19-agent pipeline metadata and real-time layer statuses
+    tree_data = pipeline_meta.build_pipeline_tree(session_base)
+    session_base.update({
+        "layers": tree_data["layers"],
+        "total_completed": tree_data["total_completed"],
+        "total_agents": tree_data["total_agents"],
+        "percent": tree_data["percent"],
+        "running_agent": tree_data["running_agent"],
+    })
+
+    return session_base
+
 
 def block_detail(client_id: str, block: str) -> dict:
+    from . import block_renderers, pipeline_meta
+
     payload = clients.read_memory_block(client_id, block)
     status = clients.read_gate_status(client_id, block)
-    return {"client_id": client_id, "block": block,
-            "payload": payload, "gate_status": status}
+    agent_info = pipeline_meta.find_agent_for_block(block)
+    formatted = block_renderers.format_block_payload(block, payload)
+
+    return {
+        "client_id": client_id,
+        "block": block,
+        "payload": payload,
+        "gate_status": status,
+        "agent_info": agent_info,
+        "visual": formatted,
+    }
 
 
 def decide(client_id: str, block: str, decision: str, actor: str, note: str = "") -> None:

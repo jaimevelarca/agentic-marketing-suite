@@ -1,22 +1,328 @@
 {% extends "base.html" %}
 {% block title %}{{ b.block }} · {{ b.client_id }}{% endblock %}
 {% block content %}
-<h1>{{ b.block }}</h1>
-<p class="nota">Cliente: <b>{{ b.client_id }}</b> · Estado de compuerta:
-  <span class="chip {% if b.gate_status == 'approved' or b.gate_status == 'auto_approved' %}ok{% else %}pausa{% endif %}">{{ b.gate_status }}</span></p>
+<style>
+  .context-banner{background:#EDF2F0;border:1px solid var(--line);border-radius:8px;padding:1.2rem 1.4rem;margin-bottom:1.6rem}
+  .card-box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.4rem;margin-bottom:1.4rem}
+  .card-title{font-size:1.1rem;font-weight:700;margin:0 0 .8rem;color:var(--ink)}
+  
+  .badge-channel{display:inline-block;padding:.2em .6em;border-radius:4px;font-size:.78rem;font-weight:600;background:#EAF4EE;color:#176A4A}
+  
+  .copy-card{background:#F9FBFA;border:1px solid var(--line);border-radius:6px;padding:1.2rem;margin-bottom:1rem}
+  .copy-headline{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:.5rem}
+  .copy-body{font-size:.9rem;line-height:1.5;white-space:pre-line;color:var(--ink)}
+  .copy-cta{display:inline-block;margin-top:.8rem;background:var(--accent);color:#fff;padding:.35em .8em;border-radius:4px;font-size:.82rem;font-weight:600}
+  
+  .segment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem}
+  .color-swatch{width:24px;height:24px;border-radius:4px;border:1px solid #ccc;display:inline-block;vertical-align:middle;margin-right:.4rem}
+</style>
 
-<form method="post" action="{% url 'decidir' b.client_id b.block %}">{% csrf_token %}
-  <input type="hidden" name="volver" value="{{ volver }}">
-  <label for="id_nota">Nota (opcional)</label>
-  <input type="text" name="nota" id="id_nota" placeholder="Motivo u observaciones de la decisión">
-  <p style="display:flex;gap:.6rem;margin-top:.8rem">
-    <button class="btn btn-aprobar" name="decision" value="approved" type="submit">Aprobar</button>
-    <button class="btn btn-devolver" name="decision" value="returned" type="submit">Devolver</button>
-    <button class="btn btn-bloquear" name="decision" value="blocked" type="submit">Bloquear</button>
-    {% if volver %}<a class="btn" style="background:#EDF2F0;color:var(--ink2)" href="{% url 'sesion' volver %}">Regresar a la corrida</a>{% endif %}
-  </p>
-</form>
+<!-- Cabecera -->
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem">
+  <div>
+    <div class="nota" style="font-size:.85rem">Cliente: <strong>{{ b.client_id }}</strong></div>
+    <h1 style="margin:0">{{ b.block }}</h1>
+  </div>
+  <div>
+    <span class="chip {% if b.gate_status == 'approved' or b.gate_status == 'auto_approved' %}ok{% else %}pausa{% endif %}" style="font-size:.88rem;padding:.3em .8em">
+      Compuerta: <strong>{{ b.gate_status|default:"pending_review" }}</strong>
+    </span>
+  </div>
+</div>
 
-<h2>Contenido del bloque</h2>
-<pre>{{ b.payload_json }}</pre>
+<!-- Formulario de decisión de compuerta humana -->
+<div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.4rem;margin-bottom:1.6rem">
+  <h3 style="margin:0 0 .6rem;font-size:1rem;color:var(--ink)">Decisión de Compuerta Humana</h3>
+  <form method="post" action="{% url 'decidir' b.client_id b.block %}">{% csrf_token %}
+    <input type="hidden" name="volver" value="{{ volver }}">
+    <label for="id_nota" style="margin-top:0">Observaciones o notas del revisor (opcional)</label>
+    <input type="text" name="nota" id="id_nota" placeholder="Motivo u observaciones de la decisión...">
+    <div style="display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-aprobar" name="decision" value="approved" type="submit" style="padding:.6em 1.4em;font-size:.95rem">
+        ✅ Aprobar Entregable
+      </button>
+      <button class="btn btn-devolver" name="decision" value="returned" type="submit" style="padding:.6em 1.2em">
+        ↩️ Devolver con Observaciones
+      </button>
+      <button class="btn btn-bloquear" name="decision" value="blocked" type="submit" style="padding:.6em 1.2em">
+        ⛔ Bloquear
+      </button>
+      {% if volver %}
+        <a class="btn" style="background:#EDF2F0;color:var(--ink2);margin-left:auto" href="{% url 'sesion' volver %}">
+          ⬅ Regresar a la Corrida
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Banner de contexto del agente creador y handoff -->
+{% if b.agent_info %}
+  <div class="context-banner">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem">
+      <span class="chip ok" style="background:#D8E6DF;color:var(--accent);font-weight:700">
+        Agente {{ b.agent_info.id }}
+      </span>
+      <strong style="font-size:.95rem;color:var(--ink)">{{ b.agent_info.title }} ({{ b.agent_info.layer_title }})</strong>
+    </div>
+    <div style="font-size:.88rem;color:var(--ink);line-height:1.45;margin-bottom:.4rem">
+      <strong>Misión cumplida:</strong> {{ b.agent_info.mission }}
+    </div>
+    <div style="font-size:.84rem;color:var(--ink2)">
+      ➡️ <strong>Transferencia a siguientes agentes (Handoff):</strong> {{ b.agent_info.handoff }}
+    </div>
+  </div>
+{% endif %}
+
+<!-- ======================================================== -->
+<!-- RENDERIZADORES VISUALES INTELIGENTES POR TIPO DE BLOQUE  -->
+<!-- ======================================================== -->
+
+{% if b.visual.type == "client_profile" %}
+  <!-- FICHA CLIENT_PROFILE -->
+  <div class="card-box">
+    <h3 class="card-title">🏢 Perfil del Cliente & Empresa</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div><strong>Nombre Comercial:</strong> {{ b.visual.company_name }}</div>
+      <div><strong>Industria:</strong> {{ b.visual.industry|default:"No especificada" }}</div>
+      <div><strong>Sitio Web:</strong> <a href="{{ b.visual.website_url }}" target="_blank">{{ b.visual.website_url|default:"No especificado" }}</a></div>
+      <div><strong>Mercado Principal:</strong> {{ b.visual.primary_market }}</div>
+    </div>
+  </div>
+
+  <div class="card-box">
+    <h3 class="card-title">💼 Oferta y Propuesta de Valor</h3>
+    <p style="line-height:1.5;margin-top:0"><strong>Descripción:</strong> {{ b.visual.offer_description }}</p>
+    {% if b.visual.value_propositions %}
+      <div><strong>Propuestas de Valor Clave:</strong></div>
+      <ul style="margin:.4rem 0 1rem;padding-left:1.4rem">
+        {% for vp in b.visual.value_propositions %}
+          <li>{{ vp }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if b.visual.services_extracted %}
+      <div><strong>Servicios Detectados:</strong></div>
+      <ul style="margin:.4rem 0 0;padding-left:1.4rem">
+        {% for s in b.visual.services_extracted %}
+          <li>{{ s }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+
+  <div class="card-box">
+    <h3 class="card-title">🎨 Identidad Visual & Tono de Marca</h3>
+    {% if b.visual.colors %}
+      <div style="margin-bottom:.8rem">
+        <strong>Paleta de Colores Detectada:</strong>
+        <div style="display:flex;gap:.8rem;align-items:center;margin-top:.4rem">
+          {% for c in b.visual.colors %}
+            <div style="display:flex;align-items:center">
+              <span class="color-swatch" style="background:{{ c }}"></span>
+              <code>{{ c }}</code>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    <div><strong>Registro de Vocabulario:</strong> <code>{{ b.visual.voice_register }}</code></div>
+    {% if b.visual.voice_tokens %}
+      <div style="margin-top:.5rem">
+        <strong>Tokens de Voz:</strong>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem">
+          {% for t in b.visual.voice_tokens %}
+            <span class="chip ok">{{ t }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+{% elif b.visual.type == "audience_segments" %}
+  <!-- SEGMENTOS DE AUDIENCIA -->
+  <h2>Segmentos de Audiencia Detectados ({{ b.visual.total_segments }})</h2>
+  <div class="segment-grid">
+    {% for s in b.visual.segments %}
+      <div class="card-box" style="margin-bottom:0">
+        <h3 class="card-title" style="color:var(--accent)">👤 {{ s.name }}</h3>
+        <p style="font-size:.88rem;color:var(--ink);line-height:1.45">{{ s.description }}</p>
+        
+        {% if s.pain_points %}
+          <div style="margin-top:.6rem">
+            <strong style="font-size:.84rem;color:var(--bad)">⚠️ Puntos de Dolor:</strong>
+            <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+              {% for p in s.pain_points %}<li>{{ p }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if s.motivations %}
+          <div style="margin-top:.6rem">
+            <strong style="font-size:.84rem;color:#176A4A">🎯 Deseos / Motivaciones:</strong>
+            <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+              {% for m in s.motivations %}<li>{{ m }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if s.core_message %}
+          <div style="margin-top:.8rem;background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.84rem">
+            <strong>Mensaje Clave:</strong> "{{ s.core_message }}"
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+{% elif b.visual.type == "competitive_map" %}
+  <!-- AUDITORÍA DE COMPETENCIA -->
+  <h2>Competidores y Posicionamiento de Mercado</h2>
+  <div class="card-box">
+    {% for c in b.visual.competitors %}
+      <div style="padding:1rem 0;border-bottom:1px solid var(--line)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h4 style="margin:0;font-size:1rem;color:var(--ink)">{{ c.name }}</h4>
+          <span class="chip">{{ c.type }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.6rem;font-size:.86rem">
+          <div><strong style="color:#176A4A">Fortalezas:</strong> {{ c.strengths|join:", "|default:"-" }}</div>
+          <div><strong style="color:var(--bad)">Debilidades:</strong> {{ c.weaknesses|join:", "|default:"-" }}</div>
+        </div>
+        {% if c.differentiation %}
+          <div style="margin-top:.4rem;font-size:.84rem">
+            <strong>Oportunidad de Diferenciación:</strong> {{ c.differentiation }}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+{% elif b.visual.type == "active_strategy" %}
+  <!-- ESTRATEGIA ACTIVA -->
+  <div class="card-box">
+    <h3 class="card-title">🎯 Tesis Estratégica de Crecimiento</h3>
+    <p style="font-size:.95rem;line-height:1.55">{{ b.visual.summary }}</p>
+    {% if b.visual.pillars %}
+      <h4 style="margin:1rem 0 .5rem">Pilares Estratégicos:</h4>
+      <ul>
+        {% for p in b.visual.pillars %}<li>{{ p }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+
+{% elif b.visual.type == "kpi_contracts" %}
+  <!-- CONTRATOS DE KPI -->
+  <div class="card-box">
+    <h3 class="card-title">📈 Metas y Contratos de KPI</h3>
+    <table>
+      <thead><tr><th>Métrica</th><th>Meta Contractual</th></tr></thead>
+      <tbody>
+        {% for k in b.visual.contracts %}
+          <tr>
+            <td><strong>{{ k.name|default:k.metric }}</strong></td>
+            <td>{{ k.target|default:k.value }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% elif b.visual.type == "content_calendar" %}
+  <!-- CALENDARIO DE CONTENIDOS -->
+  <h2>Parrilla Editorial de Contenidos ({{ b.visual.total_posts }} Publicaciones)</h2>
+  <div class="card-box">
+    <table>
+      <thead><tr><th>Semana</th><th>Día</th><th>Canal</th><th>Formato</th><th>Tema / Copy Teaser</th></tr></thead>
+      <tbody>
+        {% for p in b.visual.posts %}
+          <tr>
+            <td><strong>{{ p.week }}</strong></td>
+            <td>{{ p.day }}</td>
+            <td><span class="badge-channel">{{ p.channel }}</span></td>
+            <td>{{ p.format }}</td>
+            <td>
+              <div><strong>{{ p.topic }}</strong></div>
+              <div style="font-size:.82rem;color:var(--ink2);margin-top:.2rem">{{ p.teaser }}</div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% elif b.visual.type == "copy_assets" %}
+  <!-- LIBRERÍA DE COPYWRITING -->
+  <h2>Librería de Copys Persuasivos ({{ b.visual.total_copies }})</h2>
+  {% for c in b.visual.copies %}
+    <div class="copy-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <span class="badge-channel">{{ c.channel }}</span>
+        <span class="nota">Audiencia: <strong>{{ c.target_audience }}</strong> · Variante: <strong>{{ c.variation }}</strong></span>
+      </div>
+      {% if c.headline %}<div class="copy-headline">{{ c.headline }}</div>{% endif %}
+      <div class="copy-body">{{ c.body }}</div>
+      {% if c.cta %}<div class="copy-cta">{{ c.cta }}</div>{% endif %}
+    </div>
+  {% endfor %}
+
+{% elif b.visual.type == "visual_assets" %}
+  <!-- ACTIVOS VISUALES -->
+  <h2>Activos Visuales & Briefs de Diseño ({{ b.visual.total_visuals }})</h2>
+  <div class="segment-grid">
+    {% for v in b.visual.visuals %}
+      <div class="card-box" style="margin-bottom:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--accent)">{{ v.name }}</strong>
+          <span class="chip">{{ v.ratio }}</span>
+        </div>
+        <p style="font-size:.88rem;margin:.6rem 0">{{ v.concept }}</p>
+        {% if v.prompt %}
+          <div style="background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.8rem;color:var(--ink2)">
+            <strong>Prompt:</strong> {{ v.prompt }}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <!-- RENDERIZADOR GENÉRICO ESTRUCTURADO -->
+  <div class="card-box">
+    <h3 class="card-title">{{ b.visual.title }}</h3>
+    {% if b.visual.items %}
+      <table>
+        <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+        <tbody>
+          {% for item in b.visual.items %}
+            <tr>
+              <td><strong>{{ item.key }}</strong></td>
+              <td>
+                {% if item.is_list %}
+                  <ul style="margin:0;padding-left:1.2rem">
+                    {% for val in item.val %}<li>{{ val }}</li>{% endfor %}
+                  </ul>
+                {% else %}
+                  {{ item.val }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="nota">No hay campos formateables disponibles.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+<!-- ======================================================== -->
+<!-- ACORDEÓN TÉCNICO: JSON CRUDO (COLAPSADO POR DEFECTO)     -->
+<!-- ======================================================== -->
+<details style="margin-top:2rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.8rem 1.2rem">
+  <summary style="cursor:pointer;font-weight:600;font-size:.9rem;color:var(--ink2)">
+    🔍 Ver JSON Técnico Crudo (Para desarrolladores / auditoría)
+  </summary>
+  <pre style="margin-top:1rem;max-height:35rem;overflow-y:auto">{{ b.payload_json }}</pre>
+</details>
 {% endblock %}

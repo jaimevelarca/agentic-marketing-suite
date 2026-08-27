@@ -1,50 +1,280 @@
 {% extends "base.html" %}
-{% block title %}Corrida {{ s.id }}{% endblock %}
+{% block title %}Corrida {{ s.id }} · {{ s.client_id }}{% endblock %}
 {% block content %}
-<h1>Corrida {{ s.id }}</h1>
-<p class="nota">Cliente: <b>{{ s.client_id }}</b> ·
-  Estado: {% if s.paused %}<span class="chip pausa">{{ s.status }}</span>
-  {% else %}<span class="chip ok">{{ s.status }}</span>{% endif %}</p>
+<style>
+  .run-banner{border-radius:8px;padding:1.4rem 1.6rem;margin-bottom:1.8rem;border:1px solid var(--line)}
+  .run-banner.pausa{background:#FBF3E8;border-color:var(--warn)}
+  .run-banner.running{background:#EAF4EE;border-color:var(--accent)}
+  .run-banner.done{background:#EAF4EE;border-color:var(--gate)}
+  
+  .progress-wrap{background:#EDF2F0;border-radius:99px;height:10px;overflow:hidden;margin:.8rem 0 .4rem}
+  .progress-fill{background:var(--accent);height:100%;transition:width .4s ease}
+  
+  .layer-card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:1.4rem;overflow:hidden}
+  .layer-header{background:#F6F8F7;padding:.9rem 1.2rem;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .layer-title{font-size:1.05rem;font-weight:700;margin:0;color:var(--ink)}
+  .layer-desc{font-size:.84rem;color:var(--ink2);margin-top:.2rem}
+  
+  .agent-row{padding:1rem 1.2rem;border-bottom:1px solid var(--line);display:grid;grid-template-columns:180px 140px 1fr 130px;gap:1.2rem;align-items:start}
+  .agent-row:last-child{border-bottom:0}
+  .agent-row.is-running{background:#F4F9F6;box-shadow:inset 3px 0 0 var(--accent)}
+  .agent-row.is-pending{background:#FCF9F3;box-shadow:inset 3px 0 0 var(--warn)}
+  
+  .agent-name{font-weight:700;font-size:.95rem;color:var(--ink)}
+  .agent-id{font-size:.8rem;color:var(--ink2);margin-bottom:.3rem}
+  .agent-desc{font-size:.88rem;color:var(--ink);line-height:1.45}
+  .agent-deliverable{margin-top:.5rem;font-size:.85rem;background:#EDF2F0;padding:.4rem .7rem;border-radius:6px;display:inline-block}
+  .agent-handoff{margin-top:.4rem;font-size:.82rem;color:var(--ink2)}
+  
+  .chip.running{background:#E0F0E9;color:var(--accent);font-weight:700;animation:pulse 1.8s infinite}
+  .chip.waiting{background:#ECEFEF;color:#71807A}
+  
+  @keyframes pulse{
+    0%{opacity:1}
+    50%{opacity:.55}
+    100%{opacity:1}
+  }
+</style>
 
-{% if s.pending %}
-<h2>En espera de tu revisión</h2>
-<table>
-<thead><tr><th>Bloque</th><th></th></tr></thead>
-<tbody>
-{% for b in s.pending %}
-<tr><td>{{ b }}</td>
-    <td><a class="btn btn-sec" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">Revisar</a></td></tr>
-{% endfor %}
-</tbody>
-</table>
-<form method="post" action="{% url 'reanudar' s.id %}" style="margin-top:1rem">{% csrf_token %}
-  <button class="btn btn-sec" type="submit">Reanudar corrida</button>
-  <span class="nota">Reanuda después de aprobar; si la compuerta sigue sin aprobarse, la corrida vuelve a pausarse.</span>
-</form>
-{% endif %}
-
-<h2>Bloques aprobados ({{ s.blocks|length }})</h2>
-<p>{% for b in s.blocks %}<a class="chip" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">{{ b }}</a> {% endfor %}</p>
-
-<h2>Propuesta y Entregables</h2>
-<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 20px;">
-  <a class="btn btn-pri" target="_blank" href="{% url 'propuesta_ver' s.client_id 'deck' %}">Ver Presentación (9 Actos)</a>
-  <a class="btn btn-sec" target="_blank" href="{% url 'propuesta_ver' s.client_id 'detail' %}">Ver Anexo de Detalle / PDF</a>
-  <a class="btn btn-sec" href="{% url 'propuesta_descargar' s.client_id 'deck' %}">Descargar Presentación</a>
-  <a class="btn btn-sec" href="{% url 'propuesta_descargar' s.client_id 'detail' %}">Descargar Anexo</a>
-  <a class="btn btn-sec" href="{% url 'propuesta_generar' s.client_id %}?volver={{ s.id }}">Exportar Archivos</a>
+<!-- Cabecera de la corrida -->
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem">
+  <div>
+    <h1 style="margin-bottom:.2rem">Corrida <code>{{ s.id }}</code></h1>
+    <div class="nota">Cliente: <strong style="color:var(--ink);font-size:1.05rem">{{ s.client_id }}</strong></div>
+  </div>
+  <div>
+    {% if s.status == "en curso" %}
+      <div id="live-indicator" style="font-size:.85rem;color:var(--ink2);background:#EDF2F0;padding:.4rem .8rem;border-radius:6px">
+        🔄 Actualizando en vivo · <span id="timer">4s</span>
+        <button type="button" onclick="toggleAutoRefresh()" id="toggle-refresh-btn" class="btn" style="padding:0 0 0 .5rem;background:none;color:var(--accent);font-size:.82rem">Pausar</button>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
-<h2>Bitácora de agentes</h2>
-<table>
-<thead><tr><th>Agente</th><th>Capa</th><th>Compuerta</th><th>Resultado</th></tr></thead>
-<tbody>
-{% for t in s.transcript %}
-<tr><td>{{ t.agent }} — {{ t.name }}</td><td>{{ t.layer }}</td>
-    <td>{{ t.gate_status|default:t.gate }}</td>
-    <td>{% if t.valid %}<span class="chip ok">válido</span>{% else %}
-        <span class="chip pausa">inválido: {{ t.error }}</span>{% endif %}</td></tr>
+<!-- ======================================================== -->
+<!-- BANNER PRINCIPAL DE ESTADO (VISIBILIDAD EN TIEMPO REAL)  -->
+<!-- ======================================================== -->
+{% if s.paused %}
+  <div class="run-banner pausa">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem">
+      <span style="font-size:1.6rem">⏸️</span>
+      <div>
+        <strong style="font-size:1.15rem;color:var(--warn)">Compuerta Humana Activa — Se requiere tu revisión y aprobación</strong>
+        <div class="nota" style="color:#7A4310">
+          La suite ha pausado la ejecución de forma preventiva. Debes revisar y decidir sobre el entregable pendiente para habilitar a los siguientes agentes.
+        </div>
+      </div>
+    </div>
+
+    {% if s.pending %}
+      <div style="margin:1rem 0;background:#fff;border:1px solid var(--warn);border-radius:6px;padding:.8rem 1.2rem">
+        <strong style="font-size:.9rem;color:var(--ink)">Bloques esperando tu validación:</strong>
+        <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.5rem">
+          {% for b in s.pending %}
+            <a class="btn btn-aprobar" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}" style="font-size:.95rem;padding:.5em 1.2em">
+              🔍 Revisar Entregable «{{ b }}» ➔
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'reanudar' s.id %}" style="display:flex;align-items:center;gap:1rem;margin-top:.8rem">{% csrf_token %}
+      <button class="btn btn-sec" type="submit" style="background:var(--accent);padding:.6em 1.4em">
+        ▶️ Reanudar Corrida
+      </button>
+      <span class="nota">Al reanudar, la suite avanza si aprobaste el bloque; si sigue pendiente, volverá a pausarse.</span>
+    </form>
+  </div>
+
+{% elif s.status == "en curso" %}
+  <div class="run-banner running">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <strong style="font-size:1.15rem;color:var(--accent)">🔄 Agentes Trabajando en Tiempo Real</strong>
+        <div class="nota" style="margin-top:.2rem">
+          El pipeline de 19 agentes se está ejecutando de forma autónoma. Esta pantalla se actualiza en vivo.
+        </div>
+      </div>
+      <div style="text-align:right">
+        <span style="font-weight:700;font-size:1.2rem;color:var(--accent)">{{ s.percent }}%</span>
+        <div class="nota">{{ s.total_completed }} de 19 agentes completados</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-fill" style="width:{{ s.percent }}%"></div>
+    </div>
+    {% if s.running_agent %}
+      <div style="font-size:.85rem;color:var(--ink2);margin-top:.4rem">
+        ⚙️ Agente actual en ejecución: <strong>{{ s.running_agent.id }} — {{ s.running_agent.title }}</strong> ({{ s.running_agent.layer_title }})
+      </div>
+    {% endif %}
+  </div>
+
+{% elif s.status == "terminada" %}
+  <div class="run-banner done">
+    <div style="display:flex;align-items:center;gap:.8rem">
+      <span style="font-size:1.8rem">🎉</span>
+      <div>
+        <strong style="font-size:1.15rem;color:#176A4A">Corrida Completada Exitosamente (19/19 Agentes)</strong>
+        <div class="nota" style="margin-top:.2rem">
+          Todos los entregables estratégicos, analíticos y creativos han sido compilados en la memoria del cliente.
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- ======================================================== -->
+<!-- PROPUESTA COMERCIAL Y REPORTES COMPILADOS                -->
+<!-- ======================================================== -->
+<h2>📊 Propuesta Comercial y Entregables Finales</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 24px;">
+  <a class="btn btn-sec" style="background:var(--accent);font-size:.92rem" target="_blank" href="{% url 'propuesta_ver' s.client_id 'deck' %}">
+    🖥️ Ver Presentación Interactiva (9 Actos)
+  </a>
+  <a class="btn btn-sec" style="background:#2C534D;font-size:.92rem" target="_blank" href="{% url 'propuesta_ver' s.client_id 'detail' %}">
+    📑 Ver Dossier Ejecutivo / PDF
+  </a>
+  <a class="btn btn-sec" style="background:#EDF2F0;color:var(--ink)" href="{% url 'propuesta_descargar' s.client_id 'deck' %}">
+    💾 Descargar Deck HTML
+  </a>
+  <a class="btn btn-sec" style="background:#EDF2F0;color:var(--ink)" href="{% url 'propuesta_descargar' s.client_id 'detail' %}">
+    💾 Descargar PDF Dossier
+  </a>
+  <a class="btn btn-sec" style="background:#EDF2F0;color:var(--ink)" href="{% url 'propuesta_generar' s.client_id %}?volver={{ s.id }}">
+    📦 Exportar Todo a Disco
+  </a>
+</div>
+
+<!-- ======================================================== -->
+<!-- CADENA DE VALOR: MAPA COMPLETO DE LOS 19 AGENTES        -->
+<!-- ======================================================== -->
+<h2>🗺️ Cadena de Valor del Pipeline (19 Agentes por Capa)</h2>
+<p class="nota">Monitorea el rol de cada agente, lo que produjo, el entregable generado y lo que transfirió a los siguientes agentes en la cadena.</p>
+
+{% for layer in s.layers %}
+  <div class="layer-card">
+    <div class="layer-header">
+      <div>
+        <h3 class="layer-title">{{ layer.title }}</h3>
+        <div class="layer-desc">{{ layer.desc }}</div>
+      </div>
+      <div>
+        <span class="chip {% if layer.is_layer_done %}ok{% elif layer.is_layer_active %}run{% else %}waiting{% endif %}">
+          {{ layer.completed_count }} de {{ layer.total_count }} listos
+        </span>
+      </div>
+    </div>
+
+    <div>
+      {% for a in layer.agents %}
+        <div class="agent-row {% if a.status == 'running' %}is-running{% elif a.status == 'pending' %}is-pending{% endif %}">
+          <!-- Columna 1: ID y Nombre -->
+          <div>
+            <div class="agent-id">Agente {{ a.id }}</div>
+            <div class="agent-name">{{ a.title }}</div>
+            <div style="font-size:.78rem;color:var(--ink2);margin-top:.2rem">{{ a.name }}</div>
+          </div>
+
+          <!-- Columna 2: Estado en Vivo -->
+          <div>
+            {% if a.status == "completed" %}
+              <span class="chip ok">✅ Completado</span>
+            {% elif a.status == "pending" %}
+              <span class="chip pausa" style="font-weight:700">⏸️ Requiere Aprobación</span>
+            {% elif a.status == "running" %}
+              <span class="chip running">🔄 Trabajando...</span>
+            {% elif a.status == "error" %}
+              <span class="chip pausa" style="background:#FAEFEC;color:var(--bad)">❌ Error</span>
+            {% else %}
+              <span class="chip waiting">⏳ En espera</span>
+            {% endif %}
+            
+            <div style="font-size:.75rem;color:var(--ink2);margin-top:.4rem">
+              Compuerta: <strong>{{ a.gate_label }}</strong>
+            </div>
+          </div>
+
+          <!-- Columna 3: Misión, Entregable y Handoff -->
+          <div>
+            <div class="agent-desc">
+              <strong>Misión:</strong> {{ a.mission }}
+            </div>
+            <div class="agent-deliverable">
+              📦 <strong>Entregable:</strong> {{ a.deliverable }}
+            </div>
+            <div class="agent-handoff">
+              ➡️ <strong>Transferencia (Handoff):</strong> {{ a.handoff }}
+            </div>
+          </div>
+
+          <!-- Columna 4: Acciones -->
+          <div style="text-align:right">
+            {% if a.has_block %}
+              {% if a.status == "pending" %}
+                <a class="btn btn-aprobar" href="{% url 'bloque' s.client_id a.block %}?volver={{ s.id }}" style="font-size:.82rem;padding:.45em .9em">
+                  Revisar y Decidir
+                </a>
+              {% else %}
+                <a class="btn btn-sec" href="{% url 'bloque' s.client_id a.block %}?volver={{ s.id }}" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.45em .9em">
+                  Ver Entregable ➔
+                </a>
+              {% endif %}
+            {% else %}
+              <span style="font-size:.8rem;color:var(--ink2)">Pendiente</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 {% endfor %}
-</tbody>
-</table>
+
+<!-- Bloques generados -->
+<h2>📦 Entregables Disponibles en Memoria ({{ s.blocks|length }})</h2>
+<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem">
+  {% for b in s.blocks %}
+    <a class="chip ok" style="padding:.35em .8em;font-size:.85rem;text-decoration:none" href="{% url 'bloque' s.client_id b %}?volver={{ s.id }}">
+      📄 {{ b }}
+    </a>
+  {% empty %}
+    <span class="nota">Aún no hay bloques generados en esta corrida.</span>
+  {% endfor %}
+</div>
+
+<script>
+  let refreshTimer = null;
+  let secondsLeft = 4;
+  let isAutoRefreshActive = true;
+
+  function tick() {
+    if (!isAutoRefreshActive) return;
+    secondsLeft--;
+    const t = document.getElementById('timer');
+    if (t) t.innerText = secondsLeft + 's';
+    if (secondsLeft <= 0) {
+      location.reload();
+    }
+  }
+
+  function toggleAutoRefresh() {
+    isAutoRefreshActive = !isAutoRefreshActive;
+    const btn = document.getElementById('toggle-refresh-btn');
+    const timerSpan = document.getElementById('timer');
+    if (isAutoRefreshActive) {
+      secondsLeft = 4;
+      if (btn) btn.innerText = 'Pausar';
+      if (timerSpan) timerSpan.innerText = '4s';
+    } else {
+      if (btn) btn.innerText = 'Reanudar';
+      if (timerSpan) timerSpan.innerText = 'Pausado';
+    }
+  }
+
+  {% if s.status == "en curso" %}
+    refreshTimer = setInterval(tick, 1000);
+  {% endif %}
+</script>
 {% endblock %}
