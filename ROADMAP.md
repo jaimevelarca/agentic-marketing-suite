@@ -146,6 +146,14 @@ Real-time pipeline visibility and live status banners in `sesion.html` (auto-ref
 Complete 19-agent value chain DAG organized by 6 layers with mission, deliverable, and handoff tracking (`pipeline_meta.py`);
 319 offline tests green.
 
+**Production Release v0.2.5 ✅ 2026-08-27:**
+One-click test session cleaner prominent in dashboard header to reset Firestore state from scratch;
+Human-friendly deliverable cards properly unwrap canonical agent schema outputs (DEL-17 `website_url`, `name`, `industry`, `offers`, `usp`, `audience_segments` metadata tags, `active_strategy` thesis/mix, `content_calendar` slots, `copy_assets` hooks/captions, and `visual_assets` creative specs);
+Full in-place deliverable editor in `bloque.html` (`block_edit` endpoint) enabling human reviewers to adjust any field or copy and approve with changes;
+CI/CD race-condition prevention in `promote-prod.yml` with polling retry loop;
+323 offline tests green.
+
+
 
 ## Standing rules
 
