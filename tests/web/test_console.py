@@ -320,4 +320,62 @@ def test_block_edit_view_saves_and_approves(web, monkeypatch):
     assert updated["decision"] == "approved"
 
 
+def test_campaign_registry_trend_signals_renderers():
+    # Campaign registry
+    cr = block_renderers.format_block_payload("campaign_registry", {
+        "campaigns": [
+            {
+                "name": "Campaña TOFU Q3",
+                "funnel_stage": "top_of_funnel",
+                "theme": "Educativo",
+                "objective": "Atracción de leads",
+                "channels": ["Meta Ads", "LinkedIn"],
+                "messaging_pillars": ["Ahorro de costos", "Velocidad"],
+                "success_metrics": [{"metric": "CPL", "target": "15", "unit": "USD"}],
+            }
+        ]
+    })
+    assert cr["type"] == "campaign_registry"
+    assert cr["total_campaigns"] == 1
+    assert cr["campaigns"][0]["index"] == 0
+    assert cr["campaigns"][0]["name"] == "Campaña TOFU Q3"
+    assert "Atracción" in cr["campaigns"][0]["funnel_stage"]
+    assert "CPL: 15 USD" in cr["campaigns"][0]["metrics"]
+
+    # Trend signals
+    ts = block_renderers.format_block_payload("trend_signals", {
+        "signals": [
+            {
+                "topic": "IA Generativa en Pymes",
+                "category": "industry",
+                "velocity": "exploding",
+                "suggested_angle": "Automatización accesible",
+            }
+        ]
+    })
+    assert ts["type"] == "trend_signals"
+    assert ts["signals"][0]["index"] == 0
+    assert ts["signals"][0]["topic"] == "IA Generativa en Pymes"
+
+
+def test_session_restart_from_view(web, monkeypatch):
+    restart_calls = []
+
+    def mock_restart(session_id, client_id, from_block):
+        restart_calls.append((session_id, client_id, from_block))
+        return True
+
+    monkeypatch.setattr(views.services, "restart_run_from", mock_restart)
+    monkeypatch.setattr(views.services, "update_block_payload", lambda **kwargs: None)
+
+    res = web.post("/corridas/run-test-123/reiniciar-desde/audience_segments/", {
+        "client_id": "test-client",
+        "payload_json": '{"segments": [{"name": "Nuevo ICP"}]}',
+    })
+    assert res.status_code == 302
+    assert len(restart_calls) == 1
+    assert restart_calls[0] == ("run-test-123", "test-client", "audience_segments")
+
+
+
 

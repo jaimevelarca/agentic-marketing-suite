@@ -7,6 +7,8 @@ urlpatterns = [
     path("corridas/nueva/", views.run_new, name="nueva"),
     path("corridas/<str:session_id>/", views.session_detail, name="sesion"),
     path("corridas/<str:session_id>/reanudar/", views.session_resume, name="reanudar"),
+    path("corridas/<str:session_id>/reiniciar-desde/<str:block>/", views.session_restart_from,
+         name="reiniciar_desde"),
     path("clientes/<str:client_id>/bloques/<str:block>/", views.block_review, name="bloque"),
     path("clientes/<str:client_id>/bloques/<str:block>/decidir/", views.block_decide,
          name="decidir"),

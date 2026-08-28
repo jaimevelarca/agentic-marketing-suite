@@ -153,6 +153,13 @@ Full in-place deliverable editor in `bloque.html` (`block_edit` endpoint) enabli
 CI/CD race-condition prevention in `promote-prod.yml` with polling retry loop;
 323 offline tests green.
 
+**Production Release v0.2.6 ✅ 2026-08-27:**
+Card-based deliverable UI across all stages (`audience_segments`, `competitive_map`, `campaign_registry`, `trend_signals`, `content_plan`, `content_calendar`, `copy_assets`, `visual_assets`), eliminating raw JSON display across the entire pipeline review interface;
+Individual card action buttons (`✏️ Editar`, `🗑️ Eliminar`) and addition buttons (`➕ Añadir Nuevo...`) with interactive modal dialogs (no raw JSON required for adding/modifying audience ICPs, competitors, campaigns, content slots, or copy variants);
+Human edits automatically persist to Firestore memory blocks and are seamlessly reloaded upon gate promotion (`suite/orchestration/adk_workflow.py`);
+Pipeline re-execution mechanism (`restart_run_from` and `session_restart_from` endpoint) to re-run all downstream stages from any corrected previous block onwards;
+325 offline tests green.
+
 
 
 ## Standing rules

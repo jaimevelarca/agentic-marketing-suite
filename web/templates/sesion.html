@@ -218,9 +218,18 @@
                   Revisar y Decidir
                 </a>
               {% else %}
-                <a class="btn btn-sec" href="{% url 'bloque' s.client_id a.block %}?volver={{ s.id }}" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.45em .9em">
-                  Ver Entregable ➔
-                </a>
+                <div style="display:flex;flex-direction:column;gap:.35rem;align-items:flex-end">
+                  <a class="btn btn-sec" href="{% url 'bloque' s.client_id a.block %}?volver={{ s.id }}" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.4em .85em">
+                    👁️ Ver / Modificar ➔
+                  </a>
+                  <form method="post" action="{% url 'reiniciar_desde' s.id a.block %}" onsubmit="return confirm('¿Confirmas que deseas re-ejecutar el flujo a partir de este bloque («{{ a.block }}»)?\n\nTodos los pasos posteriores se recalcularán con los cambios.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="client_id" value="{{ s.client_id }}">
+                    <button type="submit" class="btn" style="background:#FAEFEC;color:var(--ink2);font-size:.74rem;padding:.25em .65em;border:1px solid #E8C8C2" title="Recalcula las etapas siguientes a partir de este entregable">
+                      🔄 Re-ejecutar desde aquí
+                    </button>
+                  </form>
+                </div>
               {% endif %}
             {% else %}
               <span style="font-size:.8rem;color:var(--ink2)">Pendiente</span>

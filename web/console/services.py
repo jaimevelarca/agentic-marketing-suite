@@ -168,6 +168,64 @@ def resume_run(session_id: str) -> bool:
     return True
 
 
+def restart_run_from(session_id: str, client_id: str, from_block: str) -> bool:
+    """Re-ejecuta el flujo a partir de un bloque previo modificado,
+
+    recalculando todas las etapas siguientes con los datos actualizados.
+    """
+    from google.adk.runners import Runner
+    from orchestration.pipeline import PIPELINE
+    from orchestration.adk_workflow import build_workflow, _promote
+
+    blocks_order = [s.block for s in PIPELINE]
+    if from_block not in blocks_order:
+        return False
+    from_idx = blocks_order.index(from_block)
+
+    # 1. Recolectar bloques aprobados hasta from_block (incluyendo la versión persistida más reciente)
+    approved_blocks = {}
+    for i in range(from_idx + 1):
+        blk = blocks_order[i]
+        val = clients.read_memory_block(client_id, blk)
+        if val and isinstance(val, dict):
+            step = PIPELINE[i]
+            _promote(step, val, approved_blocks)
+
+    # 2. Resetear el estado de compuerta en Firestore para bloques posteriores
+    downstream_blocks = blocks_order[from_idx + 1:]
+    for blk in downstream_blocks:
+        clients.set_gate_status(client_id, blk, "pending_review", actor="system", note=f"Re-ejecución iniciada desde {from_block}")
+
+    # 3. Leer la sesión previa para rescatar los inputs originales
+    service = _service()
+    existing = asyncio.run(service.get_session(app_name=APP_NAME, user_id=USER_ID, session_id=session_id))
+    inputs = (existing.state.get("inputs") if existing else {}) or {}
+
+    prior_agent_ids = {PIPELINE[j].id for j in range(from_idx + 1)}
+    transcript = [
+        t for t in ((existing.state.get("transcript") if existing else []) or [])
+        if t.get("agent") in prior_agent_ids
+    ]
+
+    new_state = {
+        "client_id": client_id,
+        "inputs": inputs,
+        "auto_approve": False,
+        "blocks": approved_blocks,
+        "pending_blocks": {},
+        "transcript": transcript,
+    }
+
+    asyncio.run(service.create_session(app_name=APP_NAME, user_id=USER_ID, session_id=session_id, state=new_state))
+
+    def drive():
+        runner = Runner(node=build_workflow(), app_name=APP_NAME, session_service=service)
+        list(runner.run(user_id=USER_ID, session_id=session_id, new_message=None))
+
+    _run_in_thread(drive)
+    return True
+
+
 def get_client_proposal(client_id: str, doc_type: str = "deck") -> tuple[str, str]:
     """Compile and return (html_content, filename) for presentation deck or detail report."""
     from suite.rendering import compile_detail_report, compile_presentation_deck, derive_theme_from_profile

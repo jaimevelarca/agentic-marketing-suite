@@ -98,6 +98,10 @@ def _make_gate_fn(step: AgentStep):
         if status in APPROVED:
             blocks = dict(ctx.state.get("blocks") or {})
             obj = pending.pop(step.block)
+            # Re-read persisted block in case operator modified it in the review UI
+            persisted = clients.read_memory_block(ctx.state["client_id"], step.block)
+            if persisted and isinstance(persisted, dict):
+                obj = persisted
             obj["gate_status"] = status
             _promote(step, obj, blocks)
             ctx.state["blocks"] = blocks

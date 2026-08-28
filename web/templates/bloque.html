@@ -44,6 +44,11 @@
       <button type="button" onclick="toggleEditSection()" class="btn" style="background:#EDF2F0;color:var(--accent);border:1px solid var(--accent);padding:.6em 1.2em;font-weight:600">
         ✏️ Modificar Entregable
       </button>
+      {% if volver %}
+        <button type="button" onclick="triggerRestartFrom()" class="btn" style="background:#1B2B4D;color:#fff;font-weight:600;padding:.6em 1.3em" title="Guarda los cambios y recalcula los pasos posteriores">
+          🔄 Guardar y Re-ejecutar Etapas Siguientes
+        </button>
+      {% endif %}
       <button class="btn btn-devolver" name="decision" value="returned" type="submit" style="padding:.6em 1.2em">
         ↩️ Devolver con Observaciones
       </button>
@@ -57,6 +62,13 @@
       {% endif %}
     </div>
   </form>
+  {% if volver %}
+    <form id="form-restart-from" method="post" action="{% url 'reiniciar_desde' volver b.block %}" style="display:none">
+      {% csrf_token %}
+      <input type="hidden" name="client_id" value="{{ b.client_id }}">
+      <input type="hidden" name="payload_json" id="restart_payload_json" value="">
+    </form>
+  {% endif %}
 </div>
 
 <!-- Editor de Entregables (Modificar entregable directamente) -->
@@ -69,7 +81,7 @@
     Edita los campos o datos de este entregable (por ejemplo, corregir la URL del sitio web, refinar textos, agregar canales o ajustar propuestas).
     Los cambios se guardan directamente en la memoria del bloque en Firestore para que los siguientes agentes operen con la información corregida.
   </p>
-  <form method="post" action="{% url 'editar_bloque' b.client_id b.block %}">{% csrf_token %}
+  <form id="form-edit-block" method="post" action="{% url 'editar_bloque' b.client_id b.block %}">{% csrf_token %}
     <input type="hidden" name="volver" value="{{ volver }}">
     <label for="edit_payload_json">Estructura del Entregable (JSON)</label>
     <textarea name="payload_json" id="edit_payload_json" style="width:100%;min-height:22rem;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:#F9FBFA;border:1px solid var(--line);border-radius:6px;padding:.8rem;box-sizing:border-box">{{ b.payload_json }}</textarea>
@@ -172,60 +184,232 @@
   </div>
 
 {% elif b.visual.type == "audience_segments" %}
-  <!-- SEGMENTOS DE AUDIENCIA -->
-  <h2>Segmentos de Audiencia Detectados ({{ b.visual.total_segments }})</h2>
+  <!-- SEGMENTOS DE AUDIENCIA (PERFILES OBJETIVO / ICP) -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">👥 Perfiles de Clientes Objetivos (ICP) ({{ b.visual.segments|length }})</h2>
+      <div class="nota">Perfiles validados para dirigir pautas publicitarias, copies y ángulos editoriales.</div>
+    </div>
+    <button type="button" onclick="openAddSegmentModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Nuevo Perfil Objetivo
+    </button>
+  </div>
+
   <div class="segment-grid">
     {% for s in b.visual.segments %}
-      <div class="card-box" style="margin-bottom:0">
-        <h3 class="card-title" style="color:var(--accent)">👤 {{ s.name }}</h3>
-        <p style="font-size:.88rem;color:var(--ink);line-height:1.45">{{ s.description }}</p>
-        
-        {% if s.pain_points %}
-          <div style="margin-top:.6rem">
-            <strong style="font-size:.84rem;color:var(--bad)">⚠️ Puntos de Dolor:</strong>
-            <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
-              {% for p in s.pain_points %}<li>{{ p }}</li>{% endfor %}
-            </ul>
+      <div class="card-box" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <h3 class="card-title" style="color:var(--accent);margin:0">👤 {{ s.name }}</h3>
+            <span class="chip ok" style="font-size:.75rem">#{{ forloop.counter }}</span>
           </div>
-        {% endif %}
+          <p style="font-size:.88rem;color:var(--ink);line-height:1.45;margin:.6rem 0">{{ s.description }}</p>
+          
+          {% if s.pain_points %}
+            <div style="margin-top:.6rem">
+              <strong style="font-size:.84rem;color:var(--bad)">⚠️ Puntos de Dolor:</strong>
+              <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+                {% for p in s.pain_points %}<li>{{ p }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
 
-        {% if s.motivations %}
-          <div style="margin-top:.6rem">
-            <strong style="font-size:.84rem;color:#176A4A">🎯 Deseos / Motivaciones:</strong>
-            <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
-              {% for m in s.motivations %}<li>{{ m }}</li>{% endfor %}
-            </ul>
-          </div>
-        {% endif %}
+          {% if s.motivations %}
+            <div style="margin-top:.6rem">
+              <strong style="font-size:.84rem;color:#176A4A">🎯 Deseos / Motivaciones:</strong>
+              <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+                {% for m in s.motivations %}<li>{{ m }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
 
-        {% if s.core_message %}
-          <div style="margin-top:.8rem;background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.84rem">
-            <strong>Mensaje Clave:</strong> "{{ s.core_message }}"
-          </div>
-        {% endif %}
+          {% if s.core_message %}
+            <div style="margin-top:.8rem;background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.84rem">
+              <strong>Mensaje Clave:</strong> "{{ s.core_message }}"
+            </div>
+          {% endif %}
+
+          {% if s.channels %}
+            <div style="margin-top:.6rem;display:flex;gap:.3rem;flex-wrap:wrap">
+              {% for ch in s.channels %}
+                <span class="chip" style="font-size:.72rem">{{ ch }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--line)">
+          <button type="button" onclick="editSegment({{ s.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            ✏️ Editar Perfil
+          </button>
+          <button type="button" onclick="deleteItem('segments', {{ s.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            🗑️ Eliminar
+          </button>
+        </div>
       </div>
     {% endfor %}
   </div>
 
 {% elif b.visual.type == "competitive_map" %}
   <!-- AUDITORÍA DE COMPETENCIA -->
-  <h2>Competidores y Posicionamiento de Mercado</h2>
-  <div class="card-box">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">🏢 Competidores y Posicionamiento de Mercado ({{ b.visual.competitors|length }})</h2>
+      <div class="nota">Diferenciación y análisis estratégico frente a jugadores clave del mercado.</div>
+    </div>
+    <button type="button" onclick="openAddCompetitorModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Nuevo Competidor
+    </button>
+  </div>
+
+  <div class="segment-grid">
     {% for c in b.visual.competitors %}
-      <div style="padding:1rem 0;border-bottom:1px solid var(--line)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h4 style="margin:0;font-size:1rem;color:var(--ink)">{{ c.name }}</h4>
-          <span class="chip">{{ c.type }}</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.6rem;font-size:.86rem">
-          <div><strong style="color:#176A4A">Fortalezas:</strong> {{ c.strengths|join:", "|default:"-" }}</div>
-          <div><strong style="color:var(--bad)">Debilidades:</strong> {{ c.weaknesses|join:", "|default:"-" }}</div>
-        </div>
-        {% if c.differentiation %}
-          <div style="margin-top:.4rem;font-size:.84rem">
-            <strong>Oportunidad de Diferenciación:</strong> {{ c.differentiation }}
+      <div class="card-box" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 class="card-title" style="margin:0;color:var(--ink)">🏢 {{ c.name }}</h3>
+            <span class="chip">{{ c.type }}</span>
           </div>
-        {% endif %}
+          <div style="margin-top:.4rem;font-size:.84rem;color:var(--ink2)">
+            <strong>Precio:</strong> {{ c.price_point }}
+          </div>
+          {% if c.differentiation %}
+            <p style="font-size:.88rem;color:var(--ink);line-height:1.45;margin:.6rem 0"><strong>Diferenciación:</strong> {{ c.differentiation }}</p>
+          {% endif %}
+          {% if c.strengths %}
+            <div style="margin-top:.6rem">
+              <strong style="font-size:.84rem;color:#176A4A">💪 Fortalezas:</strong>
+              <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+                {% for st in c.strengths %}<li>{{ st }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if c.weaknesses %}
+            <div style="margin-top:.6rem">
+              <strong style="font-size:.84rem;color:var(--bad)">⚠️ Debilidades / Oportunidades:</strong>
+              <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+                {% for wk in c.weaknesses %}<li>{{ wk }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--line)">
+          <button type="button" onclick="editCompetitor({{ c.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            ✏️ Editar Competidor
+          </button>
+          <button type="button" onclick="deleteItem('competitors', {{ c.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if b.visual.our_advantage %}
+    <div class="card-box" style="margin-top:1.4rem;background:#EAF6F1;border:1px solid #C2E7D5">
+      <h3 class="card-title" style="color:var(--accent);margin:0 0 .4rem">🏆 Ventaja Estratégica & Ángulo de Diferenciación</h3>
+      <p style="margin:0;font-size:.9rem;line-height:1.5">{{ b.visual.our_advantage }}</p>
+    </div>
+  {% endif %}
+
+{% elif b.visual.type == "campaign_registry" %}
+  <!-- REGISTRO ESTRATÉGICO DE CAMPAÑAS -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">🚀 Registro de Campañas Comerciales ({{ b.visual.campaigns|length }})</h2>
+      <div class="nota">Estructura por etapas del embudo comercial (TOFU, MOFU, BOFU) con canales y mensajes.</div>
+    </div>
+    <button type="button" onclick="openAddCampaignModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Nueva Campaña
+    </button>
+  </div>
+
+  <div class="segment-grid">
+    {% for cp in b.visual.campaigns %}
+      <div class="card-box" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <h3 class="card-title" style="margin:0;color:var(--accent)">🚀 {{ cp.name }}</h3>
+            <span class="chip ok" style="font-size:.78rem">{{ cp.funnel_stage }}</span>
+          </div>
+          {% if cp.theme %}
+            <div style="margin-top:.4rem;font-size:.86rem"><strong>Tema:</strong> {{ cp.theme }}</div>
+          {% endif %}
+          <p style="font-size:.88rem;color:var(--ink);line-height:1.45;margin:.6rem 0"><strong>Objetivo:</strong> {{ cp.objective }}</p>
+          {% if cp.channels %}
+            <div style="margin-top:.5rem">
+              <strong style="font-size:.82rem;color:var(--ink2)">Canales:</strong>
+              <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.2rem">
+                {% for ch in cp.channels %}<span class="chip" style="font-size:.72rem">{{ ch }}</span>{% endfor %}
+              </div>
+            </div>
+          {% endif %}
+          {% if cp.messaging_pillars %}
+            <div style="margin-top:.6rem">
+              <strong style="font-size:.82rem;color:var(--ink2)">Pilares de Mensaje:</strong>
+              <ul style="margin:.3rem 0;padding-left:1.2rem;font-size:.84rem">
+                {% for p in cp.messaging_pillars %}<li>{{ p }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if cp.metrics %}
+            <div style="margin-top:.6rem;background:#EDF2F0;padding:.5rem .7rem;border-radius:6px;font-size:.82rem">
+              <strong>Métricas / Metas:</strong> {{ cp.metrics|join:", " }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--line)">
+          <button type="button" onclick="editCampaign({{ cp.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            ✏️ Editar Campaña
+          </button>
+          <button type="button" onclick="deleteItem('campaigns', {{ cp.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+{% elif b.visual.type == "trend_signals" %}
+  <!-- RADAR DE TENDENCIAS -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">📡 Señales y Tendencias Detectadas ({{ b.visual.signals|length }})</h2>
+      <div class="nota">Oportunidades estacionales y temas emergentes para sincronizar la comunicación.</div>
+    </div>
+    <button type="button" onclick="openAddSignalModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Nueva Señal
+    </button>
+  </div>
+
+  <div class="segment-grid">
+    {% for sig in b.visual.signals %}
+      <div class="card-box" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <h3 class="card-title" style="margin:0;color:var(--ink)">📡 {{ sig.topic }}</h3>
+            <span class="chip ok" style="font-size:.78rem">{{ sig.velocity }}</span>
+          </div>
+          <div style="margin-top:.4rem;font-size:.84rem;color:var(--ink2)">
+            Categoría: <strong>{{ sig.category }}</strong>
+          </div>
+          {% if sig.suggested_angle %}
+            <p style="font-size:.88rem;color:var(--ink);line-height:1.45;margin:.6rem 0"><strong>Ángulo sugerido:</strong> {{ sig.suggested_angle }}</p>
+          {% endif %}
+          {% if sig.rationale %}
+            <div style="font-size:.84rem;color:var(--ink2);margin-top:.4rem">{{ sig.rationale }}</div>
+          {% endif %}
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--line)">
+          <button type="button" onclick="editSignal({{ sig.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            ✏️ Editar Señal
+          </button>
+          <button type="button" onclick="deleteItem('signals', {{ sig.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            🗑️ Eliminar
+          </button>
+        </div>
       </div>
     {% endfor %}
   </div>
@@ -236,7 +420,7 @@
     <h3 class="card-title">🎯 Tesis Estratégica de Crecimiento</h3>
     <p style="font-size:.95rem;line-height:1.55">{{ b.visual.summary }}</p>
     {% if b.visual.pillars %}
-      <h4 style="margin:1rem 0 .5rem">Pilares Estratégicos:</h4>
+      <h4 style="margin:1rem 0 .5rem">Pilares Estratégicos & Mix de Canales:</h4>
       <ul>
         {% for p in b.visual.pillars %}<li>{{ p }}</li>{% endfor %}
       </ul>
@@ -262,10 +446,19 @@
 
 {% elif b.visual.type == "content_calendar" %}
   <!-- CALENDARIO DE CONTENIDOS -->
-  <h2>Parrilla Editorial de Contenidos ({{ b.visual.total_posts }} Publicaciones)</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">📅 Parrilla Editorial de Contenidos ({{ b.visual.total_posts }} Publicaciones)</h2>
+      <div class="nota">Cronograma de 4 semanas organizado por fecha, canal, formato y copy teaser.</div>
+    </div>
+    <button type="button" onclick="openAddSlotModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Publicación
+    </button>
+  </div>
+
   <div class="card-box">
     <table>
-      <thead><tr><th>Semana</th><th>Día</th><th>Canal</th><th>Formato</th><th>Tema / Copy Teaser</th></tr></thead>
+      <thead><tr><th>Semana</th><th>Día</th><th>Canal</th><th>Formato</th><th>Tema / Copy Teaser</th><th style="text-align:right">Acciones</th></tr></thead>
       <tbody>
         {% for p in b.visual.posts %}
           <tr>
@@ -277,6 +470,14 @@
               <div><strong>{{ p.topic }}</strong></div>
               <div style="font-size:.82rem;color:var(--ink2);margin-top:.2rem">{{ p.teaser }}</div>
             </td>
+            <td style="text-align:right;white-space:nowrap">
+              <button type="button" onclick="editSlot({{ p.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.78rem;padding:.25em .65em;margin-right:.3rem">
+                ✏️ Editar
+              </button>
+              <button type="button" onclick="deleteItem('slots', {{ p.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.78rem;padding:.25em .65em">
+                🗑️
+              </button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -285,9 +486,18 @@
 
 {% elif b.visual.type == "copy_assets" %}
   <!-- LIBRERÍA DE COPYWRITING -->
-  <h2>Librería de Copys Persuasivos ({{ b.visual.total_copies }})</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">✍️ Librería de Copys Persuasivos ({{ b.visual.total_copies }})</h2>
+      <div class="nota">Textos redactados por canal, audiencia objetivo y pruebas A/B.</div>
+    </div>
+    <button type="button" onclick="openAddCopyModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Nuevo Copy
+    </button>
+  </div>
+
   {% for c in b.visual.copies %}
-    <div class="copy-card">
+    <div class="copy-card" style="position:relative">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
         <span class="badge-channel">{{ c.channel }}</span>
         <span class="nota">Audiencia: <strong>{{ c.target_audience }}</strong> · Variante: <strong>{{ c.variation }}</strong></span>
@@ -295,25 +505,52 @@
       {% if c.headline %}<div class="copy-headline">{{ c.headline }}</div>{% endif %}
       <div class="copy-body">{{ c.body }}</div>
       {% if c.cta %}<div class="copy-cta">{{ c.cta }}</div>{% endif %}
+      <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.8rem;padding-top:.6rem;border-top:1px solid var(--line)">
+        <button type="button" onclick="editCopy({{ c.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.8rem;padding:.3em .8em">
+          ✏️ Editar Copy
+        </button>
+        <button type="button" onclick="deleteItem('assets', {{ c.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.8rem;padding:.3em .8em">
+          🗑️ Eliminar
+        </button>
+      </div>
     </div>
   {% endfor %}
 
 {% elif b.visual.type == "visual_assets" %}
   <!-- ACTIVOS VISUALES -->
-  <h2>Activos Visuales & Briefs de Diseño ({{ b.visual.total_visuals }})</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem">
+    <div>
+      <h2 style="margin:0">🎨 Activos Visuales & Briefs Creativos ({{ b.visual.total_visuals }})</h2>
+      <div class="nota">Dirección de arte, prompts para generadores de imagen y especificaciones.</div>
+    </div>
+    <button type="button" onclick="openAddVisualModal()" class="btn" style="background:var(--accent);color:#fff;font-weight:700;padding:.6em 1.3em;box-shadow:0 2px 5px rgba(0,0,0,.15)">
+      ➕ Añadir Activo Visual
+    </button>
+  </div>
+
   <div class="segment-grid">
     {% for v in b.visual.visuals %}
-      <div class="card-box" style="margin-bottom:0">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <strong style="color:var(--accent)">{{ v.name }}</strong>
-          <span class="chip">{{ v.ratio }}</span>
-        </div>
-        <p style="font-size:.88rem;margin:.6rem 0">{{ v.concept }}</p>
-        {% if v.prompt %}
-          <div style="background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.8rem;color:var(--ink2)">
-            <strong>Prompt:</strong> {{ v.prompt }}
+      <div class="card-box" style="margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong style="color:var(--accent)">{{ v.name }}</strong>
+            <span class="chip">{{ v.ratio }}</span>
           </div>
-        {% endif %}
+          <p style="font-size:.88rem;margin:.6rem 0">{{ v.concept }}</p>
+          {% if v.prompt %}
+            <div style="background:#EDF2F0;padding:.6rem .8rem;border-radius:6px;font-size:.8rem;color:var(--ink2)">
+              <strong>Prompt:</strong> {{ v.prompt }}
+            </div>
+          {% endif %}
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;padding-top:.8rem;border-top:1px solid var(--line)">
+          <button type="button" onclick="editVisual({{ v.index }})" class="btn" style="background:#EDF2F0;color:var(--ink);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            ✏️ Editar Creativo
+          </button>
+          <button type="button" onclick="deleteItem('assets', {{ v.index }})" class="btn" style="background:#FAEFEC;color:var(--bad);font-size:.82rem;padding:.35em .85em;font-weight:600">
+            🗑️ Eliminar
+          </button>
+        </div>
       </div>
     {% endfor %}
   </div>
@@ -349,9 +586,30 @@
 {% endif %}
 
 <!-- ======================================================== -->
+<!-- MODAL INTERACTIVO PARA EDITAR Y AÑADIR TARJETAS         -->
+<!-- ======================================================== -->
+<div id="cardModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);z-index:99999;align-items:center;justify-content:center;padding:1.5rem;box-sizing:border-box">
+  <div style="background:#fff;border-radius:10px;width:100%;max-width:38rem;max-height:90vh;overflow-y:auto;padding:1.6rem;box-shadow:0 12px 30px rgba(0,0,0,.25);display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem">
+      <h3 id="modalTitle" style="margin:0;color:var(--accent);font-size:1.15rem"></h3>
+      <button type="button" onclick="closeCardModal()" style="background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--ink2);line-height:1">&times;</button>
+    </div>
+    
+    <div id="modalFields" style="display:flex;flex-direction:column;gap:.9rem;flex:1">
+      <!-- Los campos se generan dinámicamente según el tipo de bloque -->
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:.8rem;margin-top:1.5rem;border-top:1px solid var(--line);padding-top:1rem">
+      <button type="button" onclick="closeCardModal()" class="btn" style="background:#EDF2F0;color:var(--ink2)">Cancelar</button>
+      <button type="button" onclick="saveModalChanges()" class="btn btn-aprobar" style="padding:.6em 1.4em;font-weight:700">💾 Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================== -->
 <!-- ACORDEÓN TÉCNICO: JSON CRUDO (COLAPSADO POR DEFECTO)     -->
 <!-- ======================================================== -->
-<details style="margin-top:2rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.8rem 1.2rem">
+<details style="margin-top:2.5rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:.8rem 1.2rem">
   <summary style="cursor:pointer;font-weight:600;font-size:.9rem;color:var(--ink2)">
     🔍 Ver JSON Técnico Crudo (Para desarrolladores / auditoría)
   </summary>
@@ -359,6 +617,18 @@
 </details>
 
 <script>
+  let currentEditType = '';
+  let currentEditIndex = -1; // -1 = Nuevo elemento
+
+  function getPayload() {
+    try {
+      return JSON.parse(document.getElementById('edit_payload_json').value);
+    } catch(e) {
+      alert("Error al parsear el JSON actual: " + e.message);
+      return {};
+    }
+  }
+
   function toggleEditSection() {
     const el = document.getElementById('edit-section');
     if (el.style.display === 'none' || !el.style.display) {
@@ -367,6 +637,535 @@
     } else {
       el.style.display = 'none';
     }
+  }
+
+  function triggerRestartFrom() {
+    if (confirm('¿Confirmas que deseas re-ejecutar el flujo a partir de este bloque («{{ b.block }}»)?\n\nTodos los bloques y agentes siguientes se volverán a calcular con las correcciones guardadas.')) {
+      const raw = document.getElementById('edit_payload_json') ? document.getElementById('edit_payload_json').value : '';
+      document.getElementById('restart_payload_json').value = raw;
+      document.getElementById('form-restart-from').submit();
+    }
+  }
+
+  function openCardModal(title, htmlContent, editType, editIndex) {
+    currentEditType = editType;
+    currentEditIndex = editIndex;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalFields').innerHTML = htmlContent;
+    const modal = document.getElementById('cardModal');
+    modal.style.display = 'flex';
+  }
+
+  function closeCardModal() {
+    document.getElementById('cardModal').style.display = 'none';
+  }
+
+  // --- PERFILES DE AUDIENCIA (1.2) ---
+  function openAddSegmentModal() {
+    const html = `
+      <div>
+        <label>Nombre del Perfil Objetivo (ICP) *</label>
+        <input type="text" id="inp_seg_name" placeholder="p. ej. Directores de Finanzas en Empresas Medianas" required>
+      </div>
+      <div>
+        <label>Descripción / Quién es</label>
+        <textarea id="inp_seg_desc" rows="3" placeholder="Descripción del tomador de decisión, tamaño de empresa, contexto..."></textarea>
+      </div>
+      <div>
+        <label>Puntos de Dolor (uno por línea)</label>
+        <textarea id="inp_seg_pains" rows="3" placeholder="Falta de visibilidad financiera&#10;Procesos manuales lentos&#10;Costos elevados"></textarea>
+      </div>
+      <div>
+        <label>Motivaciones / Deseos de Compra (uno por línea)</label>
+        <textarea id="inp_seg_motivations" rows="3" placeholder="Automatizar reportes&#10;Ahorrar 15 horas al mes&#10;Tener certeza"></textarea>
+      </div>
+      <div>
+        <label>Mensaje Clave de Venta</label>
+        <input type="text" id="inp_seg_core" placeholder="p. ej. Control total de tus finanzas sin esfuerzo operativo">
+      </div>
+      <div>
+        <label>Canales Preferidos (separados por coma)</label>
+        <input type="text" id="inp_seg_channels" placeholder="LinkedIn, Email, WhatsApp">
+      </div>
+    `;
+    openCardModal('➕ Añadir Nuevo Perfil Objetivo (ICP)', html, 'segments', -1);
+  }
+
+  function editSegment(idx) {
+    const payload = getPayload();
+    const segs = payload.segments || [];
+    const s = segs[idx] || {};
+    const name = s.name ? (typeof s.name === 'object' ? (s.name.value || '') : s.name) : '';
+    const desc = s.description ? (typeof s.description === 'object' ? (s.description.value || '') : s.description) : '';
+    
+    let pains = s.pain_points ? (typeof s.pain_points === 'object' ? (s.pain_points.value || s.pain_points) : s.pain_points) : [];
+    if (!Array.isArray(pains)) pains = [pains];
+    
+    let motivations = s.motivations ? (typeof s.motivations === 'object' ? (s.motivations.value || s.motivations) : s.motivations) : [];
+    if (!Array.isArray(motivations)) motivations = [motivations];
+    
+    const core = s.core_message ? (typeof s.core_message === 'object' ? (s.core_message.value || '') : s.core_message) : '';
+    
+    let channels = s.preferred_channels || s.channels || [];
+    if (!Array.isArray(channels)) channels = [channels];
+
+    const html = `
+      <div>
+        <label>Nombre del Perfil Objetivo (ICP) *</label>
+        <input type="text" id="inp_seg_name" value="${escapeAttr(name)}" required>
+      </div>
+      <div>
+        <label>Descripción / Quién es</label>
+        <textarea id="inp_seg_desc" rows="3">${escapeHtml(desc)}</textarea>
+      </div>
+      <div>
+        <label>Puntos de Dolor (uno por línea)</label>
+        <textarea id="inp_seg_pains" rows="3">${escapeHtml(pains.join('\n'))}</textarea>
+      </div>
+      <div>
+        <label>Motivaciones / Deseos de Compra (uno por línea)</label>
+        <textarea id="inp_seg_motivations" rows="3">${escapeHtml(motivations.join('\n'))}</textarea>
+      </div>
+      <div>
+        <label>Mensaje Clave de Venta</label>
+        <input type="text" id="inp_seg_core" value="${escapeAttr(core)}">
+      </div>
+      <div>
+        <label>Canales Preferidos (separados por coma)</label>
+        <input type="text" id="inp_seg_channels" value="${escapeAttr(channels.join(', '))}">
+      </div>
+    `;
+    openCardModal('✏️ Editar Perfil Objetivo: ' + name, html, 'segments', idx);
+  }
+
+  // --- COMPETIDORES (1.3) ---
+  function openAddCompetitorModal() {
+    const html = `
+      <div>
+        <label>Nombre del Competidor *</label>
+        <input type="text" id="inp_comp_name" placeholder="p. ej. Rival Corp" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label>Tipo</label>
+          <input type="text" id="inp_comp_type" value="Directo" placeholder="Directo / Indirecto / Sustituto">
+        </div>
+        <div>
+          <label>Nivel de Precio</label>
+          <input type="text" id="inp_comp_price" value="Medio" placeholder="Bajo / Medio / Alto / Premium">
+        </div>
+      </div>
+      <div>
+        <label>Oportunidad de Diferenciación / Ángulo</label>
+        <textarea id="inp_comp_diff" rows="2" placeholder="Qué podemos ofrecer nosotros que ellos no tengan..."></textarea>
+      </div>
+      <div>
+        <label>Fortalezas de este competidor (una por línea)</label>
+        <textarea id="inp_comp_strengths" rows="2" placeholder="Marca reconocida&#10;Mucho presupuesto en pauta"></textarea>
+      </div>
+      <div>
+        <label>Debilidades o Fallas de este competidor (una por línea)</label>
+        <textarea id="inp_comp_weaknesses" rows="2" placeholder="Soporte deficiente&#10;Tecnología obsoleta&#10;Precios ocultos"></textarea>
+      </div>
+    `;
+    openCardModal('➕ Añadir Nuevo Competidor', html, 'competitors', -1);
+  }
+
+  function editCompetitor(idx) {
+    const payload = getPayload();
+    const comps = payload.competitors || [];
+    const c = comps[idx] || {};
+    const name = c.name || '';
+    const type = c.type || 'Directo';
+    const price = c.price_point || 'Medio';
+    const diff = c.differentiation || '';
+    const strengths = Array.isArray(c.strengths) ? c.strengths : [];
+    const weaknesses = Array.isArray(c.weaknesses) ? c.weaknesses : [];
+
+    const html = `
+      <div>
+        <label>Nombre del Competidor *</label>
+        <input type="text" id="inp_comp_name" value="${escapeAttr(name)}" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label>Tipo</label>
+          <input type="text" id="inp_comp_type" value="${escapeAttr(type)}">
+        </div>
+        <div>
+          <label>Nivel de Precio</label>
+          <input type="text" id="inp_comp_price" value="${escapeAttr(price)}">
+        </div>
+      </div>
+      <div>
+        <label>Oportunidad de Diferenciación / Ángulo</label>
+        <textarea id="inp_comp_diff" rows="2">${escapeHtml(diff)}</textarea>
+      </div>
+      <div>
+        <label>Fortalezas de este competidor (una por línea)</label>
+        <textarea id="inp_comp_strengths" rows="2">${escapeHtml(strengths.join('\n'))}</textarea>
+      </div>
+      <div>
+        <label>Debilidades o Fallas de este competidor (una por línea)</label>
+        <textarea id="inp_comp_weaknesses" rows="2">${escapeHtml(weaknesses.join('\n'))}</textarea>
+      </div>
+    `;
+    openCardModal('✏️ Editar Competidor: ' + name, html, 'competitors', idx);
+  }
+
+  // --- CAMPAÑAS (2.2) ---
+  function openAddCampaignModal() {
+    const html = `
+      <div>
+        <label>Nombre de la Campaña *</label>
+        <input type="text" id="inp_camp_name" placeholder="p. ej. Atracción B2B Q3 - Diagnóstico Sin Costo" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label>Etapa del Embudo</label>
+          <select id="inp_camp_stage" style="width:100%;padding:.5rem;border:1px solid var(--line);border-radius:4px">
+            <option value="top_of_funnel">Atracción (TOFU)</option>
+            <option value="middle_of_funnel">Consideración (MOFU)</option>
+            <option value="bottom_of_funnel">Conversión (BOFU)</option>
+            <option value="retention">Retención / Lealtad</option>
+          </select>
+        </div>
+        <div>
+          <label>Tema o Ángulo</label>
+          <input type="text" id="inp_camp_theme" placeholder="p. ej. Caso de Estudio / Eficiencia Operativa">
+        </div>
+      </div>
+      <div>
+        <label>Objetivo de la Campaña</label>
+        <textarea id="inp_camp_obj" rows="2" placeholder="p. ej. Captar 30 leads B2B calificados"></textarea>
+      </div>
+      <div>
+        <label>Canales (separados por coma)</label>
+        <input type="text" id="inp_camp_channels" value="Meta Ads, LinkedIn, Email">
+      </div>
+      <div>
+        <label>Pilares de Mensaje (uno por línea)</label>
+        <textarea id="inp_camp_pillars" rows="2" placeholder="Ahorro comprobado de costos&#10;Implementación en menos de 7 días"></textarea>
+      </div>
+    `;
+    openCardModal('➕ Añadir Nueva Campaña Comercial', html, 'campaigns', -1);
+  }
+
+  function editCampaign(idx) {
+    const payload = getPayload();
+    const camps = payload.campaigns || [];
+    const c = camps[idx] || {};
+    const name = c.name || '';
+    const theme = c.theme || '';
+    const obj = c.objective || '';
+    const stage = c.funnel_stage || 'top_of_funnel';
+    let channels = c.channel_mix || c.channels || [];
+    if (Array.isArray(channels)) {
+      channels = channels.map(ch => typeof ch === 'object' ? ch.channel : ch);
+    } else {
+      channels = [channels];
+    }
+    const pillars = Array.isArray(c.messaging_pillars) ? c.messaging_pillars : [];
+
+    const html = `
+      <div>
+        <label>Nombre de la Campaña *</label>
+        <input type="text" id="inp_camp_name" value="${escapeAttr(name)}" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label>Etapa del Embudo</label>
+          <select id="inp_camp_stage" style="width:100%;padding:.5rem;border:1px solid var(--line);border-radius:4px">
+            <option value="top_of_funnel" ${stage.includes('top') ? 'selected' : ''}>Atracción (TOFU)</option>
+            <option value="middle_of_funnel" ${stage.includes('middle') ? 'selected' : ''}>Consideración (MOFU)</option>
+            <option value="bottom_of_funnel" ${stage.includes('bottom') ? 'selected' : ''}>Conversión (BOFU)</option>
+            <option value="retention" ${stage.includes('retention') ? 'selected' : ''}>Retención / Lealtad</option>
+          </select>
+        </div>
+        <div>
+          <label>Tema o Ángulo</label>
+          <input type="text" id="inp_camp_theme" value="${escapeAttr(theme)}">
+        </div>
+      </div>
+      <div>
+        <label>Objetivo de la Campaña</label>
+        <textarea id="inp_camp_obj" rows="2">${escapeHtml(obj)}</textarea>
+      </div>
+      <div>
+        <label>Canales (separados por coma)</label>
+        <input type="text" id="inp_camp_channels" value="${escapeAttr(channels.join(', '))}">
+      </div>
+      <div>
+        <label>Pilares de Mensaje (uno por línea)</label>
+        <textarea id="inp_camp_pillars" rows="2">${escapeHtml(pillars.join('\n'))}</textarea>
+      </div>
+    `;
+    openCardModal('✏️ Editar Campaña: ' + name, html, 'campaigns', idx);
+  }
+
+  // --- SEÑALES DE TENDENCIA (1.4) ---
+  function openAddSignalModal() {
+    const html = `
+      <div><label>Tema de la Tendencia *</label><input type="text" id="inp_sig_topic" required></div>
+      <div><label>Categoría</label><input type="text" id="inp_sig_cat" value="seasonal"></div>
+      <div><label>Ángulo Sugerido</label><textarea id="inp_sig_angle" rows="2"></textarea></div>
+      <div><label>Justificación / Rationale</label><textarea id="inp_sig_rat" rows="2"></textarea></div>
+    `;
+    openCardModal('➕ Añadir Nueva Señal', html, 'signals', -1);
+  }
+
+  function editSignal(idx) {
+    const payload = getPayload();
+    const sigs = payload.signals || [];
+    const s = sigs[idx] || {};
+    const html = `
+      <div><label>Tema de la Tendencia *</label><input type="text" id="inp_sig_topic" value="${escapeAttr(s.topic||'')}" required></div>
+      <div><label>Categoría</label><input type="text" id="inp_sig_cat" value="${escapeAttr(s.category||'')}"></div>
+      <div><label>Ángulo Sugerido</label><textarea id="inp_sig_angle" rows="2">${escapeHtml(s.suggested_angle||'')}</textarea></div>
+      <div><label>Justificación / Rationale</label><textarea id="inp_sig_rat" rows="2">${escapeHtml(s.rationale||'')}</textarea></div>
+    `;
+    openCardModal('✏️ Editar Señal', html, 'signals', idx);
+  }
+
+  // --- PARRILLA DE CONTENIDOS (3.2) ---
+  function openAddSlotModal() {
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Semana</label><input type="number" id="inp_slot_week" value="1" min="1" max="4"></div>
+        <div><label>Fecha / Día</label><input type="text" id="inp_slot_date" placeholder="2026-09-01 o Lunes"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Canal</label><input type="text" id="inp_slot_channel" value="Meta"></div>
+        <div><label>Formato</label><input type="text" id="inp_slot_format" value="Carrusel"></div>
+      </div>
+      <div><label>Tema o Título *</label><input type="text" id="inp_slot_topic" required></div>
+      <div><label>Copy Teaser / Hook</label><textarea id="inp_slot_teaser" rows="2"></textarea></div>
+    `;
+    openCardModal('➕ Añadir Publicación al Calendario', html, 'slots', -1);
+  }
+
+  function editSlot(idx) {
+    const payload = getPayload();
+    const slots = payload.slots || [];
+    const s = slots[idx] || {};
+    const ref = s.content_ref || {};
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Semana</label><input type="number" id="inp_slot_week" value="${s.week||1}" min="1" max="4"></div>
+        <div><label>Fecha / Día</label><input type="text" id="inp_slot_date" value="${escapeAttr(s.publish_date||s.day||'')}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Canal</label><input type="text" id="inp_slot_channel" value="${escapeAttr(s.channel||'Meta')}"></div>
+        <div><label>Formato</label><input type="text" id="inp_slot_format" value="${escapeAttr(s.format||'Post')}"></div>
+      </div>
+      <div><label>Tema o Título *</label><input type="text" id="inp_slot_topic" value="${escapeAttr(ref.topic_title||s.topic||s.title||'')}" required></div>
+      <div><label>Copy Teaser / Hook</label><textarea id="inp_slot_teaser" rows="2">${escapeHtml(ref.messaging_pillar||s.copy_teaser||s.hook||'')}</textarea></div>
+    `;
+    openCardModal('✏️ Editar Publicación', html, 'slots', idx);
+  }
+
+  // --- COPYS (4.1) ---
+  function openAddCopyModal() {
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Canal</label><input type="text" id="inp_copy_channel" value="meta_ads"></div>
+        <div><label>Audiencia Objetivo</label><input type="text" id="inp_copy_target" placeholder="Audiencia General"></div>
+      </div>
+      <div><label>Titular / Hook *</label><input type="text" id="inp_copy_hook" placeholder="¿Listo para acelerar tu prospección?" required></div>
+      <div><label>Cuerpo del Copy *</label><textarea id="inp_copy_body" rows="4" required></textarea></div>
+      <div><label>Llamado a la Acción (CTA)</label><input type="text" id="inp_copy_cta" value="Agendar diagnóstico sin costo"></div>
+    `;
+    openCardModal('➕ Añadir Nuevo Copy', html, 'copies', -1);
+  }
+
+  function editCopy(idx) {
+    const payload = getPayload();
+    const assets = payload.assets || [];
+    const c = assets[idx] || {};
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Canal</label><input type="text" id="inp_copy_channel" value="${escapeAttr(c.channel||'')}"></div>
+        <div><label>Audiencia Objetivo</label><input type="text" id="inp_copy_target" value="${escapeAttr(c.target_segment_id||c.target_audience||'')}"></div>
+      </div>
+      <div><label>Titular / Hook *</label><input type="text" id="inp_copy_hook" value="${escapeAttr(c.hook||c.headline||'')}" required></div>
+      <div><label>Cuerpo del Copy *</label><textarea id="inp_copy_body" rows="4" required>${escapeHtml(c.primary_caption||c.body||'')}</textarea></div>
+      <div><label>Llamado a la Acción (CTA)</label><input type="text" id="inp_copy_cta" value="${escapeAttr(c.cta||'')}"></div>
+    `;
+    openCardModal('✏️ Editar Copy', html, 'copies', idx);
+  }
+
+  // --- ACTIVOS VISUALES (4.2) ---
+  function openAddVisualModal() {
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Nombre / ID</label><input type="text" id="inp_vis_id" placeholder="creative-01"></div>
+        <div><label>Relación de Aspecto</label><input type="text" id="inp_vis_ratio" value="1:1"></div>
+      </div>
+      <div><label>Concepto Creativo</label><textarea id="inp_vis_concept" rows="2"></textarea></div>
+      <div><label>Prompt para Generador de Imagen</label><textarea id="inp_vis_prompt" rows="3"></textarea></div>
+    `;
+    openCardModal('➕ Añadir Activo Visual', html, 'visuals', -1);
+  }
+
+  function editVisual(idx) {
+    const payload = getPayload();
+    const assets = payload.assets || [];
+    const v = assets[idx] || {};
+    const promptStr = typeof v.prompt === 'object' ? (v.prompt.prompt || '') : (v.prompt || '');
+    const html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div><label>Nombre / ID</label><input type="text" id="inp_vis_id" value="${escapeAttr(v.asset_id||v.name||'')}"></div>
+        <div><label>Relación de Aspecto</label><input type="text" id="inp_vis_ratio" value="${escapeAttr(v.aspect_ratio||v.ratio||'1:1')}"></div>
+      </div>
+      <div><label>Concepto Creativo</label><textarea id="inp_vis_concept" rows="2">${escapeHtml(v.concept_rationale||v.concept||'')}</textarea></div>
+      <div><label>Prompt para Generador de Imagen</label><textarea id="inp_vis_prompt" rows="3">${escapeHtml(promptStr)}</textarea></div>
+    `;
+    openCardModal('✏️ Editar Activo Visual', html, 'visuals', idx);
+  }
+
+  // --- GUARDADO GENERAL DEL MODAL HACIA FIRESTORE ---
+  function saveModalChanges() {
+    const payload = getPayload();
+
+    if (currentEditType === 'segments') {
+      if (!payload.segments) payload.segments = [];
+      const item = currentEditIndex >= 0 ? payload.segments[currentEditIndex] : {};
+      
+      const nameVal = document.getElementById('inp_seg_name').value.trim();
+      const descVal = document.getElementById('inp_seg_desc').value.trim();
+      const painsVal = document.getElementById('inp_seg_pains').value.split('\n').map(x => x.trim()).filter(x => x);
+      const motivationsVal = document.getElementById('inp_seg_motivations').value.split('\n').map(x => x.trim()).filter(x => x);
+      const coreMsgVal = document.getElementById('inp_seg_core').value.trim();
+      const channelsVal = document.getElementById('inp_seg_channels').value.split(',').map(x => x.trim()).filter(x => x);
+
+      if (!nameVal) { alert("Por favor ingresa el nombre del perfil."); return; }
+
+      if (item.name && typeof item.name === 'object' && 'value' in item.name) {
+        item.name.value = nameVal;
+      } else {
+        item.name = nameVal;
+      }
+      if (item.description && typeof item.description === 'object' && 'value' in item.description) {
+        item.description.value = descVal;
+      } else {
+        item.description = descVal;
+      }
+      if (item.pain_points && typeof item.pain_points === 'object' && 'value' in item.pain_points) {
+        item.pain_points.value = painsVal;
+      } else {
+        item.pain_points = painsVal;
+      }
+      if (item.motivations && typeof item.motivations === 'object' && 'value' in item.motivations) {
+        item.motivations.value = motivationsVal;
+      } else {
+        item.motivations = motivationsVal;
+      }
+      if (item.core_message && typeof item.core_message === 'object' && 'value' in item.core_message) {
+        item.core_message.value = coreMsgVal;
+      } else {
+        item.core_message = coreMsgVal;
+      }
+      item.preferred_channels = channelsVal;
+
+      if (currentEditIndex < 0) {
+        item.segment_id = 'seg-' + (payload.segments.length + 1);
+        item.priority_rank = payload.segments.length + 1;
+        payload.segments.push(item);
+      }
+    } else if (currentEditType === 'competitors') {
+      if (!payload.competitors) payload.competitors = [];
+      const item = currentEditIndex >= 0 ? payload.competitors[currentEditIndex] : {};
+      item.name = document.getElementById('inp_comp_name').value.trim();
+      if (!item.name) { alert("Por favor ingresa el nombre del competidor."); return; }
+      item.type = document.getElementById('inp_comp_type').value.trim();
+      item.price_point = document.getElementById('inp_comp_price').value.trim();
+      item.differentiation = document.getElementById('inp_comp_diff').value.trim();
+      item.strengths = document.getElementById('inp_comp_strengths').value.split('\n').map(x => x.trim()).filter(x => x);
+      item.weaknesses = document.getElementById('inp_comp_weaknesses').value.split('\n').map(x => x.trim()).filter(x => x);
+      if (currentEditIndex < 0) {
+        payload.competitors.push(item);
+      }
+    } else if (currentEditType === 'campaigns') {
+      if (!payload.campaigns) payload.campaigns = [];
+      const item = currentEditIndex >= 0 ? payload.campaigns[currentEditIndex] : {};
+      item.name = document.getElementById('inp_camp_name').value.trim();
+      if (!item.name) { alert("Por favor ingresa el nombre de la campaña."); return; }
+      item.funnel_stage = document.getElementById('inp_camp_stage').value;
+      item.theme = document.getElementById('inp_camp_theme').value.trim();
+      item.objective = document.getElementById('inp_camp_obj').value.trim();
+      item.channels = document.getElementById('inp_camp_channels').value.split(',').map(x => x.trim()).filter(x => x);
+      item.messaging_pillars = document.getElementById('inp_camp_pillars').value.split('\n').map(x => x.trim()).filter(x => x);
+      if (currentEditIndex < 0) {
+        item.campaign_id = 'camp-' + (payload.campaigns.length + 1);
+        payload.campaigns.push(item);
+      }
+    } else if (currentEditType === 'signals') {
+      if (!payload.signals) payload.signals = [];
+      const item = currentEditIndex >= 0 ? payload.signals[currentEditIndex] : {};
+      item.topic = document.getElementById('inp_sig_topic').value.trim();
+      item.category = document.getElementById('inp_sig_cat').value.trim();
+      item.suggested_angle = document.getElementById('inp_sig_angle').value.trim();
+      item.rationale = document.getElementById('inp_sig_rat').value.trim();
+      if (currentEditIndex < 0) payload.signals.push(item);
+    } else if (currentEditType === 'slots') {
+      if (!payload.slots) payload.slots = [];
+      const item = currentEditIndex >= 0 ? payload.slots[currentEditIndex] : {};
+      item.week = parseInt(document.getElementById('inp_slot_week').value) || 1;
+      item.publish_date = document.getElementById('inp_slot_date').value.trim();
+      item.channel = document.getElementById('inp_slot_channel').value.trim();
+      item.format = document.getElementById('inp_slot_format').value.trim();
+      if (!item.content_ref) item.content_ref = {};
+      item.content_ref.topic_title = document.getElementById('inp_slot_topic').value.trim();
+      item.content_ref.messaging_pillar = document.getElementById('inp_slot_teaser').value.trim();
+      if (currentEditIndex < 0) {
+        item.slot_id = 'slot-' + (payload.slots.length + 1);
+        payload.slots.push(item);
+      }
+    } else if (currentEditType === 'copies') {
+      if (!payload.assets) payload.assets = [];
+      const item = currentEditIndex >= 0 ? payload.assets[currentEditIndex] : {};
+      item.channel = document.getElementById('inp_copy_channel').value.trim();
+      item.target_segment_id = document.getElementById('inp_copy_target').value.trim();
+      item.hook = document.getElementById('inp_copy_hook').value.trim();
+      item.primary_caption = document.getElementById('inp_copy_body').value.trim();
+      item.cta = document.getElementById('inp_copy_cta').value.trim();
+      if (currentEditIndex < 0) payload.assets.push(item);
+    } else if (currentEditType === 'visuals') {
+      if (!payload.assets) payload.assets = [];
+      const item = currentEditIndex >= 0 ? payload.assets[currentEditIndex] : {};
+      item.asset_id = document.getElementById('inp_vis_id').value.trim() || ('vis-' + (payload.assets.length + 1));
+      item.aspect_ratio = document.getElementById('inp_vis_ratio').value.trim() || '1:1';
+      item.concept_rationale = document.getElementById('inp_vis_concept').value.trim();
+      item.prompt = document.getElementById('inp_vis_prompt').value.trim();
+      if (currentEditIndex < 0) payload.assets.push(item);
+    }
+
+    // Guardar en textarea y enviar formulario
+    document.getElementById('edit_payload_json').value = JSON.stringify(payload, null, 2);
+    document.getElementById('edit_nota').value = `Modificación de ${currentEditType} vía tarjeta interactiva`;
+    document.getElementById('form-edit-block').submit();
+  }
+
+  function deleteItem(collectionKey, index) {
+    if (!confirm('¿Confirmas que deseas eliminar este elemento del entregable?')) return;
+    const payload = getPayload();
+    const list = payload[collectionKey];
+    if (list && list.length > index) {
+      list.splice(index, 1);
+      document.getElementById('edit_payload_json').value = JSON.stringify(payload, null, 2);
+      document.getElementById('edit_nota').value = `Eliminación de elemento en ${collectionKey}`;
+      document.getElementById('form-edit-block').submit();
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function escapeAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 </script>
 {% endblock %}

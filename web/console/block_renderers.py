@@ -142,12 +142,12 @@ def _format_audience_segments(payload: dict) -> dict[str, Any]:
         raw_segments = list(raw_segments.values())
 
     segments_out = []
-    for idx, s in enumerate(raw_segments, 1):
+    for idx, s in enumerate(raw_segments):
         if not isinstance(s, dict):
-            segments_out.append({"name": f"Segmento {idx}", "description": str(s)})
+            segments_out.append({"index": idx, "name": f"Segmento {idx+1}", "description": str(s)})
             continue
 
-        name = _val(s.get("segment_name") or s.get("name")) or f"Segmento {idx}"
+        name = _val(s.get("segment_name") or s.get("name")) or f"Segmento {idx+1}"
         desc = _val(s.get("funnel_focus") or s.get("description") or s.get("profile") or "")
 
         pains = _val(s.get("pain_points") or s.get("pains") or [])
@@ -177,6 +177,8 @@ def _format_audience_segments(payload: dict) -> dict[str, Any]:
                 channels.append(ch)
 
         segments_out.append({
+            "index": idx,
+            "segment_id": s.get("segment_id") or f"seg-{idx+1}",
             "name": name,
             "description": desc,
             "demographics": _val(s.get("demographics") or s.get("demographic_profile") or {}),
@@ -188,7 +190,7 @@ def _format_audience_segments(payload: dict) -> dict[str, Any]:
 
     return {
         "type": "audience_segments",
-        "title": "Segmentación Estratégica de Audiencias (ICP)",
+        "title": "Segmentación Estratégica de Audiencias (Perfiles Objetivo / ICP)",
         "segments": segments_out,
         "total_segments": len(segments_out),
         "notes": payload.get("notes") or "",
@@ -201,11 +203,12 @@ def _format_competitive_map(payload: dict) -> dict[str, Any]:
         comps = list(comps.values())
 
     out_comps = []
-    for c in comps:
+    for idx, c in enumerate(comps):
         if not isinstance(c, dict):
-            out_comps.append({"name": str(c)})
+            out_comps.append({"index": idx, "name": str(c)})
             continue
         out_comps.append({
+            "index": idx,
             "name": _val(c.get("name") or c.get("competitor_name") or "Competidor"),
             "type": _val(c.get("type") or c.get("tier") or c.get("category") or "Directo"),
             "strengths": _val(c.get("strengths") or []),
@@ -221,6 +224,35 @@ def _format_competitive_map(payload: dict) -> dict[str, Any]:
         "quadrant_summary": _val(payload.get("quadrant_summary") or payload.get("market_gaps") or payload.get("differentiation_opportunities") or ""),
         "our_advantage": _val(payload.get("our_advantage") or payload.get("strategic_advantage") or payload.get("strategic_positioning") or ""),
     }
+
+
+def _format_trend_signals(payload: dict) -> dict[str, Any]:
+    raw_signals = payload.get("signals") or payload.get("trends") or []
+    if isinstance(raw_signals, dict):
+        raw_signals = list(raw_signals.values())
+
+    signals_out = []
+    for idx, s in enumerate(raw_signals):
+        if not isinstance(s, dict):
+            signals_out.append({"index": idx, "topic": str(s)})
+            continue
+        signals_out.append({
+            "index": idx,
+            "topic": s.get("topic") or f"Señal {idx+1}",
+            "category": s.get("category") or "General",
+            "velocity": s.get("velocity") or "rising",
+            "suggested_angle": s.get("suggested_angle") or s.get("angle") or "",
+            "channels": s.get("recommended_channels") or [],
+            "rationale": s.get("rationale") or "",
+        })
+
+    return {
+        "type": "trend_signals",
+        "title": "Radar de Tendencias & Señales de Mercado",
+        "signals": signals_out,
+        "total_signals": len(signals_out),
+    }
+
 
 def _format_active_strategy(payload: dict) -> dict[str, Any]:
     thesis = payload.get("strategic_thesis")
@@ -258,6 +290,107 @@ def _format_active_strategy(payload: dict) -> dict[str, Any]:
     }
 
 
+def _format_campaign_registry(payload: dict) -> dict[str, Any]:
+    raw_campaigns = payload.get("campaigns") or []
+    if isinstance(raw_campaigns, dict):
+        raw_campaigns = list(raw_campaigns.values())
+
+    stage_labels = {
+        "top_of_funnel": "Atracción (TOFU)",
+        "middle_of_funnel": "Consideración (MOFU)",
+        "bottom_of_funnel": "Conversión (BOFU)",
+        "retention": "Retención / Lealtad",
+        "tofu": "Atracción (TOFU)",
+        "mofu": "Consideración (MOFU)",
+        "bofu": "Conversión (BOFU)",
+    }
+
+    out_campaigns = []
+    for idx, c in enumerate(raw_campaigns):
+        if not isinstance(c, dict):
+            out_campaigns.append({"index": idx, "name": str(c)})
+            continue
+
+        raw_channels = c.get("channel_mix") or c.get("channels") or []
+        channels = []
+        for ch in raw_channels:
+            if isinstance(ch, dict):
+                channels.append(ch.get("channel") or str(ch))
+            else:
+                channels.append(str(ch))
+
+        stage_raw = str(c.get("funnel_stage", "")).lower()
+        stage_label = stage_labels.get(stage_raw, c.get("funnel_stage") or "General")
+
+        pillars = c.get("messaging_pillars") or []
+        if isinstance(pillars, str):
+            pillars = [pillars]
+
+        metrics = c.get("success_metrics") or []
+        metric_labels = []
+        for m in metrics:
+            if isinstance(m, dict):
+                metric_labels.append(f"{m.get('metric', '')}: {m.get('target', '')} {m.get('unit', '')}".strip())
+            else:
+                metric_labels.append(str(m))
+
+        out_campaigns.append({
+            "index": idx,
+            "campaign_id": c.get("campaign_id") or f"camp-{idx+1}",
+            "name": c.get("name") or f"Campaña {idx+1}",
+            "theme": c.get("theme") or "",
+            "objective": c.get("objective") or "",
+            "funnel_stage": stage_label,
+            "funnel_stage_raw": stage_raw,
+            "priority": c.get("priority", idx+1),
+            "channels": channels,
+            "messaging_pillars": pillars,
+            "target_segments": c.get("primary_segment_ids") or [],
+            "metrics": metric_labels,
+        })
+
+    budget_summary = payload.get("budget_summary") or {}
+    total_budget = ""
+    if isinstance(budget_summary, dict):
+        total_budget = budget_summary.get("total_budget_usd") or budget_summary.get("monthly_total") or ""
+
+    return {
+        "type": "campaign_registry",
+        "title": "Registro Estratégico de Campañas por Etapa del Embudo",
+        "campaigns": out_campaigns,
+        "total_campaigns": len(out_campaigns),
+        "total_budget": total_budget,
+        "cycle_label": payload.get("cycle_label") or "Ciclo 1",
+    }
+
+
+def _format_content_plan(payload: dict) -> dict[str, Any]:
+    raw_pillars = payload.get("pillars") or payload.get("themes") or payload.get("weeks") or []
+    if isinstance(raw_pillars, dict):
+        raw_pillars = list(raw_pillars.values())
+
+    pillars_out = []
+    for idx, p in enumerate(raw_pillars):
+        if not isinstance(p, dict):
+            pillars_out.append({"index": idx, "name": str(p)})
+            continue
+        pillars_out.append({
+            "index": idx,
+            "week": p.get("week") or f"Semana {idx+1}",
+            "name": p.get("pillar_name") or p.get("theme") or p.get("name") or f"Pilar {idx+1}",
+            "narrative_angle": p.get("narrative_angle") or p.get("angle") or p.get("description") or "",
+            "formats": p.get("formats") or p.get("recommended_formats") or [],
+            "channels": p.get("channels") or [],
+        })
+
+    return {
+        "type": "content_plan",
+        "title": "Plan de Contenido Mensual (Pilares Temáticos)",
+        "pillars": pillars_out,
+        "total_pillars": len(pillars_out),
+    }
+
+
 def _format_kpi_contracts(payload: dict) -> dict[str, Any]:
     contracts = payload.get("kpi_contracts") or payload.get("kpis") or payload.get("contracts") or payload.get("metrics") or []
     if isinstance(contracts, dict):
@@ -282,9 +415,9 @@ def _format_content_calendar(payload: dict) -> dict[str, Any]:
     raw_posts = payload.get("slots") or payload.get("calendar") or payload.get("posts") or payload.get("items") or []
     posts_out = []
 
-    for p in raw_posts:
+    for idx, p in enumerate(raw_posts):
         if not isinstance(p, dict):
-            posts_out.append({"title": str(p)})
+            posts_out.append({"index": idx, "title": str(p)})
             continue
         
         content_ref = p.get("content_ref") or {}
@@ -294,6 +427,7 @@ def _format_content_calendar(payload: dict) -> dict[str, Any]:
         week_label = f"S{week_val}" if isinstance(week_val, int) else str(week_val)
 
         posts_out.append({
+            "index": idx,
             "week": week_label,
             "day": p.get("publish_date") or p.get("day") or p.get("dia") or "Fecha programada",
             "channel": p.get("channel") or p.get("canal") or "Meta",
@@ -318,13 +452,14 @@ def _format_copy_assets(payload: dict) -> dict[str, Any]:
         raw_copies = list(raw_copies.values())
 
     copies_out = []
-    for c in raw_copies:
+    for idx, c in enumerate(raw_copies):
         if not isinstance(c, dict):
-            copies_out.append({"body": str(c)})
+            copies_out.append({"index": idx, "body": str(c)})
             continue
         headline = c.get("hook") or c.get("headline") or c.get("title") or c.get("h1") or ""
         body = c.get("primary_caption") or c.get("body") or c.get("text") or c.get("copy") or ""
         copies_out.append({
+            "index": idx,
             "channel": c.get("channel") or c.get("platform") or "General",
             "target_audience": c.get("target_segment_id") or c.get("target_audience") or c.get("segment") or "Audiencia Principal",
             "headline": headline,
@@ -347,15 +482,16 @@ def _format_visual_assets(payload: dict) -> dict[str, Any]:
         raw_visuals = list(raw_visuals.values())
 
     visuals_out = []
-    for v in raw_visuals:
+    for idx, v in enumerate(raw_visuals):
         if not isinstance(v, dict):
-            visuals_out.append({"description": str(v)})
+            visuals_out.append({"index": idx, "description": str(v)})
             continue
         concept = v.get("concept_rationale") or v.get("rationale") or v.get("concept") or v.get("description") or ""
         prompt = v.get("prompt") or v.get("image_prompt") or ""
         if isinstance(prompt, dict):
             prompt = prompt.get("prompt") or str(prompt)
         visuals_out.append({
+            "index": idx,
             "name": v.get("asset_id") or v.get("name") or v.get("title") or "Creativo",
             "ratio": v.get("aspect_ratio") or v.get("ratio") or "1:1",
             "channel": v.get("channel") or v.get("platform") or "Redes",
@@ -397,9 +533,12 @@ _RENDERERS = {
     "client_profile": _format_client_profile,
     "audience_segments": _format_audience_segments,
     "competitive_map": _format_competitive_map,
+    "trend_signals": _format_trend_signals,
     "active_strategy": _format_active_strategy,
-    "kpi_contracts": _format_kpi_contracts,
+    "campaign_registry": _format_campaign_registry,
+    "content_plan": _format_content_plan,
     "content_calendar": _format_content_calendar,
+    "kpi_contracts": _format_kpi_contracts,
     "copy_assets": _format_copy_assets,
     "visual_assets": _format_visual_assets,
 }

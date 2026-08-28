@@ -44,6 +44,37 @@ def session_resume(request, session_id):
 
 
 @login_required
+@require_POST
+def session_restart_from(request, session_id, block):
+    client_id = request.POST.get("client_id", "").strip()
+    raw_payload = request.POST.get("payload_json", "").strip()
+    if client_id and raw_payload:
+        try:
+            payload = json.loads(raw_payload)
+            services.update_block_payload(
+                client_id=client_id,
+                block=block,
+                payload=payload,
+                decision="approved",
+                actor=request.user.get_username(),
+                note=f"Ajustado antes de re-ejecución desde {block}",
+            )
+        except Exception as e:
+            messages.error(request, f"Error al guardar cambios en {block}: {e}")
+            return redirect("bloque", client_id=client_id, block=block)
+
+    if not client_id:
+        sess = services.get_session(session_id)
+        client_id = (sess.get("client_id") if sess else "") or ""
+
+    if services.restart_run_from(session_id, client_id, block):
+        messages.success(request, f"Corrida reiniciada desde «{block}». Las etapas siguientes se están recalculando con los cambios.")
+    else:
+        messages.info(request, f"No fue posible re-ejecutar desde «{block}».")
+    return redirect("sesion", session_id=session_id)
+
+
+@login_required
 def block_review(request, client_id, block):
     detail = services.block_detail(client_id, block)
     if detail["payload"] is None and detail["gate_status"] is None:
