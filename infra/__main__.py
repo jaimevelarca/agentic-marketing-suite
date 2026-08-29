@@ -24,7 +24,6 @@ artifact_host_project = app_cfg.get("artifactHostProject") or "agentic-marketing
 BILLING_ACCOUNT = "01624A-839C44-1DB4D6"
 IAP_USER = "user:js@qhhe.net"
 IAP_JUDGES = [
-    "group:testing@devpost.com",
     "group:cloudhackathons@google.com",
 ]
 
