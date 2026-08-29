@@ -293,7 +293,7 @@ gcp.cloudrunv2.ServiceIamMember(
     opts=pulumi.ResourceOptions(depends_on=[console]),
 )
 
-gcp.iap.WebCloudRunServiceIamMember(
+console_iap_accessor = gcp.iap.WebCloudRunServiceIamMember(
     "console-iap-accessor",
     project=project,
     location=region,
@@ -303,15 +303,16 @@ gcp.iap.WebCloudRunServiceIamMember(
     opts=pulumi.ResourceOptions(depends_on=[console, apis["iap.googleapis.com"]]),
 )
 
+prev_iap = console_iap_accessor
 for idx, judge_user in enumerate(IAP_JUDGES):
-    gcp.iap.WebCloudRunServiceIamMember(
+    prev_iap = gcp.iap.WebCloudRunServiceIamMember(
         f"console-iap-judge-{idx}",
         project=project,
         location=region,
         cloud_run_service_name=console.name,
         role="roles/iap.httpsResourceAccessor",
         member=judge_user,
-        opts=pulumi.ResourceOptions(depends_on=[console, apis["iap.googleapis.com"]]),
+        opts=pulumi.ResourceOptions(depends_on=[prev_iap]),
     )
 
 orchestrator_job = gcp.cloudrunv2.Job(
