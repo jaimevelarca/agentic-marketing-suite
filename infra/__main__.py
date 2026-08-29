@@ -24,8 +24,8 @@ artifact_host_project = app_cfg.get("artifactHostProject") or "agentic-marketing
 BILLING_ACCOUNT = "01624A-839C44-1DB4D6"
 IAP_USER = "user:js@qhhe.net"
 IAP_JUDGES = [
-    "user:testing@devpost.com",
-    "user:cloudhackathons@google.com",
+    "group:testing@devpost.com",
+    "group:cloudhackathons@google.com",
 ]
 
 # Images: prefer resolved immutable digest/tag from stack config, else default
