@@ -160,6 +160,15 @@ Human edits automatically persist to Firestore memory blocks and are seamlessly 
 Pipeline re-execution mechanism (`restart_run_from` and `session_restart_from` endpoint) to re-run all downstream stages from any corrected previous block onwards;
 325 offline tests green.
 
+**Release v0.2.7 (Hackathon Fortified Fleet & Model Armor) ✅ 2026-08-29:**
+Auditoría integral y alineación a los 4 pilares de Fortified Enterprise Fleet para el All Things Agentic Hackathon;
+Aislamiento de inputs de clientes reales al vault local (`~/.agent_dispatcher/`) y endurecimiento en `.gitignore`;
+Gobernanza IAP en Pulumi (`infra/__main__.py`) con acceso para evaluadores (`testing@devpost.com`, `cloudhackathons@google.com`);
+Contrato de onboarding corporativo en inglés (`suite/inputs/acme_global.json`);
+Módulo Model Armor con Google Gemma (`suite/security/model_armor.py`) para defensa contra prompt injection, sanitización de PII y bloqueo de tool poisoning;
+README.md exhaustivo con arquitectura visual Mermaid, matriz de 19 agentes e instrucciones de spin-up paso a paso;
+335 offline tests green (10 nuevos tests unitarios de seguridad perimetral).
+
 
 
 ## Standing rules

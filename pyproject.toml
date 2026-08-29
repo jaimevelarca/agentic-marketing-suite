@@ -1,6 +1,6 @@
 [project]
 name = "agentic-marketing-suite"
-version = "0.2.0"
+version = "0.2.7"
 description = "Agentic Marketing Suite — QHHE's 6-layer / 19-agent marketing engine"
 requires-python = ">=3.12"
 readme = "README.md"

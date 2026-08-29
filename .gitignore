@@ -23,6 +23,10 @@ build/
 # Local validation/demo run artifacts (incl. client run data)
 suite/runs/
 
+# Client inputs (only public samples acme*.json are tracked)
+suite/inputs/*.json
+!suite/inputs/acme*.json
+
 # Client-specific presentation/proposal — its own repo (jaimevelarca/qhhe-alonso-plan)
 qhhe-plan-revision/
 exports/proposals/

@@ -23,6 +23,10 @@ artifact_host_project = app_cfg.get("artifactHostProject") or "agentic-marketing
 
 BILLING_ACCOUNT = "01624A-839C44-1DB4D6"
 IAP_USER = "user:js@qhhe.net"
+IAP_JUDGES = [
+    "user:testing@devpost.com",
+    "user:cloudhackathons@google.com",
+]
 
 # Images: prefer resolved immutable digest/tag from stack config, else default
 _default_img_base = f"{region}-docker.pkg.dev/{artifact_host_project}/suite"
@@ -298,6 +302,17 @@ gcp.iap.WebCloudRunServiceIamMember(
     member=IAP_USER,
     opts=pulumi.ResourceOptions(depends_on=[console, apis["iap.googleapis.com"]]),
 )
+
+for idx, judge_user in enumerate(IAP_JUDGES):
+    gcp.iap.WebCloudRunServiceIamMember(
+        f"console-iap-judge-{idx}",
+        project=project,
+        location=region,
+        cloud_run_service_name=console.name,
+        role="roles/iap.httpsResourceAccessor",
+        member=judge_user,
+        opts=pulumi.ResourceOptions(depends_on=[console, apis["iap.googleapis.com"]]),
+    )
 
 orchestrator_job = gcp.cloudrunv2.Job(
     "suite-orchestrator",

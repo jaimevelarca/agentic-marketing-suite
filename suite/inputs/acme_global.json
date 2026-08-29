@@ -1,0 +1,88 @@
+{
+  "client_id": "acme-global",
+  "quick_start_form": {
+    "company_name": "Acme Global Technologies Inc.",
+    "website_url": "https://www.acme-global.com/",
+    "industry": "Autonomous Enterprise Software & Cloud Infrastructure",
+    "offer_description": "Next-generation enterprise AI agent runtime, automated data pipelines, and intelligent workflow orchestration for Fortune 500 companies. Guarantees 65% reduction in manual digital marketing workflows and 4.8x ROI.",
+    "target_markets": [
+      "United States",
+      "United Kingdom",
+      "Canada",
+      "European Union",
+      "Australia",
+      "Singapore"
+    ],
+    "primary_market": "United States",
+    "target_customer": "Chief Marketing Officers (CMOs), Chief Information Officers (CIOs), and VP of Digital Transformation at mid-market and enterprise technology organizations.",
+    "marketing_objective": "Generate 500 enterprise qualified pipeline leads (SQLs) for the Gemini Enterprise Agent Platform launch and establish thought leadership in autonomous AI marketing workflows.",
+    "monthly_budget": "150,000 USD",
+    "sales_cycle": "6-12 weeks",
+    "languages": [
+      "en",
+      "es-MX"
+    ],
+    "notes": "Priority Q3-Q4 launch targeting US & UK enterprise B2B tech decision makers."
+  },
+  "scraper_output": {
+    "scrape_status": "success",
+    "meta_description": "Acme Global Technologies — Accelerating enterprise intelligence with autonomous agent fleets and real-time cloud data pipelines.",
+    "about_text_excerpt": "Over 12 years of industry leadership pioneering enterprise agentic architectures on Google Cloud. Trusted by global leaders to automate mission-critical operations with fortified security, zero-trust governance, and guaranteed performance.",
+    "services_extracted": [
+      "Autonomous Agentic Fleet Deployment (Enterprise Edition)",
+      "Cloud Infrastructure Modernization & Zero-Trust Governance",
+      "Real-Time Multimodal Creative & Marketing Automation Engine"
+    ],
+    "value_propositions": [
+      "Autonomous multi-agent orchestration beyond simple chatbots",
+      "Fortified enterprise security with zero-trust IAP and WIF",
+      "Measurable 4.8x average ROI contractually benchmarked"
+    ],
+    "primary_cta": "Book an Executive Strategy Session",
+    "locations_detected": [
+      "San Francisco",
+      "New York",
+      "London",
+      "Austin",
+      "Toronto"
+    ],
+    "visual_identity": {
+      "top_5_hex": [
+        "#1A73E8",
+        "#1ebe82",
+        "#202124",
+        "#F8F9FA",
+        "#5F6368"
+      ],
+      "heading_font": "Google Sans",
+      "body_font": "Roboto",
+      "logo": {
+        "url": "https://www.acme-global.com/assets/logo.png"
+      }
+    },
+    "brand_voice": {
+      "detected_language": "en",
+      "vocabulary_register": "authoritative/visionary/enterprise",
+      "proposed_voice_tokens": [
+        "innovative",
+        "fortified",
+        "strategic",
+        "authoritative",
+        "results-driven"
+      ],
+      "sample_sentences": [
+        "Accelerating enterprise transformation with autonomous agentic intelligence.",
+        "Fortified agent fleets that integrate directly with official enterprise infrastructure.",
+        "Empowering global marketing leaders with closed-loop autonomous workflows."
+      ]
+    },
+    "company_context": {
+      "social_links_found": {
+        "linkedin": "https://www.linkedin.com/company/acme-global-technologies",
+        "x": "https://x.com/acmeglobaltech",
+        "youtube": "https://www.youtube.com/@acmeglobaltech"
+      }
+    }
+  },
+  "operator_notes": "International demo contract for All Things Agentic Hackathon evaluation. Demonstrates full English language capability across the 19-agent pipeline."
+}
