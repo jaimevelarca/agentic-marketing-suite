@@ -163,11 +163,16 @@ Pipeline re-execution mechanism (`restart_run_from` and `session_restart_from` e
 **Release v0.2.7 (Hackathon Fortified Fleet & Model Armor) ✅ 2026-08-29:**
 Auditoría integral y alineación a los 4 pilares de Fortified Enterprise Fleet para el All Things Agentic Hackathon;
 Aislamiento de inputs de clientes reales al vault local (`~/.agent_dispatcher/`) y endurecimiento en `.gitignore`;
-Gobernanza IAP en Pulumi (`infra/__main__.py`) con acceso para evaluadores (`testing@devpost.com`, `cloudhackathons@google.com`);
+Gobernanza IAP en Pulumi (`infra/__main__.py`) con acceso para evaluadores (`group:cloudhackathons@google.com`);
 Contrato de onboarding corporativo en inglés (`suite/inputs/acme_global.json`);
 Módulo Model Armor con Google Gemma (`suite/security/model_armor.py`) para defensa contra prompt injection, sanitización de PII y bloqueo de tool poisoning;
 README.md exhaustivo con arquitectura visual Mermaid, matriz de 19 agentes e instrucciones de spin-up paso a paso;
 335 offline tests green (10 nuevos tests unitarios de seguridad perimetral).
+
+**Release v0.2.8 (Demo Assets & Presentation Compiler Parity) ✅ 2026-08-30:**
+Parche defensivo en `suite/rendering/presentation_compiler.py`, `detail_compiler.py` y `theme.py` para desenvolver estructuras compuestas tipo diccionario en metadatos de marcas, USP y mercados sin fallos de conversión HTML;
+Integración de suite de assets para demo en video (`docs/video/teleprompter.html`, scripts de automatización de locución y datos pre-compilados en `exports/proposals/acme-global/`);
+335 offline tests green en <5s.
 
 
 
