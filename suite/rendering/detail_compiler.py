@@ -197,8 +197,17 @@ def compile_detail_report(
     now_str = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d")
 
     # Section 1: Client Profile Data
-    desc = profile.get("description") or "Empresa mexicana líder en consultoría y servicios profesionales."
-    usp = profile.get("usp") or "Soluciones integrales con certeza estratégica y respaldo técnico garantizado."
+    def _val(x):
+        if isinstance(x, dict):
+            for k in ("statement", "description", "primary", "value"):
+                if k in x:
+                    return _val(x[k])
+        return x
+
+    raw_desc = profile.get("description") or "Empresa mexicana líder en consultoría y servicios profesionales."
+    desc = str(_val(raw_desc))
+    raw_usp = profile.get("usp") or "Soluciones integrales con certeza estratégica y respaldo técnico garantizado."
+    usp = str(_val(raw_usp))
     services = profile.get("services") or profile.get("core_services") or [
         "Estrategia Corporativa", "Optimización y Cumplimiento", "Transformación Digital"
     ]
@@ -207,7 +216,13 @@ def compile_detail_report(
     else:
         services_html = f"<li>{html.escape(str(services))}</li>"
 
-    markets = profile.get("target_markets") or ["México", "CDMX", "Guadalajara", "Monterrey"]
+    raw_markets = profile.get("target_markets")
+    if isinstance(raw_markets, dict):
+        markets = raw_markets.get("ranked") or raw_markets.get("primary") or []
+    elif isinstance(raw_markets, list):
+        markets = raw_markets
+    else:
+        markets = [str(raw_markets)] if raw_markets else ["México", "CDMX", "Guadalajara", "Monterrey"]
     markets_str = ", ".join(markets) if isinstance(markets, list) else str(markets)
     budget = profile.get("budget") or profile.get("confirmed_budget_mxn") or "50,000 MXN / mes"
 

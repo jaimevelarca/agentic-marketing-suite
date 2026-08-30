@@ -146,13 +146,18 @@ def derive_theme_from_profile(client_profile: dict[str, Any] | None, client_id: 
     else:
         trade_name = client_id.replace("-", " ").title() or "Cliente"
 
-    theme_dict["name"] = trade_name
-    theme_dict["tagline"] = (
+    theme_dict["name"] = str(trade_name)
+    raw_tagline = (
         client_profile.get("tagline")
         or client_profile.get("usp")
         or client_profile.get("positioning_statement")
         or "Certeza y decisiones seguras"
     )
+    if isinstance(raw_tagline, dict):
+        tagline = raw_tagline.get("statement") or raw_tagline.get("value") or raw_tagline.get("primary") or "Certeza y decisiones seguras"
+    else:
+        tagline = str(raw_tagline)
+    theme_dict["tagline"] = tagline
     theme_dict["footer_text"] = (
         f"Plan generado por QHHE · AI Marketing Suite · Documento para revisión humana · {trade_name}"
     )

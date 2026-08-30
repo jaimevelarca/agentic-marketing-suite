@@ -450,8 +450,8 @@ def compile_presentation_deck(
     else:
         th = load_theme(theme)
 
-    client_name = th.name
-    tagline = th.tagline
+    client_name = th.name if isinstance(th.name, str) else str(th.name)
+    tagline = th.tagline if isinstance(th.tagline, str) else (th.tagline.get("statement") if isinstance(th.tagline, dict) else str(th.tagline))
 
     # Metric counts for Act 0 & 5
     segments_list = audience.get("segments") or []
@@ -467,16 +467,32 @@ def compile_presentation_deck(
     cycle_days = (calendar.get("cycle_weeks") or 4) * 7 if calendar.get("cycle_weeks") else 90
 
     # Act 1: Value Proposition & Objectives
-    usp = profile.get("usp") or strategy.get("strategic_thesis") or "Certeza y decisiones seguras en cada etapa de crecimiento."
-    description = profile.get("description") or "Empresa líder orientada a resultados comerciales y posicionamiento de alto valor."
+    def _val(x):
+        if isinstance(x, dict):
+            for k in ("statement", "description", "primary", "value"):
+                if k in x:
+                    return _val(x[k])
+        return x
+
+    raw_usp = profile.get("usp") or strategy.get("strategic_thesis") or "Certeza y decisiones seguras en cada etapa de crecimiento."
+    usp = str(_val(raw_usp))
+    raw_desc = profile.get("description") or "Empresa líder orientada a resultados comerciales y posicionamiento de alto valor."
+    description = str(_val(raw_desc))
     
     # Target markets
-    markets = profile.get("target_markets") or ["México", "Nacional"]
-    primary_mkt = profile.get("primary_market") or (markets[0] if markets else "México")
+    raw_markets = profile.get("target_markets")
+    if isinstance(raw_markets, dict):
+        markets = raw_markets.get("ranked") or raw_markets.get("primary") or []
+    elif isinstance(raw_markets, list):
+        markets = raw_markets
+    else:
+        markets = [str(raw_markets)] if raw_markets else ["México", "Nacional"]
+    primary_mkt = profile.get("primary_market") or (markets[0] if isinstance(markets, list) and markets else "México")
     markets_str = " · ".join(markets[:3]) if isinstance(markets, list) else str(markets)
 
     # Growth / Cycle Objectives
-    objectives = profile.get("marketing_objective") or strategy.get("strategic_thesis") or (
+    raw_obj = profile.get("marketing_objective") or strategy.get("strategic_thesis")
+    objectives = str(_val(raw_obj)) if raw_obj else (
         f"Generar entre 8 y 12 oportunidades comerciales calificadas al mes y consolidar la autoridad de marca en {primary_mkt}."
     )
 

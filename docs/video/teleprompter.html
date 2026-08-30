@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Marketing Suite — Hackathon Video Teleprompter & Director Console</title>
+<style>
+  :root {
+    --bg: #0b0f19;
+    --surface: #131b2e;
+    --surface-border: #1f2d4d;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #1ebe82; /* Sacred Human Gate */
+    --accent-glow: rgba(30, 190, 130, 0.25);
+    --google-blue: #4285f4;
+    --google-red: #ea4335;
+    --google-yellow: #fbbc05;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--surface-border);
+    padding: 18px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .title-group h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .badge {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .timer-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg);
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+  }
+  .timer-display {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .btn {
+    background: var(--google-blue);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-accent { background: var(--accent); color: #07271b; }
+  .btn-secondary { background: #334155; }
+  .btn-outline { background: transparent; border: 1px solid var(--surface-border); color: var(--text); }
+  .btn-outline:hover { background: var(--surface); border-color: var(--google-blue); }
+
+  .container {
+    max-width: 1080px;
+    margin: 32px auto;
+    padding: 0 24px;
+  }
+  .tab-launch-bar {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+  }
+  .tab-launch-bar h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .tab-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .act-card {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .act-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .act-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 30px var(--accent-glow);
+  }
+  .act-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .act-title-group h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+  .act-timestamp {
+    font-family: ui-monospace, monospace;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--surface-border);
+  }
+
+  .visual-cue {
+    background: rgba(66, 133, 244, 0.12);
+    border-left: 4px solid var(--google-blue);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+  }
+  .visual-cue strong { color: #93c5fd; }
+
+  .script-content {
+    font-size: 1.35rem;
+    line-height: 1.7;
+    color: #f1f5f9;
+    background: #090d16;
+    padding: 24px;
+    border-radius: 10px;
+    border: 1px solid #1a233a;
+    letter-spacing: 0.01em;
+  }
+  .script-content mark {
+    background: var(--accent-glow);
+    color: var(--accent);
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .audio-controls {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  audio {
+    height: 38px;
+    flex-grow: 1;
+    filter: invert(0.9) hue-rotate(180deg);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-group">
+    <h1>
+      <span>Agentic Marketing Suite</span>
+      <span class="badge">Director Console & Teleprompter</span>
+    </h1>
+  </div>
+  <div class="timer-box">
+    <button class="btn btn-accent" id="toggleTimer" onclick="toggleTimer()">▶ Start Timer</button>
+    <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
+    <div class="timer-display" id="timerDisplay">00:00 / 03:45</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 1-Click Browser Tabs Launcher -->
+  <div class="tab-launch-bar">
+    <h3>Director Quick-Launch: Open Recording Tabs</h3>
+    <div class="tab-links">
+      <a class="btn btn-outline" href="https://github.com/jaimevelarca/agentic-marketing-suite#system-architecture" target="_blank">Tab 1: GitHub README Architecture</a>
+      <a class="btn btn-outline" href="https://console-m6hls6q6ua-uc.a.run.app/corridas/nueva/" target="_blank">Tab 2: Cloud Run Onboarding</a>
+      <a class="btn btn-outline" href="https://console-m6hls6q6ua-uc.a.run.app" target="_blank">Tab 3: Live Review Console (Prod)</a>
+      <a class="btn btn-outline" href="https://console.cloud.google.com/run?project=agentic-marketing-suite-prod" target="_blank">Tab 4: Cloud Run Dashboard</a>
+      <a class="btn btn-outline" href="https://console.cloud.google.com/firestore/databases/-default-/data/panel?project=agentic-marketing-suite-prod" target="_blank">Tab 5: Firestore Studio</a>
+    </div>
+  </div>
+
+  <!-- ACT 1 -->
+  <div class="act-card" id="act1">
+    <div class="act-header">
+      <div class="act-title-group">
+        <h2>Act 1: Problem & System Architecture</h2>
+      </div>
+      <div class="act-timestamp">00:00 – 00:43 (43s)</div>
+    </div>
+    <div class="visual-cue">
+      <strong>🎥 Visual Cue (Tab 1 — GitHub):</strong> Show repository README. Mouse slowly circles the 6-Layer / 19-Agent Mermaid architecture diagram, highlighting Google ADK 2.x and Gemini 3.7 Flash nodes.
+    </div>
+    <div class="script-content">
+      "Welcome to the Agentic Marketing Suite, an institutional fleet of <mark>19 autonomous AI agents</mark> built on Google Cloud for the All Things Agentic Hackathon, competing in the <strong>Fortified Enterprise Fleet</strong> category. Digital marketing today is fragmented across isolated silos: market research, 90-day strategy, 4-week content calendars, multimodal copy, visual assets, and paid media distribution. Rather than a simple conversational chatbot, we built an asynchronous enterprise fleet. It is orchestrated via <strong>Google ADK 2.x Graph Workflows</strong>, powered by <strong>Gemini 3.7 Flash</strong> and Vertex AI, persisted in <strong>Firestore Native</strong>, and strictly governed by sacred emerald <mark>Human Financial Gates</mark>."
+    </div>
+    <div class="audio-controls">
+      <audio controls src="audio/act1_intro.m4a"></audio>
+    </div>
+  </div>
+
+  <!-- ACT 2 -->
+  <div class="act-card" id="act2">
+    <div class="act-header">
+      <div class="act-title-group">
+        <h2>Act 2: Onboarding & Asynchronous DAG</h2>
+      </div>
+      <div class="act-timestamp">00:43 – 01:17 (34s)</div>
+    </div>
+    <div class="visual-cue">
+      <strong>🎥 Visual Cue (Tab 2 & 3 — Review Console):</strong> Open <code>/corridas/nueva/</code>. Click <strong>"Iniciar Corrida"</strong>. Switch to Session Detail view showing Layer 1 (Diagnostics, Audience, Competitive Radar) executing asynchronously.
+    </div>
+    <div class="script-content">
+      "Here is our review console running live on Google Cloud Run behind <strong>Direct Identity-Aware Proxy</strong>. An enterprise operator onboards a client through our structured wizard. Behind the scenes, a Cloud Run Job triggers our <strong>ADK 2.x graph workflow</strong>. Layer 1 executes Business Diagnostics, Audience Intelligence, and Competitive Radar, extracting brand unique selling propositions and Ideal Customer Profiles. Notice that each agent's output is a strictly typed memory block, streamed directly to <strong>Firestore Native</strong>. The system runs asynchronously without blocking active user sessions."
+    </div>
+    <div class="audio-controls">
+      <audio controls src="audio/act2_onboarding.m4a"></audio>
+    </div>
+  </div>
+
+  <!-- ACT 3 -->
+  <div class="act-card" id="act3">
+    <div class="act-header">
+      <div class="act-title-group">
+        <h2>Act 3: Sacred #1ebe82 Human Gate & In-Place Editing</h2>
+      </div>
+      <div class="act-timestamp">01:17 – 01:58 (40s)</div>
+    </div>
+    <div class="visual-cue">
+      <strong>🎥 Visual Cue (Session View & Deliverable Card):</strong> Show the emerald pause banner on Layer 2 Strategy. Open the deliverable card. Click <strong>"Editar"</strong>, edit a KPI number, save, and click the emerald <strong>"Aprobar Bloque (#1ebe82)"</strong> button. Show the downstream DAG resuming automatically!
+    </div>
+    <div class="script-content">
+      "Now, witness our sacred emerald <mark>Human Gate (#1ebe82)</mark> in action. True enterprise automation requires <strong>zero blind spend</strong>. When the Strategy Orchestrator finishes, the ADK 2.x workflow raises a native <code>RequestInput</code> interrupt, cleanly suspending execution without burning idle compute. In the review console, operators review visual deliverable cards rather than raw JSON. I can inspect audience segments, edit strategic copy in-place, and click the emerald approval button. Instantly, the gate updates in Firestore, and our ADK orchestrator automatically resumes downstream execution, recalculating all subsequent production layers with the human-approved adjustments."
+    </div>
+    <div class="audio-controls">
+      <audio controls src="audio/act3_human_gate.m4a"></audio>
+    </div>
+  </div>
+
+  <!-- ACT 4 -->
+  <div class="act-card" id="act4">
+    <div class="act-header">
+      <div class="act-title-group">
+        <h2>Act 4: Multimodal Production, 9-Act Deck & Model Armor</h2>
+      </div>
+      <div class="act-timestamp">01:58 – 02:37 (39s)</div>
+    </div>
+    <div class="visual-cue">
+      <strong>🎥 Visual Cue (9-Act Deck & Code):</strong> Navigate through the compiled 9-Act HTML presentation deck (metric counters, 2x2 positioning quadrant). Switch briefly to IDE displaying <code>model_armor.py</code> (Gemma integration) and <code>financial_gate.py</code>.
+    </div>
+    <div class="script-content">
+      "Downstream, Layer 4 Production generates copy assets, visual creative specs via <strong>Gemini 3.1 Flash Image</strong>, landing pages, and email nurture flows. With one click, the suite compiles this interactive <strong>9-act HTML presentation deck</strong> and executive report directly from Firestore memory. For external distribution, our FastMCP gateway connects to Meta Ads and Resend Email. It is guarded by our <strong>Human Financial Authorization Gate</strong>, which rejects any API call exceeding confirmed client budget ceilings, and <strong>Model Armor powered by Google Gemma</strong>, which intercepts prompt injections and redacts sensitive PII before execution."
+    </div>
+    <div class="audio-controls">
+      <audio controls src="audio/act4_creative_production.m4a"></audio>
+    </div>
+  </div>
+
+  <!-- ACT 5 -->
+  <div class="act-card" id="act5">
+    <div class="act-header">
+      <div class="act-title-group">
+        <h2>Act 5: Google Cloud Backend Proof & Economics</h2>
+      </div>
+      <div class="act-timestamp">02:37 – 03:13 (36s)</div>
+    </div>
+    <div class="visual-cue">
+      <strong>🎥 Visual Cue (Tab 4 Cloud Run, Tab 5 Firestore & Terminal):</strong> Show Cloud Run service <code>console</code> on <code>.run.app</code> with <code>cpu_idle: true</code>. Show Firestore collections. Switch to terminal and run <code>uv run --all-extras pytest -q</code> showing 335 tests passed.
+    </div>
+    <div class="script-content">
+      "Everything you see is deployed on Google Cloud via <strong>Pulumi Infrastructure as Code</strong>. Here is our Cloud Run service with request-based billing: when idle, it scales to zero for <mark>$0.00 compute spend</mark>. Here is our Firestore Native Memory Bank maintaining multi-week state across sessions, and Vertex AI logs running <strong>Gemini 3.7 Flash</strong>. Finally, our offline hermetic test suite runs <strong>335 unit tests in under 5 seconds</strong>, guaranteeing 100% reliability. Agentic Marketing Suite proves that autonomous, multi-agent enterprise fleets are here today on Google Cloud. Thank you!"
+    </div>
+    <div class="audio-controls">
+      <audio controls src="audio/act5_cloud_proof.m4a"></audio>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let seconds = 0;
+  let timerInterval = null;
+
+  function updateTimer() {
+    seconds++;
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').innerText = `${m}:${s} / 03:45`;
+
+    // Highlight current act based on timestamp
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('active'));
+    if (seconds < 43) {
+      document.getElementById('act1').classList.add('active');
+    } else if (seconds < 77) {
+      document.getElementById('act2').classList.add('active');
+    } else if (seconds < 118) {
+      document.getElementById('act3').classList.add('active');
+    } else if (seconds < 157) {
+      document.getElementById('act4').classList.add('active');
+    } else {
+      document.getElementById('act5').classList.add('active');
+    }
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('toggleTimer');
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      btn.innerText = '▶ Resume Timer';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-accent');
+    } else {
+      timerInterval = setInterval(updateTimer, 1000);
+      btn.innerText = '⏸ Pause Timer';
+      btn.classList.remove('btn-accent');
+      btn.classList.add('btn-secondary');
+    }
+  }
+
+  function resetTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    seconds = 0;
+    document.getElementById('timerDisplay').innerText = '00:00 / 03:45';
+    document.getElementById('toggleTimer').innerText = '▶ Start Timer';
+    document.getElementById('toggleTimer').classList.remove('btn-secondary');
+    document.getElementById('toggleTimer').classList.add('btn-accent');
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('active'));
+  }
+</script>
+</body>
+</html>
