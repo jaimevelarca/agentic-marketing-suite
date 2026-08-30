@@ -25,6 +25,7 @@ BILLING_ACCOUNT = "01624A-839C44-1DB4D6"
 IAP_USER = "user:js@qhhe.net"
 IAP_JUDGES = [
     "group:cloudhackathons@google.com",
+    "user:jaimevelarca@gmail.com",
 ]
 
 # Images: prefer resolved immutable digest/tag from stack config, else default
