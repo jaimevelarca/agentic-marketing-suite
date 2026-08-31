@@ -1,0 +1,91 @@
+1
+00:00:00,000 --> 00:00:06,500
+Welcome to the Agentic Marketing Suite, an institutional fleet of 19 autonomous AI agents built on Google Cloud for the All Things Agentic Hackathon.
+
+2
+00:00:06,500 --> 00:00:13,500
+Digital marketing today is fragmented across isolated silos: market research, 90-day strategy, content calendars, and multimodal creative production.
+
+3
+00:00:13,500 --> 00:00:20,500
+Rather than a simple chatbot, we built an asynchronous enterprise fleet orchestrated via Google ADK 2.x Graph Workflows,
+
+4
+00:00:20,500 --> 00:00:31,600
+powered by Gemini 3.7 Flash and Vertex AI, and strictly governed by sacred #1ebe82 Human Financial Gates.
+
+5
+00:00:33,600 --> 00:00:38,500
+Here is our review console running live on Google Cloud Run behind Direct Identity-Aware Proxy.
+
+6
+00:00:38,500 --> 00:00:43,000
+An enterprise operator onboards a client through our structured wizard.
+
+7
+00:00:43,000 --> 00:00:47,500
+Behind the scenes, a Cloud Run Job triggers our ADK 2.x graph workflow.
+
+8
+00:00:47,500 --> 00:00:54,500
+Layer 1 executes Business Diagnostics, Audience Intelligence, and Competitive Radar, extracting brand USPs and Ideal Customer Profiles.
+
+9
+00:00:54,500 --> 00:01:04,200
+Each agent output is a strictly typed memory block, streamed directly to Firestore Native without blocking active user sessions.
+
+10
+00:01:06,200 --> 00:01:10,500
+Now, witness our sacred #1ebe82 Human Gate in action. True enterprise automation requires zero blind spend.
+
+11
+00:01:10,500 --> 00:01:17,500
+When the Strategy Orchestrator finishes, the ADK 2.x workflow raises a native interrupt, cleanly suspending execution without burning idle compute.
+
+12
+00:01:17,500 --> 00:01:23,000
+In the review console, operators review visual deliverable cards rather than raw JSON.
+
+13
+00:01:23,000 --> 00:01:28,500
+I can inspect audience segments, edit strategic copy in-place, and click the emerald #1ebe82 approval button.
+
+14
+00:01:28,500 --> 00:01:34,200
+Instantly, Firestore updates and downstream execution automatically resumes.
+
+15
+00:01:36,200 --> 00:01:42,500
+Downstream, Layer 4 Production generates copy assets, visual creative specs via Gemini Flash Image, landing pages, and email nurture flows.
+
+16
+00:01:42,500 --> 00:01:49,000
+With one click, the suite compiles this interactive 9-act presentation deck and executive report directly from Firestore memory.
+
+17
+00:01:49,000 --> 00:01:54,500
+For external distribution, our FastMCP gateway connects to Meta Ads and Resend,
+
+18
+00:01:54,500 --> 00:02:07,300
+guarded by our Human Financial Authorization Gate and Model Armor powered by Google Gemma, which intercepts prompt injections and redacts sensitive PII.
+
+19
+00:02:09,400 --> 00:02:14,000
+Everything you see is deployed on Google Cloud via Pulumi IaC.
+
+20
+00:02:14,000 --> 00:02:20,500
+Here is our Cloud Run service with request-based billing: when idle, it scales to zero for zero dollar compute spend.
+
+21
+00:02:20,500 --> 00:02:27,500
+Here is our Firestore Native Memory Bank maintaining multi-week state across sessions, and Vertex AI logs running Gemini 3.7 Flash.
+
+22
+00:02:27,500 --> 00:02:35,000
+Finally, our offline hermetic test suite runs 335 unit tests in under five seconds, guaranteeing 100% reliability.
+
+23
+00:02:35,000 --> 00:02:44,500
+Agentic Marketing Suite proves that autonomous multi-agent enterprise fleets are here today on Google Cloud. Thank you!

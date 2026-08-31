@@ -30,3 +30,6 @@ suite/inputs/*.json
 # Client-specific presentation/proposal — its own repo (jaimevelarca/qhhe-alonso-plan)
 qhhe-plan-revision/
 exports/proposals/
+
+# demo recorder artefacts — clips, and a Chrome profile holding live IAP session cookies
+docs/video/build/

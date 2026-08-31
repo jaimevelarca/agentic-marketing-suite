@@ -1,0 +1,50 @@
+graph TD
+    subgraph Enterprise_Governance ["1. Enterprise Governance & Zero-Trust Access"]
+        IAP["Google Cloud IAP / SSO"] --> DJ["Django Review Console (Cloud Run Service)"]
+        WIF["GitHub Actions CI/CD + WIF (OIDC)"] --> PL["Pulumi IaC (Dev & Prod Multi-Project)"]
+        FG["Human Financial Authorization Gate (#1ebe82)"]
+    end
+
+    subgraph Orchestration_Layer ["2. Asynchronous Agent Runtime (Cloud Run & ADK 2.x)"]
+        DAG["ADK 2.x Graph Workflow (19 Nodes)"]
+        JOB["Cloud Run Job (suite-orchestrator)"]
+        HITL["RequestInput / NodeInterruptedError (Gate Pause)"]
+        JOB --> DAG
+        DAG -.-> HITL
+    end
+
+    subgraph AI_Intelligence ["3. Gemini Enterprise Intelligence Core"]
+        G_PRI["Gemini 3.7 Flash (GA) — Primary Synthesis"]
+        G_ROU["Gemini 3.5 Flash-Lite — Enroute & Classify"]
+        G_DEP["Gemini 3.1 Pro — Deep Strategy Orchestration"]
+        G_IMG["Gemini 3.1 Flash Image (Nano Banana 2) — Multimodal Creatives"]
+        V_RE["Vertex AI Reasoning Engine (A2A Protocol)"]
+    end
+
+    subgraph State_Bank ["4. Persistent State & Memory Bank"]
+        FS[("Firestore Native: clients/{id}/blocks/{block}")]
+        AUD[("Append-Only Inmutable Audit Trail")]
+        SQL[("Cloud SQL Postgres: Django Auth / Sessions")]
+    end
+
+    subgraph Integration_Fleet ["5. Distribution Fleet & FastMCP Gateway"]
+        MCP["FastMCP Gateway Server"]
+        META["Meta Marketing API (Dry-run / Live)"]
+        RESEND["Resend Broadcast Email API"]
+        DECK["9-Act Interactive HTML Presentation Compiler"]
+        PDF["Executive Detail Dossier (Print / PDF)"]
+    end
+
+    DJ --> FS
+    DAG --> FS
+    DAG --> G_PRI
+    DAG --> G_ROU
+    DAG --> G_DEP
+    DAG --> G_IMG
+    V_RE --> FS
+    FG --> FS
+    FG --> MCP
+    MCP --> META
+    MCP --> RESEND
+    DJ --> DECK
+    DJ --> PDF

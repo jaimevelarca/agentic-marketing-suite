@@ -18,6 +18,7 @@ dependencies = [
 adk = ["google-adk>=2.7,<3"]  # 2.x graph Workflow runtime (verified 2.7.1)
 mcp = ["mcp>=1.2"]
 dev = ["pytest>=8.0", "ruff>=0.6"]
+video = ["playwright>=1.47"]  # demo recorder (docs/video/record_demo.py)
 web = [
     "dj-database-url>=3.1.2",
     "django>=5.0",
